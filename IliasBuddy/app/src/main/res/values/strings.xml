@@ -15,6 +15,7 @@
     <string name="action_sign_in">Apply</string>
     <string name="action_help">Instructions on how to setup private RSS feed</string>
     <string name="error_field_required">This field is required</string>
+    <string name="help_instructions">Help/Instructions</string>
 
     <!-- Strings used in preferences -->
     <string name="ilias_url">ilias_url</string>

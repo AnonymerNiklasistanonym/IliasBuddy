@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
     public void showLastResponse(MenuItem menuItem) {
         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Last response")
-                .setIcon(R.drawable.ic_ilias_logo)
                 .setMessage((lastResponse != null) ? lastResponse : "NO RESPONSE UNTIL NOW")
                 .setNeutralButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {

@@ -6,6 +6,10 @@
     <string name="action_open_campus">Open C@mpus</string>
     <string name="action_setup">Open setup</string>
     <string name="action_last_response">Show last response</string>
+    <string name="open_in_ilias">Open in Ilias</string>
+    <string name="go_back">Go back</string>
+    <string name="action_start_intent_service">Start intent service (beta)</string>
+    <string name="action_start_service">Start service (beta)</string>
 
     <!-- Strings related to setup activity -->
     <string name="ilias_connection_setup">Setup Ilias RSS connection</string>

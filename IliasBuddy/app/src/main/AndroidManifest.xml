@@ -27,7 +27,7 @@
             android:theme="@style/AppTheme.NoActionBar"/>
 
         <service
-            android:name=".BackgroundService"
+            android:name=".BackgroundIntentService"
             android:exported="false"/>
     </application>
 

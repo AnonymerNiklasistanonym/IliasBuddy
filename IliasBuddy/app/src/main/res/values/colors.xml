@@ -2,10 +2,14 @@
 <resources>
     <color name="colorPrimary">#23456f</color>
     <color name="colorPrimaryDark">#23456f</color>
-    <color name="colorAccent">#ffd600</color>
+    <color name="colorAccent">#23456f</color>
 
     <!-- custom -->
     <color name="year">#999999</color>
     <color name="title">#222222</color>
+    <color name="colorFabButton">#ffd600</color>
+    <color name="fabRippleColor">#366bae</color>
+
+
 
 </resources>

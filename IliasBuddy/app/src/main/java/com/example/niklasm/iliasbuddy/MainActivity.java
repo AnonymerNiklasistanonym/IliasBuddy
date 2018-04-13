@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,9 +21,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -37,15 +37,12 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.io.StringReader;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -64,6 +61,9 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private IliasRssItem latestRssEntry = null;
+    private String lastResponse = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +72,11 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mRecyclerView = findViewById(R.id.my_recycler_view);
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
 
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         iliasRssUrl = myPrefs.getString(getString(R.string.ilias_url), "nothing_found");
@@ -83,8 +88,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getRssFeed();
@@ -93,28 +97,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //getRssFeed();
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
+        // try to load saved RSS feed
         final IliasRssItem[] myDataset = readRssFeed(this, "TestFile.test");
-
         if (myDataset != null && myDataset.length > 0) {
+            // save latest object
+            latestRssEntry = myDataset[0];
             // specify an adapter (see also next example)
             mAdapter = new MyAdapter(myDataset);
             mRecyclerView.setAdapter(mAdapter);
         }
+
+        // load newest changes
+        getRssFeed();
     }
 
     public void openSetup(MenuItem menuItem) {
         Intent intent = new Intent(this, SetupActivity.class);
         startActivity(intent);
+    }
+
+    public void showLastResponse(MenuItem menuItem) {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Last response")
+                .setIcon(R.drawable.ic_ilias_logo)
+                .setMessage((lastResponse != null) ? lastResponse : "NO RESPONSE UNTIL NOW")
+                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        alertDialog.show();
     }
 
     @Override
@@ -160,24 +174,11 @@ public class MainActivity extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, iliasRssUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Response")
-                        .setIcon(R.drawable.ic_ilias_logo)
-                        .setMessage(response)
-                        .create();
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
-                Log.i("Response", response);
+                lastResponse = response;
+                // Log.i("Response", response);
                 try {
                     test(response);
-                } catch (IOException err) {
-                    Log.e("Error", err.toString());
-                } catch (XmlPullParserException err) {
+                } catch (IOException | XmlPullParserException err) {
                     Log.e("Error", err.toString());
                 }
 
@@ -185,25 +186,25 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle("Response Error");
-                alertDialog.setMessage(error.toString());
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Response Error")
+                        .setMessage(error.toString())
+                        .setNeutralButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                        .create();
                 alertDialog.show();
                 Log.e("Response is", error.toString());
             }
         }) {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                String credentials = iliasRssUserName + ":" + iliasRssPassword;
-                String auth = "Basic "
-                        + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+            public Map<String, String> getHeaders() {
+                final Map<String, String> headers = new HashMap<>();
+                final String credentials = iliasRssUserName + ":" + iliasRssPassword;
+                final String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
                 headers.put("Content-Type", "application/json");
                 headers.put("Authorization", auth);
                 return headers;
@@ -211,18 +212,14 @@ public class MainActivity extends AppCompatActivity {
         };
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
-        // Add the request to the RequestQueue.
-        Log.i("Test", "test");
-
     }
 
-    public void test(String content) throws XmlPullParserException, IOException
-    {
+    public void test(String content) throws XmlPullParserException, IOException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
         XmlPullParser xpp = factory.newPullParser();
 
-        xpp.setInput( new StringReader( content ) );
+        xpp.setInput(new StringReader(content));
         int eventType = xpp.getEventType();
         boolean inItem = false;
         String currentTag = null;
@@ -234,9 +231,9 @@ public class MainActivity extends AppCompatActivity {
         List<IliasRssItem> entries = new ArrayList<>();
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
-            if(eventType == XmlPullParser.START_DOCUMENT) {
+            if (eventType == XmlPullParser.START_DOCUMENT) {
                 // Log.i("XML-Test","Start document");
-            } else if(eventType == XmlPullParser.START_TAG) {
+            } else if (eventType == XmlPullParser.START_TAG) {
                 currentTag = xpp.getName();
                 // Log.i("XML-Test","Start tag "+currentTag);
                 if (currentTag.equals("item")) {
@@ -248,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                     date = null;
                     // Log.i("XML-Test","---------------------");
                 }
-            } else if(eventType == XmlPullParser.END_TAG) {
+            } else if (eventType == XmlPullParser.END_TAG) {
                 // Log.i("XML-Test","End tag "+xpp.getName());
                 if (xpp.getName().equals("item")) {
                     inItem = false;
@@ -256,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                     // Log.i("XML-Test","---------------------");
                 }
                 currentTag = null;
-            } else if(eventType == XmlPullParser.TEXT) {
+            } else if (eventType == XmlPullParser.TEXT) {
                 // Log.i("XML-Test","Text "+xpp.getText());
                 if (inItem && currentTag != null) {
                     final String currentText = xpp.getText();
@@ -291,12 +288,10 @@ public class MainActivity extends AppCompatActivity {
 
         IliasRssItem[] myDataset = entries.toArray(new IliasRssItem[0]);
 
-        writeRssFeed(this, "TestFile.test", myDataset);
+        // only continue if the latest object is different
+        if (latestRssEntry != null && latestRssEntry.toString().equals(myDataset[0].toString())) return;
 
-        for (int i = 0; i < entries.size(); i++) {
-            IliasRssItem cE = entries.get(i);
-            Log.i("Entrylist", "Course: " + cE.getCourse() + ", Title: " + cE.getTitle() + ", Link: " + cE.getLink() + ", Description: " + cE.getDescription() + ", Date: " + DateFormat.getDateInstance(DateFormat.LONG).format(cE.getDate()));
-        }
+        writeRssFeed(this, "TestFile.test", myDataset);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -310,55 +305,74 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new MyAdapter(myDataset);
         mRecyclerView.setAdapter(mAdapter);
 
+        latestRssEntry = myDataset[0];
+    }
+
+    public void writeRssFeed(Context context, String filename, Object saveThisObject) {
+
+        final File directory = new File(context.getFilesDir().getAbsolutePath()
+                + File.separator + "serialisation");
+        if (!directory.exists() && !directory.mkdirs()) {
+                Log.e("Error", "Directory (" + directory.toString() + "could not be created!");
+        }
+
+        try {
+            final ObjectOutput out = new ObjectOutputStream(new FileOutputStream(directory
+                    + File.separator + filename));
+            out.writeObject(saveThisObject);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public IliasRssItem[] readRssFeed(Context context, String filename) {
+
+        final File directory = new File(context.getFilesDir().getAbsolutePath()
+                + File.separator + "serialisation");
+        IliasRssItem[] ReturnClass = null;
+
+        try {
+            final ObjectInputStream input = new ObjectInputStream(new FileInputStream(directory
+                    + File.separator + filename));
+            ReturnClass = (IliasRssItem[]) input.readObject();
+            input.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ReturnClass;
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
-        private final IliasRssItem[] mDataset;
+        private final IliasRssItem[] dataSet;
 
-
-
-
-        // Provide a reference to the views for each data item
-        // Complex data items may need more than one view per item, and
-        // you provide access to all the views for a data item in a view holder
-        public class ViewHolder extends RecyclerView.ViewHolder  {
-            // each data item is just a string in this case
-            public TextView course, title, date, description;
-            public ViewHolder(View view) {
-                super(view);
-                course = view.findViewById(R.id.course);
-                date =view.findViewById(R.id.date);
-                title = view.findViewById(R.id.title);
-                description = view.findViewById(R.id.description);
-
-            }
+        private MyAdapter(IliasRssItem[] dataSet) {
+            this.dataSet = dataSet;
         }
 
-        // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(IliasRssItem[] myDataset) {
-            mDataset = myDataset;
-        }
-
-
-        // Create new views (invoked by the layout manager)
         @Override
-        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                       int viewType) {
-            // create a new view
-            View v = LayoutInflater.from(parent.getContext())
+        @NonNull
+        public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            // Create new views (invoked by the layout manager)
+            final View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recycler_view, parent, false);
             return new ViewHolder(v);
         }
 
-        // Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            // - get element from your dataset at this position
+            // Replace the contents of a view (invoked by the layout manager)
+            // - get element from the data set at this position
             // - replace the contents of the view with that element
-            final IliasRssItem entry = mDataset[position];
-            final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM HH:mm");
+            final IliasRssItem entry = dataSet[position];
+            final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
+            if (latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
+                holder.background.setBackgroundResource(R.color.colorFabButton);
+            }
             if (entry.getDescription() == null) {
+                holder.description.setVisibility(View.GONE);
+                holder.title.setLines(2);
                 holder.course.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -366,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             } else {
+                holder.description.setText(Html.fromHtml(entry.getDescription().replaceAll("\\s+", " ")));
                 holder.course.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -374,12 +389,12 @@ public class MainActivity extends AppCompatActivity {
                                 .setTitle(entry.getCourse() + " (" + sdf.format(entry.getDate()) + ")")
                                 .setMessage(entry.getTitle() + "\n\n" + Html.fromHtml(entry.getDescription()))
                                 .setCancelable(false)
-                                .setPositiveButton("Open Ilias",new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,int id) {
+                                .setPositiveButton("Open Ilias", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
                                         openUrl(entry.getLink());
                                     }
                                 })
-                                .setNegativeButton("BACK",new DialogInterface.OnClickListener() {
+                                .setNegativeButton("BACK", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                     }
@@ -391,66 +406,34 @@ public class MainActivity extends AppCompatActivity {
             }
             holder.course.setText(entry.getCourse());
             holder.title.setText(entry.getTitle());
-            if (entry.getDescription() != null) {
-                holder.description.setText(Html.fromHtml(entry.getDescription().replaceAll("\\s+", " ")));
-            }
             holder.date.setText(sdf.format(entry.getDate()));
         }
 
-        // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
-            return mDataset.length;
-        }
-    }
-
-    public void writeRssFeed(Context context, String filename, Object saveThisObject) {
-
-        File directory = new File(context.getFilesDir().getAbsolutePath()
-                + File.separator + "serialisation");
-        if (!directory.exists()) {
-            directory.mkdirs();
+            // Return the size of the data set (invoked by the layout manager)
+            return dataSet.length;
         }
 
-        ObjectOutput out;
+        /**
+         * Provide a reference to the views for each data item - Complex data items may need more
+         * than one view per item, and you provide access to all the views for a data item in a
+         * view holder
+         */
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            final public TextView course, title, date, description;
+            final public LinearLayout background;
 
-        try {
-            out = new ObjectOutputStream(new FileOutputStream(directory
-                    + File.separator + filename));
-            out.writeObject(saveThisObject);
-            out.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            private ViewHolder(View view) {
+                super(view);
+                background = view.findViewById(R.id.background);
+                course = view.findViewById(R.id.course);
+                date = view.findViewById(R.id.date);
+                title = view.findViewById(R.id.title);
+                description = view.findViewById(R.id.description);
+
+            }
         }
-    }
-
-    public IliasRssItem[] readRssFeed(Context context, String filename) {
-
-        File directory = new File(context.getFilesDir().getAbsolutePath()
-                + File.separator + "serialisation");
-
-        ObjectInputStream input;
-        IliasRssItem[] ReturnClass = null;
-
-        try {
-
-            input = new ObjectInputStream(new FileInputStream(directory
-                    + File.separator + filename));
-            ReturnClass = (IliasRssItem[]) input.readObject();
-            input.close();
-
-        } catch (StreamCorruptedException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return ReturnClass;
     }
 
 }

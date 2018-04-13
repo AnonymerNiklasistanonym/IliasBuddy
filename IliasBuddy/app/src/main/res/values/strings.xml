@@ -5,6 +5,7 @@
     <string name="action_open_ilias">Open Ilias</string>
     <string name="action_open_campus">Open C@mpus</string>
     <string name="action_setup">Open setup</string>
+    <string name="action_last_response">Show last response</string>
 
     <!-- Strings related to setup activity -->
     <string name="ilias_connection_setup">Setup Ilias RSS connection</string>

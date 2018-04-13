@@ -60,6 +60,11 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         return date;
     }
 
+    @Override
+    public String toString() {
+        return "course="+course+",title="+title+",link="+link+",description="+description+",date="+date.getTime();
+    }
+
     public int compare(final IliasRssItem o1, final IliasRssItem o2) {
         final int dateIsTheSame = o1.getDate().compareTo(o2.getDate());
         if (dateIsTheSame != 0) return dateIsTheSame;

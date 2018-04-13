@@ -1,0 +1,22 @@
+<resources>
+    <!-- Strings related to main activity -->
+    <string name="app_name">IliasBuddy</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_open_ilias">Open Ilias</string>
+    <string name="action_open_campus">Open C@mpus</string>
+    <string name="action_setup">Open setup</string>
+
+    <!-- Strings related to setup activity -->
+    <string name="ilias_connection_setup">Setup Ilias RSS connection</string>
+    <string name="rss_url">Ilias private RSS URL</string>
+    <string name="rss_user_name">Ilias private RSS user name</string>
+    <string name="rss_password">Ilias private RSS password</string>
+    <string name="action_sign_in">Apply</string>
+    <string name="action_help">Instructions on how to setup private RSS feed</string>
+    <string name="error_field_required">This field is required</string>
+
+    <!-- Strings used in preferences -->
+    <string name="ilias_url">ilias_url</string>
+    <string name="ilias_user_name">ilias_user_name</string>
+    <string name="ilias_password">ilias_password</string>
+</resources>

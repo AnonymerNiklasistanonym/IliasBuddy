@@ -1,0 +1,36 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.niklasm.iliasbuddy.MainActivity">
+
+    <!-- Open C@mpus -->
+    <item
+        android:id="@+id/action_open_campus"
+        android:icon="@drawable/ic_campus_logo"
+        android:title="@string/action_open_campus"
+        android:onClick="openCampus"
+        app:showAsAction="ifRoom"/>
+
+    <!-- Open Ilias -->
+    <item
+        android:id="@+id/action_open_ilias"
+        android:icon="@drawable/ic_ilias_logo"
+        android:title="@string/action_open_ilias"
+        android:onClick="openIlias"
+        app:showAsAction="ifRoom"/>
+
+    <!-- Settings, should always be in the overflow -->
+
+    <item
+        android:id="@+id/action_setup"
+        android:title="@string/action_setup"
+        android:onClick="openSetup"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+</menu>

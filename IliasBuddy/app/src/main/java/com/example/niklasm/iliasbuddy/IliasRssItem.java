@@ -1,14 +1,36 @@
 package com.example.niklasm.iliasbuddy;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
 
-public class IliasRssItem implements Comparator<IliasRssItem> {
-    final private String course;
-    final private String title;
-    final private String link;
-    final private String description;
-    final private Date date;
+public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
+    private String course;
+    private String title;
+    private String link;
+    private String description;
+
+    public void setCourse(String course) {
+        this.course = course;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    private Date date;
 
     public IliasRssItem(final String course, final String title, final String link, final String description, final Date date) {
         this.course = course;

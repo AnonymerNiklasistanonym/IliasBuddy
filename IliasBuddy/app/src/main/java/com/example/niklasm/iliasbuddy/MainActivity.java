@@ -1,5 +1,6 @@
 package com.example.niklasm.iliasbuddy;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,7 +35,15 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.io.StringReader;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -83,7 +93,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        getRssFeed();
+        //getRssFeed();
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        final IliasRssItem[] myDataset = readRssFeed(this, "TestFile.test");
+
+        if (myDataset != null && myDataset.length > 0) {
+            // specify an adapter (see also next example)
+            mAdapter = new MyAdapter(myDataset);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 
     public void openSetup(MenuItem menuItem) {
@@ -265,6 +291,8 @@ public class MainActivity extends AppCompatActivity {
 
         IliasRssItem[] myDataset = entries.toArray(new IliasRssItem[0]);
 
+        writeRssFeed(this, "TestFile.test", myDataset);
+
         for (int i = 0; i < entries.size(); i++) {
             IliasRssItem cE = entries.get(i);
             Log.i("Entrylist", "Course: " + cE.getCourse() + ", Title: " + cE.getTitle() + ", Link: " + cE.getLink() + ", Description: " + cE.getDescription() + ", Date: " + DateFormat.getDateInstance(DateFormat.LONG).format(cE.getDate()));
@@ -296,12 +324,14 @@ public class MainActivity extends AppCompatActivity {
         // you provide access to all the views for a data item in a view holder
         public class ViewHolder extends RecyclerView.ViewHolder  {
             // each data item is just a string in this case
-            public TextView title, year, genre;
+            public TextView course, title, date, description;
             public ViewHolder(View view) {
                 super(view);
-                title = (TextView) view.findViewById(R.id.title);
-                genre = (TextView) view.findViewById(R.id.genre);
-                year = (TextView) view.findViewById(R.id.year);
+                course = view.findViewById(R.id.course);
+                date =view.findViewById(R.id.date);
+                title = view.findViewById(R.id.title);
+                description = view.findViewById(R.id.description);
+
             }
         }
 
@@ -326,17 +356,45 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            IliasRssItem entry = mDataset[position];
-            final String link = entry.getLink();
-            holder.title.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openUrl(link);
-                }
-            });;
-            holder.title.setText(entry.getCourse());
-            holder.genre.setText(entry.getTitle());
-            holder.year.setText(DateFormat.getDateInstance(DateFormat.LONG).format(entry.getDate()));
+            final IliasRssItem entry = mDataset[position];
+            final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM HH:mm");
+            if (entry.getDescription() == null) {
+                holder.course.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openUrl(entry.getLink());
+                    }
+                });
+            } else {
+                holder.course.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog alertDialogBuilder = new AlertDialog.Builder(
+                                MainActivity.this)
+                                .setTitle(entry.getCourse() + " (" + sdf.format(entry.getDate()) + ")")
+                                .setMessage(entry.getTitle() + "\n\n" + Html.fromHtml(entry.getDescription()))
+                                .setCancelable(false)
+                                .setPositiveButton("Open Ilias",new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog,int id) {
+                                        openUrl(entry.getLink());
+                                    }
+                                })
+                                .setNegativeButton("BACK",new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                                .create();
+                        alertDialogBuilder.show();
+                    }
+                });
+            }
+            holder.course.setText(entry.getCourse());
+            holder.title.setText(entry.getTitle());
+            if (entry.getDescription() != null) {
+                holder.description.setText(Html.fromHtml(entry.getDescription().replaceAll("\\s+", " ")));
+            }
+            holder.date.setText(sdf.format(entry.getDate()));
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -344,6 +402,55 @@ public class MainActivity extends AppCompatActivity {
         public int getItemCount() {
             return mDataset.length;
         }
+    }
+
+    public void writeRssFeed(Context context, String filename, Object saveThisObject) {
+
+        File directory = new File(context.getFilesDir().getAbsolutePath()
+                + File.separator + "serialisation");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        ObjectOutput out;
+
+        try {
+            out = new ObjectOutputStream(new FileOutputStream(directory
+                    + File.separator + filename));
+            out.writeObject(saveThisObject);
+            out.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public IliasRssItem[] readRssFeed(Context context, String filename) {
+
+        File directory = new File(context.getFilesDir().getAbsolutePath()
+                + File.separator + "serialisation");
+
+        ObjectInputStream input;
+        IliasRssItem[] ReturnClass = null;
+
+        try {
+
+            input = new ObjectInputStream(new FileInputStream(directory
+                    + File.separator + filename));
+            ReturnClass = (IliasRssItem[]) input.readObject();
+            input.close();
+
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return ReturnClass;
     }
 
 }

@@ -26,6 +26,11 @@
         app:showAsAction="never" />
 
     <item
+        android:onClick="displayLicenses"
+        android:title="@string/custom_license_title"
+        app:showAsAction="never" />
+
+    <item
         android:onClick="showLastResponse"
         android:title="@string/action_last_response"
         app:showAsAction="never" />
@@ -47,6 +52,7 @@
 
     <item
         android:title="@string/action_settings"
+        android:onClick="openSettings"
         app:showAsAction="never" />
 
 </menu>

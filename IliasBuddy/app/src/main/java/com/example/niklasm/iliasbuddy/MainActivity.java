@@ -33,6 +33,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -106,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
         startService();
     }
 
+    public void openSettings(MenuItem menuItem) {
+        startActivity(new Intent(this, SettingsActivity.class));
+
+    }
+
     public IliasRssItem getLatestRssEntry() {
         return this.latestRssEntry;
     }
@@ -120,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // setContentView(R.layout.myLayout);
         Log.i("MainActivity", "Configuration changed - " + newConfig.toString());
+    }
+
+    public void displayLicenses(MenuItem menuItem) {
+        OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title));
+        startActivity(new Intent(this, OssLicensesMenuActivity.class));
     }
 
     public void errorSnackbar(final String title, final String message) {

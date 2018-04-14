@@ -1,8 +1,6 @@
 package com.example.niklasm.iliasbuddy;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.util.Log;
 
@@ -66,17 +64,7 @@ public class IliasRssHandler {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                AlertDialog alertDialog = new AlertDialog.Builder(context)
-                        .setTitle("Response Error")
-                        .setMessage(error.toString())
-                        .setNeutralButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                })
-                        .create();
-                alertDialog.show();
+                mainActivity.errorSnackbar("Response Error", error.toString());
                 Log.e("IliasRssHandler - Error", error.toString());
             }
         }) {
@@ -151,7 +139,7 @@ public class IliasRssHandler {
                             break;
                         case "pubDate":
                             try {
-                                SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
+                                final SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
                                 date = sf1.parse(currentText);
                             } catch (ParseException e) {
                                 Log.e("Error Date", e.toString());
@@ -168,14 +156,18 @@ public class IliasRssHandler {
 
         IliasRssItem[] myDataset = entries.toArray(new IliasRssItem[0]);
 
+        // get the latest RSS entry from the main activity
+        latestRssEntry = mainActivity.getLatestRssEntry();
+
         // only continue if the latest object is different
-        final boolean newEntryFound = latestRssEntry == null || latestRssEntry.toString().equals(myDataset[0].toString());
+        final boolean newEntryFound = latestRssEntry == null || !latestRssEntry.toString().equals(myDataset[0].toString());
 
         if (newEntryFound) {
             latestRssEntry = myDataset[0];
             Log.i("IliasRssHandler", "New entry found");
             mainActivity.renderNewList(myDataset);
         } else {
+            mainActivity.noNewEntryFound();
             Log.i("IliasRssHandler", "No new entry found");
         }
     }

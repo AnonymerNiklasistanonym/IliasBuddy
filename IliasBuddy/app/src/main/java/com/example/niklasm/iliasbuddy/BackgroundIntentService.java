@@ -3,16 +3,14 @@ package com.example.niklasm.iliasbuddy;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -42,16 +40,20 @@ public class BackgroundIntentService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i("Ilias Buddy", "Do something in the background");
-        Toast.makeText(getApplicationContext(), "hi there", Toast.LENGTH_LONG).show();
+        Log.i("BackgroundIntentService", "onStartCommand");
+        // make visible that service started
+        // Toast.makeText(getApplicationContext(), "BackgroundIntentService onStartCommand", Toast.LENGTH_SHORT).show();
 
-        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        // get the important data for a web request
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         iliasRssUrl = myPrefs.getString(getString(R.string.ilias_url), "nothing_found");
         iliasRssUserName = myPrefs.getString(getString(R.string.ilias_user_name), "nothing_found");
         iliasRssPassword = myPrefs.getString(getString(R.string.ilias_password), "nothing_found");
 
+        // make a web request with the important data
         getWebContent();
 
+        // return this so that the service can be restarted
         return START_NOT_STICKY;
     }
 
@@ -61,9 +63,17 @@ public class BackgroundIntentService extends Service {
     }
 
     public void createNotification(String previewString, String bigString) {
+
+        Notification notification2 = new Notification();
+        notification2.defaults |= Notification.DEFAULT_SOUND;
+        notification2.defaults |= Notification.DEFAULT_VIBRATE;
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL")
-                .setSmallIcon(R.drawable.ic_fiber_new)
+                .setDefaults(notification2.defaults)
+                .setSmallIcon(R.drawable.ic_ilias_logo_notification)
+                .setColor(ContextCompat.getColor(BackgroundIntentService.this, R.color.colorPrimary))
                 .setContentTitle("Ilias Buddy Notification!")
+                .setLights(getResources().getColor(R.color.colorPrimary), 3000, 3000)
                 .setContentText(previewString);
 
         NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
@@ -71,6 +81,9 @@ public class BackgroundIntentService extends Service {
         builder.setStyle(bigText);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
+        resultIntent.putExtra(getString(R.string.render_new_elements), true);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
 
@@ -82,14 +95,13 @@ public class BackgroundIntentService extends Service {
     }
 
     public void getWebContent() {
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-
+        Log.i("BackgroundIntentService", "getWebContent");
+        final RequestQueue queue = Volley.newRequestQueue(this);
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, this.iliasRssUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.i("BackgroundIntentService", response);
+                Log.i("BackgroundIntentService", "Got RSS data response");
                 try {
                     parseXml(response);
                 } catch (IOException | XmlPullParserException err) {
@@ -100,18 +112,7 @@ public class BackgroundIntentService extends Service {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                AlertDialog alertDialog = new AlertDialog.Builder(BackgroundIntentService.this)
-                        .setTitle("Response Error")
-                        .setMessage(error.toString())
-                        .setNeutralButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                })
-                        .create();
-                alertDialog.show();
-                Log.e("IliasRssHandler - Error", error.toString());
+                Log.e("BackgroundIntentService", "Error RSS data response" + error.toString());
             }
         }) {
             @Override
@@ -129,12 +130,13 @@ public class BackgroundIntentService extends Service {
     }
 
     public void parseXml(String content) throws XmlPullParserException, IOException {
-        XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+        Log.i("BackgroundIntentService", "parseXml");
+        final XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         factory.setNamespaceAware(true);
-        XmlPullParser xpp = factory.newPullParser();
-
+        final XmlPullParser xpp = factory.newPullParser();
         xpp.setInput(new StringReader(content));
         int eventType = xpp.getEventType();
+
         boolean inItem = false;
         String currentTag = null;
         String course = null;
@@ -142,6 +144,7 @@ public class BackgroundIntentService extends Service {
         String description = null;
         String link = null;
         Date date = null;
+
         List<IliasRssItem> entries = new ArrayList<>();
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
@@ -185,7 +188,7 @@ public class BackgroundIntentService extends Service {
                             break;
                         case "pubDate":
                             try {
-                                SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
+                                final SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
                                 date = sf1.parse(currentText);
                             } catch (ParseException e) {
                                 Log.e("Error Date", e.toString());
@@ -198,43 +201,51 @@ public class BackgroundIntentService extends Service {
         }
         // Log.i("XML-Test","End document");
 
-        //String[] myDataset = new String[entries.size()];
+        // convert ArrayList to Array
+        final IliasRssItem[] myDataSet = entries.toArray(new IliasRssItem[0]);
 
-        IliasRssItem[] myDataset = entries.toArray(new IliasRssItem[0]);
-        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        // get latest item string form shared preferences
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         final String latestItem = myPrefs.getString(getString(R.string.latestItem),"nothing_found");
-        ArrayList<IliasRssItem> stringArrayList = new ArrayList<>();
+
+        int latestEntry = -1;
         boolean searchingForNewElements = true;
-        for (int i = 0; i < myDataset.length; i++) {
-            if (searchingForNewElements) {
-                if (myDataset[i].toString().equals(latestItem)) {
+        for (int i = 0; i < myDataSet.length; i++) {
+            if (searchingForNewElements && myDataSet[i].toString().equals(latestItem)) {
+                    latestEntry = i;
                     searchingForNewElements = false;
-                } else {
-                    stringArrayList.add(myDataset[i]);
                 }
             }
-        }
-        if (stringArrayList.size() > 0) {
-            Log.i("IliasRssHandler", "New entry found");
-            final String previewString = stringArrayList.size() + " new entries";
-            String bigString = previewString;
-            for (int i = 0; i < stringArrayList.size(); i++) {
-                bigString += stringArrayList.get(i).toString() + "\n";
+        if (latestEntry == -1) {
+            Log.i("BackgroundIntentService", "All entries are new");
+            final String previewString = myDataSet.length + " new entries (all are new)";
+            final StringBuilder bigString = new StringBuilder(previewString + "\n");
+            final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
+            for (IliasRssItem entry : myDataSet) {
+                bigString.append("- ")
+                        .append(entry.getCourse())
+                        .append(" >> ")
+                        .append(entry.getTitle())
+                        .append(" (")
+                        .append(viewDateFormat.format(entry.getDate()))
+                        .append(")\n");
             }
-            createNotification(previewString, bigString);
+            createNotification(previewString, bigString.toString());
+        } else if (latestEntry == 0) {
+            Log.i("BackgroundIntentService", "No new entry found");
         } else {
-            Log.i("IliasRssHandler", "No new entry found");
+            Log.i("BackgroundIntentService", "New entries found");
+            final String previewString = latestEntry == 1 ? "one new entry found" : latestEntry + " new entries found";
+            final StringBuilder bigString = new StringBuilder(previewString);
+            final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
+            for (int i = 0; i < latestEntry; i++) {
+                bigString.append(myDataSet[i].getCourse())
+                        .append(myDataSet[i].getTitle())
+                        .append(" (")
+                        .append(viewDateFormat.format(myDataSet[i].getDate()))
+                        .append(")\n");
+            }
+            createNotification(previewString, bigString.toString());
         }
-
-        // only continue if the latest object is different
-        // final boolean newEntryFound = latestRssEntry != null && latestRssEntry.toString().equals(myDataset[0].toString());
-
-        /*if (newEntryFound) {
-            latestRssEntry = myDataset[0];
-            Log.i("IliasRssHandler", "New entry found");
-            mainActivity.renderNewList(myDataset);
-        } else {
-            Log.i("IliasRssHandler", "No new entry found");
-        }*/
     }
 }

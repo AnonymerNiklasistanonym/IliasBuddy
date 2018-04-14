@@ -3,30 +3,38 @@ package com.example.niklasm.iliasbuddy;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
     private IliasRssHandler rssHandler;
     private IliasRssDataSaver rssDataSaver;
+
+    private boolean deleteAgain = false;
 
     private AlarmManager am;
     private PendingIntent pendingIntent;
@@ -75,8 +85,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 checkForRssUpdates();
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
 
@@ -87,14 +95,55 @@ public class MainActivity extends AppCompatActivity {
             // save latest object
             latestRssEntry = myDataset[0];
             // specify an adapter (see also next example)
-            mAdapter = new MyAdapter(myDataset);
+            mAdapter = new MyAdapter(myDataset, this);
             mRecyclerView.setAdapter(mAdapter);
+        } else {
+            latestRssEntry = null;
         }
 
         // load newest changes
         checkForRssUpdates();
-
         startService();
+    }
+
+    public IliasRssItem getLatestRssEntry() {
+        return this.latestRssEntry;
+    }
+
+    public void noNewEntryFound() {
+        Log.i("MainActivity", "noNewEntryFound (Snackbar)");
+        Snackbar.make(findViewById(R.id.fab), "No new entry found", Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // setContentView(R.layout.myLayout);
+        Log.i("MainActivity", "Configuration changed - " + newConfig.toString());
+    }
+
+    public void errorSnackbar(final String title, final String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), title, Snackbar.LENGTH_LONG);
+        snackbar.setActionTextColor(Color.RED); //to change the color of action text
+        snackbar.setAction("MORE", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(title)
+                        .setMessage(message)
+                        .setNeutralButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                        .create();
+                alertDialog.show();
+            }
+        });
+        snackbar.show();
+
+
     }
 
     public void checkForRssUpdates() {
@@ -116,13 +165,15 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences.Editor e = myPrefs.edit();
         e.putString(getString(R.string.latestItem), "");
         e.apply();
+        this.latestRssEntry = null;
+        renderNewList(new IliasRssItem[0]);
     }
 
     public void renderNewList(IliasRssItem[] newDataSet) {
 
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         final SharedPreferences.Editor e = myPrefs.edit();
-        e.putString(getString(R.string.latestItem), newDataSet[0].toString());
+        e.putString(getString(R.string.latestItem), newDataSet.length > 0 ? newDataSet[0].toString() : "");
         e.apply();
 
         this.rssDataSaver.writeRssFeed(newDataSet);
@@ -131,16 +182,16 @@ public class MainActivity extends AppCompatActivity {
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
         // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(newDataSet);
+        mAdapter = new MyAdapter(newDataSet, this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        this.latestRssEntry = newDataSet.length > 0 ? newDataSet[0] : null;
     }
 
     public void startService() {
+        Log.i("MainActivity", "startService");
         //Create a new PendingIntent and add it to the AlarmManager
         Intent intent = new Intent(getApplicationContext(), BackgroundIntentService.class);
         pendingIntent = PendingIntent.getService(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -150,11 +201,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.i("MainActivity", "onNewIntent");
+        if (intent.getStringExtra(getString(R.string.render_new_elements)).equals(true)) {
+            Log.i("MainActivity", "onNewIntent " + getString(R.string.render_new_elements));
+            checkForRssUpdates();
+        }
+    }
+
     public void restartService(MenuItem menuItem) {
         startService();
     }
 
     public void stopService(MenuItem menuItem) {
+        Log.i("MainActivity", "stopService");
         am.cancel(pendingIntent);
     }
 
@@ -195,16 +257,23 @@ public class MainActivity extends AppCompatActivity {
         private final IliasRssItem[] dataSet;
         private final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
 
+        private Context context;
 
-        private MyAdapter(IliasRssItem[] dataSet) {
+        // The items to display in your RecyclerView
+        private ArrayList<String> items;
+        // Allows to remember the last item shown on screen
+        private int lastPosition = -1;
+
+        private MyAdapter(IliasRssItem[] dataSet, Context context) {
             this.dataSet = dataSet;
+            this.context = context;
         }
 
         @Override
         @NonNull
         public MyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             // Create new views (invoked by the layout manager)
-            final View v = LayoutInflater.from(parent.getContext())
+            View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recycler_view, parent, false);
             return new ViewHolder(v);
         }
@@ -215,20 +284,42 @@ public class MainActivity extends AppCompatActivity {
             // - get element from the data set at this position
             // - replace the contents of the view with that element
             final IliasRssItem entry = dataSet[position];
-            if (latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
+            Log.i("MainActivity", "latestRssEntry: " + latestRssEntry);
+            if (latestRssEntry == null || latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
                 Log.i("COLOR BACKGROUND", "IT HAPPENED????" + latestRssEntry.getDate().getTime() + ", " + entry.getDate().getTime());
                 holder.background.setBackgroundResource(R.color.colorNewEntry);
                 Toast.makeText(MainActivity.this, "WOW - there is a new post: " + entry.toString(), Toast.LENGTH_LONG).show();
             }
+            final Spanned test;
             if (entry.getDescription() == null) {
                 holder.description.setVisibility(View.GONE);
                 holder.title.setLines(2);
+                test =  Html.fromHtml("");
             } else {
-                holder.description.setText(Html.fromHtml(entry.getDescription().replaceAll("\\s+", " ")));
+                test = Html.fromHtml(entry.getDescription().replaceAll("\\s+", " "));
             }
             holder.course.setText(entry.getCourse());
             holder.title.setText(entry.getTitle());
             holder.date.setText(viewDateFormat.format(entry.getDate()));
+            holder.description.setText(test);
+
+            setAnimation(holder.itemView, position);
+        }
+
+        /**
+         * Here is the key method to apply the animation
+         * https://stackoverflow.com/a/26748274/7827128
+         */
+        private void setAnimation(View viewToAnimate, int position)
+        {
+            // If the bound view wasn't previously displayed on screen, it's animated
+            if (position > lastPosition)
+            {
+                // R.anim.slide_up
+                Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }
         }
 
         @Override

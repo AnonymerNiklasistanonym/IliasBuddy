@@ -13,6 +13,7 @@
     <string name="action_stop_service">Stop service</string>
     <string name="latestItem">LATEST_ELEMENT</string>
     <string name="action_clean_list">Clean downloaded list</string>
+    <string name="render_new_elements">GET_NEW_ELEMENTS</string>
 
     <!-- Strings related to setup activity -->
     <string name="ilias_connection_setup">Setup Ilias RSS connection</string>

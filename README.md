@@ -2,7 +2,7 @@
 Aims to use the information from your private Ilias RSS feed and sends notifications if something new is on
 
 ## Edit/Run
-Open the directory with Android Studio 3.1 with an installed Android SDK bigger than v21 (Andorid 5.1+).
+Open the directory with Android Studio 3.1 with an installed Android SDK bigger than v21 (Android 5.1+).
 You can then build it with gradle on an external device via USB-Debugging or run it on an internal Android Virtual Device (which you need to install to).
 
 ## How does it work

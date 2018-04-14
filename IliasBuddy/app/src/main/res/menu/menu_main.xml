@@ -3,45 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.niklasm.iliasbuddy.MainActivity">
 
-    <!-- Open C@mpus -->
+    <!-- Icon - open C@mpus -->
     <item
-        android:id="@+id/action_open_campus"
         android:icon="@drawable/ic_campus_logo"
-        android:title="@string/action_open_campus"
         android:onClick="openCampus"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/action_open_campus"
+        app:showAsAction="ifRoom" />
 
-    <!-- Open Ilias -->
+    <!-- Icon - open Ilias -->
     <item
-        android:id="@+id/action_open_ilias"
         android:icon="@drawable/ic_ilias_logo"
-        android:title="@string/action_open_ilias"
         android:onClick="openIlias"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/action_open_ilias"
+        app:showAsAction="ifRoom" />
 
-    <!-- Settings, should always be in the overflow -->
+    <!-- Options -->
 
     <item
-        android:id="@+id/action_setup"
-        android:title="@string/action_setup"
         android:onClick="openSetup"
+        android:title="@string/action_setup"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_last_response"
-        android:title="@string/action_last_response"
         android:onClick="showLastResponse"
+        android:title="@string/action_last_response"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_start_service"
+        android:onClick="stopService"
+        android:title="@string/action_stop_service"
+        app:showAsAction="never" />
+
+    <item
+        android:onClick="restartService"
         android:title="@string/action_start_service"
-        android:onClick="startService"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:onClick="cleanList"
+        android:title="@string/action_clean_list"
+        app:showAsAction="never" />
+
+    <item
         android:title="@string/action_settings"
         app:showAsAction="never" />
 

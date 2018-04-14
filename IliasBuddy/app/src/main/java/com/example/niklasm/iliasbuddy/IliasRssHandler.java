@@ -54,6 +54,7 @@ public class IliasRssHandler {
             @Override
             public void onResponse(String response) {
                 lastResponse = response;
+                mainActivity.setLastResponse(response);
                 // Log.i("IliasRssHandler - Response", response);
                 try {
                     parseXml(response);
@@ -168,7 +169,7 @@ public class IliasRssHandler {
         IliasRssItem[] myDataset = entries.toArray(new IliasRssItem[0]);
 
         // only continue if the latest object is different
-        final boolean newEntryFound = latestRssEntry != null && latestRssEntry.toString().equals(myDataset[0].toString());
+        final boolean newEntryFound = latestRssEntry == null || latestRssEntry.toString().equals(myDataset[0].toString());
 
         if (newEntryFound) {
             latestRssEntry = myDataset[0];
@@ -177,5 +178,9 @@ public class IliasRssHandler {
         } else {
             Log.i("IliasRssHandler", "No new entry found");
         }
+    }
+
+    public void reset() {
+        latestRssEntry = null;
     }
 }

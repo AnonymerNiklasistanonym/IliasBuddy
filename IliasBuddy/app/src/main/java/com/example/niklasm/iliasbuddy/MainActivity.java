@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private IliasRssHandler rssHandler;
     private IliasRssDataSaver rssDataSaver;
 
+    private AlarmManager am;
+    private PendingIntent pendingIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Make sure this is before calling super.onCreate
@@ -90,17 +93,37 @@ public class MainActivity extends AppCompatActivity {
 
         // load newest changes
         checkForRssUpdates();
+
+        startService();
     }
 
     public void checkForRssUpdates() {
         rssHandler.getWebContent();
     }
 
+    public void setLastResponse(final String response) {
+        this.lastResponse = response;
+    }
+
     public void openSetup(MenuItem menuItem) {
         startActivity(new Intent(this, SetupActivity.class));
     }
 
+    public void cleanList(MenuItem menuItem) {
+        this.rssDataSaver.writeRssFeed(new IliasRssItem[0]);
+        this.rssHandler.reset();
+        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final SharedPreferences.Editor e = myPrefs.edit();
+        e.putString(getString(R.string.latestItem), "");
+        e.apply();
+    }
+
     public void renderNewList(IliasRssItem[] newDataSet) {
+
+        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final SharedPreferences.Editor e = myPrefs.edit();
+        e.putString(getString(R.string.latestItem), newDataSet[0].toString());
+        e.apply();
 
         this.rssDataSaver.writeRssFeed(newDataSet);
 
@@ -117,14 +140,22 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mAdapter);
     }
 
-    public void startService(MenuItem menuItem) {
+    public void startService() {
         //Create a new PendingIntent and add it to the AlarmManager
         Intent intent = new Intent(getApplicationContext(), BackgroundIntentService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
-        if (am != null) {
-            am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 60000, pendingIntent);
+        pendingIntent = PendingIntent.getService(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        am = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+        if (am != null) { // check every 5 minutes
+            am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * 5, pendingIntent);
         }
+    }
+
+    public void restartService(MenuItem menuItem) {
+        startService();
+    }
+
+    public void stopService(MenuItem menuItem) {
+        am.cancel(pendingIntent);
     }
 
     public void showLastResponse(MenuItem menuItem) {
@@ -145,21 +176,6 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void openCampus(MenuItem item) {
@@ -201,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
             final IliasRssItem entry = dataSet[position];
             if (latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
                 Log.i("COLOR BACKGROUND", "IT HAPPENED????" + latestRssEntry.getDate().getTime() + ", " + entry.getDate().getTime());
-                holder.background.setBackgroundResource(R.color.colorFabButton);
+                holder.background.setBackgroundResource(R.color.colorNewEntry);
                 Toast.makeText(MainActivity.this, "WOW - there is a new post: " + entry.toString(), Toast.LENGTH_LONG).show();
             }
             if (entry.getDescription() == null) {

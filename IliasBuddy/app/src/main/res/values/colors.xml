@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Theme colors -->
     <color name="colorPrimary">#23456f</color>
     <color name="colorPrimaryDark">#23456f</color>
     <color name="colorAccent">#23456f</color>
 
-    <!-- custom -->
-    <color name="year">#999999</color>
+    <!-- Custom colors -->
+    <color name="date">#999999</color>
     <color name="title">#222222</color>
-    <color name="colorFabButton">#ffd600</color>
     <color name="fabRippleColor">#366bae</color>
     <color name="recyclerViewLineColor">#bdbdbd</color>
-
-
-
+    <color name="colorNewEntry">#ffe100</color>
 </resources>

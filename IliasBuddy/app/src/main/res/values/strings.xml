@@ -14,6 +14,7 @@
     <string name="latestItem">LATEST_ELEMENT</string>
     <string name="action_clean_list">Clean downloaded list</string>
     <string name="render_new_elements">GET_NEW_ELEMENTS</string>
+    <string name="lastNotification">LAST_NOTIFICATION_TEXT</string>
 
     <!-- Strings related to setup activity -->
     <string name="ilias_connection_setup">Setup Ilias RSS connection</string>

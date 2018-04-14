@@ -64,6 +64,21 @@ public class BackgroundIntentService extends Service {
 
     public void createNotification(String previewString, String bigString) {
 
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final String latestItem = myPrefs.getString(getString(R.string.lastNotification),"nothing_found");
+
+        if (!latestItem.equals("nothing_found") && latestItem.equals(bigString)) {
+            Log.i("BackgroundIntentService", "Do not make a new notification, the text is the same");
+            return;
+        } else {
+            Log.i("BackgroundIntentService", "Make a new notification, the text is NOT the same");
+        }
+
+        // if new notification save the old String
+        final SharedPreferences.Editor e = myPrefs.edit();
+        e.putString(getString(R.string.lastNotification), bigString);
+        e.apply();
+
         Notification notification2 = new Notification();
         notification2.defaults |= Notification.DEFAULT_SOUND;
         notification2.defaults |= Notification.DEFAULT_VIBRATE;

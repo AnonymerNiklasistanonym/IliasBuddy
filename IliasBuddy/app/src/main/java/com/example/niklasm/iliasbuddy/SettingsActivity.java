@@ -44,7 +44,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
 
+            Log.i("SettingsActivity", "OnPreferenceChangeListener: " + value.toString());
+
             if (preference instanceof ListPreference) {
+                Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof ListPreference");
+
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
                 ListPreference listPreference = (ListPreference) preference;
@@ -57,6 +61,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 : null);
 
             } else if (preference instanceof RingtonePreference) {
+                Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof RingtonePreference");
                 // For ringtone preferences, look up the correct display value
                 // using RingtoneManager.
                 if (TextUtils.isEmpty(stringValue)) {
@@ -79,6 +84,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
             } else {
+                Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof else");
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);

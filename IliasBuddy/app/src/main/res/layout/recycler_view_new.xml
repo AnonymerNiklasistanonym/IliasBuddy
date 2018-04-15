@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/background"
+        android:paddingTop="@dimen/row_padding_vertical"
+        android:paddingBottom="@dimen/row_padding_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="?android:attr/windowSwipeToDismiss"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/star"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:contentDescription="star"
+            android:paddingLeft="@dimen/row_padding_vertical"
+            android:paddingRight="@dimen/row_padding_vertical"
+            app:srcCompat="@drawable/ic_star"
+        tools:ignore="VectorDrawableCompat" />
+
+        <!--
+        android:paddingBottom="@dimen/row_padding_vertical"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/row_padding_vertical"
+        -->
+
+        <!-- Title text view -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingLeft="@dimen/row_padding_vertical"
+            android:paddingRight="@dimen/row_padding_vertical"
+            android:orientation="vertical">
+
+            <!-- Course text view -->
+            <TextView
+                android:id="@+id/course"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/title"
+                android:textSize="@dimen/recyclerViewFontSizeBig"
+                android:textStyle="bold"
+                tools:text="Demo course messageeeeeeeeeeeeeeeeeee" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="@dimen/recyclerViewFontSizeNormal"
+                tools:text="Demo title of entry" />
+
+            <!-- Description text view -->
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="@dimen/recyclerViewFontSizeNormal"
+                android:textStyle="italic"
+                tools:text="Demo description: Very long text that gets ellipsized when reaching the end of the parent" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/row_padding_vertical"
+            android:paddingRight="@dimen/row_padding_vertical"
+            android:orientation="vertical">
+
+            <!-- Date text view -->
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/date"
+                android:textSize="@dimen/recyclerViewFontSizeDate"
+                tools:text="13.04" />
+
+            <!-- Date text view -->
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:textColor="@color/date"
+                android:textSize="@dimen/recyclerViewFontSizeDate"
+                tools:text="18:32" />
+
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"/>
+
+
+    <!-- Gray line below the row object
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/recyclerViewLineWidth"
+        android:background="@color/recyclerViewLineColor" />
+    -->
+
+</LinearLayout>

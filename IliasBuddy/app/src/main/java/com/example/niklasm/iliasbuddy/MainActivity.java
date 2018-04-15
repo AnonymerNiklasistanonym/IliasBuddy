@@ -20,7 +20,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -267,7 +267,8 @@ public class MainActivity extends AppCompatActivity {
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         private final IliasRssItem[] dataSet;
-        private final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
+        private final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM", getResources().getConfiguration().locale);
+        private final SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm", getResources().getConfiguration().locale);
 
         private Context context;
 
@@ -286,12 +287,12 @@ public class MainActivity extends AppCompatActivity {
         public MyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             // Create new views (invoked by the layout manager)
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.recycler_view, parent, false);
+                    .inflate(R.layout.recycler_view_new, parent, false);
             return new ViewHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
             // Replace the contents of a view (invoked by the layout manager)
             // - get element from the data set at this position
             // - replace the contents of the view with that element
@@ -302,20 +303,35 @@ public class MainActivity extends AppCompatActivity {
                 holder.background.setBackgroundResource(R.color.colorNewEntry);
                 Toast.makeText(MainActivity.this, "WOW - there is a new post: " + entry.toString(), Toast.LENGTH_LONG).show();
             }
-            final Spanned test;
             if (entry.getDescription() == null) {
                 holder.description.setVisibility(View.GONE);
                 holder.title.setLines(2);
-                test =  Html.fromHtml("");
             } else {
-                test = Html.fromHtml(entry.getDescription().replaceAll("\\s+", " "));
-            }
+                holder.description.setText(Html.fromHtml(entry.getDescription()).toString().replaceAll("\\s+", " "));
+                }
             holder.course.setText(entry.getCourse());
             holder.title.setText(entry.getTitle());
             holder.date.setText(viewDateFormat.format(entry.getDate()));
-            holder.description.setText(test);
+            holder.time.setText(viewTimeFormat.format(entry.getDate()));
 
-            setAnimation(holder.itemView, position);
+            final ImageView starView = holder.star;
+
+            holder.star.setOnClickListener(new View.OnClickListener() {
+                private boolean clicked = false;
+                @Override
+                public void onClick(final View view) {
+                    final IliasRssItem entry = dataSet[position];
+                    Log.i("MainActivity", "Star clicked " + entry.toString());
+                    if (clicked) {
+                        starView.setImageResource(R.drawable.ic_star);
+                    } else {
+                        starView.setImageResource(R.drawable.ic_star_filled);
+                    }
+                    clicked = !clicked;
+                }
+            });
+
+            // setAnimation(holder.itemView, position);
         }
 
         /**
@@ -346,8 +362,9 @@ public class MainActivity extends AppCompatActivity {
          * view holder
          */
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            final public TextView course, title, date, description;
+            final public TextView course, title, date, time, description;
             final public LinearLayout background;
+            final public ImageView star;
 
             private ViewHolder(View view) {
                 super(view);
@@ -359,6 +376,8 @@ public class MainActivity extends AppCompatActivity {
                 date = view.findViewById(R.id.date);
                 title = view.findViewById(R.id.title);
                 description = view.findViewById(R.id.description);
+                time = view.findViewById(R.id.time);
+                star = view.findViewById(R.id.star);
             }
 
             @Override

@@ -42,8 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private IliasRssItem latestRssEntry = null;
+    private IliasRssItem latestRssEntry;
+    private IliasRssItem latestRssEntry2;
     private String lastResponse = null;
+
+    private int dataSetLength = 0;
 
     private IliasRssHandler rssHandler;
     private IliasRssDataSaver rssDataSaver;
@@ -84,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                removeColoring();
                 checkForRssUpdates();
             }
         });
@@ -93,17 +97,26 @@ public class MainActivity extends AppCompatActivity {
         final IliasRssItem[] myDataset = rssDataSaver.readRssFeed();
         if (myDataset != null && myDataset.length > 0) {
             // save latest object
+            latestRssEntry2 = myDataset[0];
             latestRssEntry = myDataset[0];
             // specify an adapter (see also next example)
             mAdapter = new MyAdapter(myDataset, this);
             mRecyclerView.setAdapter(mAdapter);
+            dataSetLength = myDataset.length;
+
         } else {
             latestRssEntry = null;
+            latestRssEntry2 = null;
         }
 
         // load newest changes
         checkForRssUpdates();
         startService();
+    }
+
+    public void removeColoring() {
+        this.latestRssEntry = this.latestRssEntry2;
+        mAdapter.notifyItemRangeChanged(0, this.dataSetLength);
     }
 
     public void openSettings(MenuItem menuItem) {
@@ -177,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
         e.apply();
         this.latestRssEntry = null;
         renderNewList(new IliasRssItem[0]);
+        dataSetLength = 0;
     }
 
     public void renderNewList(IliasRssItem[] newDataSet) {
@@ -197,7 +211,10 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
+        dataSetLength = newDataSet.length;
+
         // this.latestRssEntry = newDataSet.length > 0 ? newDataSet[0] : null;
+        this.latestRssEntry2 = newDataSet.length > 0 ? newDataSet[0] : null;
     }
 
     public void startService() {

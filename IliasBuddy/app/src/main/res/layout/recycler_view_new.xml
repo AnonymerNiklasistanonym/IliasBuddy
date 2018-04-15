@@ -16,7 +16,6 @@
         android:paddingBottom="@dimen/row_padding_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="?android:attr/windowSwipeToDismiss"
         android:orientation="horizontal">
 
         <ImageView
@@ -24,8 +23,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:contentDescription="star"
-            android:paddingLeft="@dimen/row_padding_vertical"
-            android:paddingRight="@dimen/row_padding_vertical"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginLeft="@dimen/row_padding_vertical"
+            android:layout_marginRight="@dimen/row_padding_vertical"
             app:srcCompat="@drawable/ic_star"
         tools:ignore="VectorDrawableCompat" />
 

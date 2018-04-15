@@ -31,12 +31,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -199,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        this.latestRssEntry = newDataSet.length > 0 ? newDataSet[0] : null;
+        // this.latestRssEntry = newDataSet.length > 0 ? newDataSet[0] : null;
     }
 
     public void startService() {
@@ -217,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.i("MainActivity", "onNewIntent");
-        if (intent.getStringExtra(getString(R.string.render_new_elements)).equals(true)) {
+        if (intent.getBooleanExtra(getString(R.string.render_new_elements), false)) {
             Log.i("MainActivity", "onNewIntent " + getString(R.string.render_new_elements));
             checkForRssUpdates();
         }
@@ -272,8 +270,6 @@ public class MainActivity extends AppCompatActivity {
 
         private Context context;
 
-        // The items to display in your RecyclerView
-        private ArrayList<String> items;
         // Allows to remember the last item shown on screen
         private int lastPosition = -1;
 
@@ -291,17 +287,24 @@ public class MainActivity extends AppCompatActivity {
             return new ViewHolder(v);
         }
 
+        private final View.OnClickListener mButtonClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+            }
+        };
+
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int positionButDoNotUse) {
             // Replace the contents of a view (invoked by the layout manager)
             // - get element from the data set at this position
             // - replace the contents of the view with that element
-            final IliasRssItem entry = dataSet[position];
+            final int position = holder.getAdapterPosition();
+            final IliasRssItem entry = dataSet[holder.getAdapterPosition()];
             Log.i("MainActivity", "latestRssEntry: " + latestRssEntry);
             if (latestRssEntry == null || latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
-                Log.i("COLOR BACKGROUND", "IT HAPPENED????" + latestRssEntry.getDate().getTime() + ", " + entry.getDate().getTime());
+                Log.i("COLOR BACKGROUND", "IT HAPPENED????");
                 holder.background.setBackgroundResource(R.color.colorNewEntry);
-                Toast.makeText(MainActivity.this, "WOW - there is a new post: " + entry.toString(), Toast.LENGTH_LONG).show();
+                // Toast.makeText(MainActivity.this, "WOW - there is a new post: " + entry.toString(), Toast.LENGTH_LONG).show();
             }
             if (entry.getDescription() == null) {
                 holder.description.setVisibility(View.GONE);
@@ -315,6 +318,8 @@ public class MainActivity extends AppCompatActivity {
             holder.time.setText(viewTimeFormat.format(entry.getDate()));
 
             final ImageView starView = holder.star;
+
+            holder.star.setVisibility(View.GONE);
 
             holder.star.setOnClickListener(new View.OnClickListener() {
                 private boolean clicked = false;
@@ -331,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-            // setAnimation(holder.itemView, position);
+            setAnimation(holder.itemView, position);
         }
 
         /**
@@ -343,8 +348,8 @@ public class MainActivity extends AppCompatActivity {
             // If the bound view wasn't previously displayed on screen, it's animated
             if (position > lastPosition)
             {
-                // R.anim.slide_up
-                Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+                // R.anim.slide_up, slide_in_left
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.fall_down);
                 viewToAnimate.startAnimation(animation);
                 lastPosition = position;
             }

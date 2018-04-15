@@ -3,7 +3,9 @@ package com.example.niklasm.iliasbuddy;
 import android.content.Context;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -64,6 +66,11 @@ public class IliasRssHandler {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                if (error instanceof AuthFailureError) {
+                    Toast.makeText(context, "Authentication error", Toast.LENGTH_SHORT).show();
+                    mainActivity.openSetup(null);
+                    return;
+                }
                 mainActivity.errorSnackbar("Response Error", error.toString());
                 Log.e("IliasRssHandler - Error", error.toString());
             }
@@ -163,7 +170,6 @@ public class IliasRssHandler {
         final boolean newEntryFound = latestRssEntry == null || !latestRssEntry.toString().equals(myDataset[0].toString());
 
         if (newEntryFound) {
-            latestRssEntry = myDataset[0];
             Log.i("IliasRssHandler", "New entry found");
             mainActivity.renderNewList(myDataset);
         } else {

@@ -10,5 +10,5 @@
     <color name="title">#222222</color>
     <color name="fabRippleColor">#366bae</color>
     <color name="recyclerViewLineColor">#bdbdbd</color>
-    <color name="colorNewEntry">#ffe100</color>
+    <color name="colorNewEntry">#88ffd600</color>
 </resources>

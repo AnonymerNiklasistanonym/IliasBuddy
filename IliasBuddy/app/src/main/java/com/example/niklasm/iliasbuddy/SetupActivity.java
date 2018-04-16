@@ -34,13 +34,6 @@ public class SetupActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                backToMainActivity();
-            }
-        });
-
         // set fab on click listener
         findViewById(R.id.fabSetup).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +78,17 @@ public class SetupActivity extends AppCompatActivity {
                 .create();
         alertDialog.show();
         ((TextView) alertDialog.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void backToMainActivity() {

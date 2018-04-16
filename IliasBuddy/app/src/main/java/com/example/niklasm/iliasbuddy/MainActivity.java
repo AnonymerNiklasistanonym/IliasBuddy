@@ -32,8 +32,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
-
 import java.text.SimpleDateFormat;
 
 public class MainActivity extends AppCompatActivity {
@@ -50,9 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private IliasRssHandler rssHandler;
     private IliasRssDataSaver rssDataSaver;
-
-    private boolean deleteAgain = false;
-
+    
     private AlarmManager am;
     private PendingIntent pendingIntent;
 
@@ -119,6 +115,11 @@ public class MainActivity extends AppCompatActivity {
         mAdapter.notifyItemRangeChanged(0, this.dataSetLength);
     }
 
+    public void openAbout(MenuItem menuItem) {
+        startActivity(new Intent(this, AboutActivity.class));
+
+    }
+
     public void openSettings(MenuItem menuItem) {
         startActivity(new Intent(this, SettingsActivity.class));
 
@@ -138,11 +139,6 @@ public class MainActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // setContentView(R.layout.myLayout);
         Log.i("MainActivity", "Configuration changed - " + newConfig.toString());
-    }
-
-    public void displayLicenses(MenuItem menuItem) {
-        OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title));
-        startActivity(new Intent(this, OssLicensesMenuActivity.class));
     }
 
     public void errorSnackbar(final String title, final String message) {
@@ -303,12 +299,6 @@ public class MainActivity extends AppCompatActivity {
                     .inflate(R.layout.recycler_view_new, parent, false);
             return new ViewHolder(v);
         }
-
-        private final View.OnClickListener mButtonClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-            }
-        };
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int positionButDoNotUse) {

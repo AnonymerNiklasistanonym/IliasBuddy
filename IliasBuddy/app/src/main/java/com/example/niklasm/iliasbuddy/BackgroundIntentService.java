@@ -251,7 +251,7 @@ public class BackgroundIntentService extends Service {
         } else {
             Log.i("BackgroundIntentService", "New entries found");
             final String previewString = latestEntry == 1 ? "one new entry found" : latestEntry + " new entries found";
-            final StringBuilder bigString = new StringBuilder(previewString);
+            final StringBuilder bigString = new StringBuilder(previewString + "\n");
             final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
             for (int i = 0; i < latestEntry; i++) {
                 bigString.append(myDataSet[i].getCourse())

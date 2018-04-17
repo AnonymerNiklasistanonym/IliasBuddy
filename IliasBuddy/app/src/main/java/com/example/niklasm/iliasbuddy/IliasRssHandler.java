@@ -47,6 +47,8 @@ public class IliasRssHandler {
 
     public void getWebContent() {
 
+        mainActivity.refreshIcon(true);
+
         RequestQueue queue = Volley.newRequestQueue(this.context);
 
         // Request a string response from the provided URL.
@@ -60,12 +62,14 @@ public class IliasRssHandler {
                     parseXml(response);
                 } catch (IOException | XmlPullParserException err) {
                     Log.e("IliasRssHandler Error", err.toString());
+                    mainActivity.refreshIcon(false);
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                mainActivity.refreshIcon(false);
                 if (error instanceof AuthFailureError) {
                     Toast.makeText(context, "Authentication error", Toast.LENGTH_SHORT).show();
                     mainActivity.openSetup(null);
@@ -176,6 +180,7 @@ public class IliasRssHandler {
             mainActivity.noNewEntryFound();
             Log.i("IliasRssHandler", "No new entry found");
         }
+        mainActivity.refreshIcon(false);
     }
 
     public void reset() {

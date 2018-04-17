@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,7 +35,7 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -46,9 +47,11 @@ public class MainActivity extends AppCompatActivity {
 
     private int dataSetLength = 0;
 
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
     private IliasRssHandler rssHandler;
     private IliasRssDataSaver rssDataSaver;
-    
+
     private AlarmManager am;
     private PendingIntent pendingIntent;
 
@@ -105,8 +108,29 @@ public class MainActivity extends AppCompatActivity {
             latestRssEntry2 = null;
         }
 
-        // load newest changes
-        checkForRssUpdates();
+        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                mSwipeRefreshLayout.setRefreshing(true);
+
+                // load newest changes
+                checkForRssUpdates();
+            }
+        });
+
         startService();
     }
 
@@ -166,7 +190,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkForRssUpdates() {
+        mSwipeRefreshLayout.setRefreshing(true);
         rssHandler.getWebContent();
+    }
+    public void refreshIcon(boolean state) {
+        mSwipeRefreshLayout.setRefreshing(state);
     }
 
     public void setLastResponse(final String response) {
@@ -273,6 +301,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void openUrl(final String url) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    }
+
+    @Override
+    public void onRefresh() {
+        removeColoring();
+        checkForRssUpdates();
     }
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {

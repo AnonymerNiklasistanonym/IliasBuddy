@@ -68,7 +68,7 @@ public class AboutActivity extends AppCompatActivity {
                         startActivity(new Intent(AboutActivity.this, OssLicensesMenuActivity.class));
                     }
                 }))
-                .addGroup("Connect with us")
+                //.addGroup("Connect with us")
                 //.addEmail("elmehdi.sakout@gmail.com")
                 .addWebsite("https://github.com/AnonymerNiklasistanonym/IliasBuddy", "Visit website with source code and bug tracker")
                 //.addFacebook("the.medy")

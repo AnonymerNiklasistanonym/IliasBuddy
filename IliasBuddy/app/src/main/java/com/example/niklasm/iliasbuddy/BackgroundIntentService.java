@@ -1,42 +1,45 @@
 package com.example.niklasm.iliasbuddy;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Base64;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
+import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.text.ParseException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class BackgroundIntentService extends Service {
-    String iliasRssUrl;
-    String iliasRssUserName;
-    String iliasRssPassword;
+public class BackgroundIntentService extends Service implements IliasXmlWebRequesterInterface {
+    private IliasXmlWebRequester webRequester;
+
+    private boolean applicationInForeground() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> services = activityManager.getRunningAppProcesses();
+        boolean isActivityFound = false;
+
+        if (services.get(0).processName.equalsIgnoreCase(getPackageName())) {
+            isActivityFound = true;
+        }
+
+        return isActivityFound;
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -44,14 +47,9 @@ public class BackgroundIntentService extends Service {
         // make visible that service started
         // Toast.makeText(getApplicationContext(), "BackgroundIntentService onStartCommand", Toast.LENGTH_SHORT).show();
 
-        // get the important data for a web request
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        iliasRssUrl = myPrefs.getString(getString(R.string.ilias_url), "nothing_found");
-        iliasRssUserName = myPrefs.getString(getString(R.string.ilias_user_name), "nothing_found");
-        iliasRssPassword = myPrefs.getString(getString(R.string.ilias_password), "nothing_found");
-
         // make a web request with the important data
-        getWebContent();
+        webRequester = new IliasXmlWebRequester(this);
+        webRequester.getWebContent();
 
         // return this so that the service can be restarted
         return START_NOT_STICKY;
@@ -107,117 +105,23 @@ public class BackgroundIntentService extends Service {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(0, notification);
+
+        Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON);
+        callMainActivity.putExtra("previewString", previewString);
+        callMainActivity.putExtra("bigString", bigString);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(callMainActivity);
     }
 
-    public void getWebContent() {
-        Log.i("BackgroundIntentService", "getWebContent");
-        final RequestQueue queue = Volley.newRequestQueue(this);
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, this.iliasRssUrl, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                Log.i("BackgroundIntentService", "Got RSS data response");
-                try {
-                    parseXml(response);
-                } catch (IOException | XmlPullParserException err) {
-                    Log.e("IliasRssHandler Error", err.toString());
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("BackgroundIntentService", "Error RSS data response" + error.toString());
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                final Map<String, String> headers = new HashMap<>();
-                final String credentials = iliasRssUserName + ":" + iliasRssPassword;
-                final String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                headers.put("Content-Type", "application/json");
-                headers.put("Authorization", auth);
-                return headers;
-            }
-        };
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
-    }
-
-    public void parseXml(String content) throws XmlPullParserException, IOException {
+    public void processIliasXml(final String xmlData) {
         Log.i("BackgroundIntentService", "parseXml");
-        final XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-        factory.setNamespaceAware(true);
-        final XmlPullParser xpp = factory.newPullParser();
-        xpp.setInput(new StringReader(content));
-        int eventType = xpp.getEventType();
-
-        boolean inItem = false;
-        String currentTag = null;
-        String course = null;
-        String title = null;
-        String description = null;
-        String link = null;
-        Date date = null;
-
-        List<IliasRssItem> entries = new ArrayList<>();
-
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-            if (eventType == XmlPullParser.START_DOCUMENT) {
-                // Log.i("XML-Test","Start document");
-            } else if (eventType == XmlPullParser.START_TAG) {
-                currentTag = xpp.getName();
-                // Log.i("XML-Test","Start tag "+currentTag);
-                if (currentTag.equals("item")) {
-                    inItem = true;
-                    course = null;
-                    title = null;
-                    description = null;
-                    link = null;
-                    date = null;
-                    // Log.i("XML-Test","---------------------");
-                }
-            } else if (eventType == XmlPullParser.END_TAG) {
-                // Log.i("XML-Test","End tag "+xpp.getName());
-                if (xpp.getName().equals("item")) {
-                    inItem = false;
-                    entries.add(new IliasRssItem(course, title, link, description, date));
-                    // Log.i("XML-Test","---------------------");
-                }
-                currentTag = null;
-            } else if (eventType == XmlPullParser.TEXT) {
-                // Log.i("XML-Test","Text "+xpp.getText());
-                if (inItem && currentTag != null) {
-                    final String currentText = xpp.getText();
-                    switch (currentTag) {
-                        case "title":
-                            // convert title into course and title
-                            course = currentText.substring(currentText.indexOf("[") + 1, currentText.indexOf("]")).trim();
-                            title = currentText.substring(currentText.indexOf("]") + 1).trim();
-                            break;
-                        case "link":
-                            link = currentText;
-                            break;
-                        case "description":
-                            description = currentText;
-                            break;
-                        case "pubDate":
-                            try {
-                                final SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
-                                date = sf1.parse(currentText);
-                            } catch (ParseException e) {
-                                Log.e("Error Date", e.toString());
-                            }
-                            break;
-                    }
-                }
-            }
-            eventType = xpp.next();
+        final InputStream stream = new ByteArrayInputStream(xmlData.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
+        final IliasRssItem[] myDataSet;
+        try {
+            myDataSet = IliasXmlParser.parse(stream);
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+            return;
         }
-        // Log.i("XML-Test","End document");
-
-        // convert ArrayList to Array
-        final IliasRssItem[] myDataSet = entries.toArray(new IliasRssItem[0]);
 
         // get latest item string form shared preferences
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
@@ -227,10 +131,10 @@ public class BackgroundIntentService extends Service {
         boolean searchingForNewElements = true;
         for (int i = 0; i < myDataSet.length; i++) {
             if (searchingForNewElements && myDataSet[i].toString().equals(latestItem)) {
-                    latestEntry = i;
-                    searchingForNewElements = false;
-                }
+                latestEntry = i;
+                searchingForNewElements = false;
             }
+        }
         if (latestEntry == -1) {
             Log.i("BackgroundIntentService", "All entries are new");
             final String previewString = myDataSet.length + " new entries (all are new)";
@@ -239,6 +143,8 @@ public class BackgroundIntentService extends Service {
             for (IliasRssItem entry : myDataSet) {
                 bigString.append("- ")
                         .append(entry.getCourse())
+                        .append(" > ")
+                        .append(entry.getExtra())
                         .append(" >> ")
                         .append(entry.getTitle())
                         .append(" (")
@@ -254,7 +160,10 @@ public class BackgroundIntentService extends Service {
             final StringBuilder bigString = new StringBuilder(previewString + "\n");
             final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
             for (int i = 0; i < latestEntry; i++) {
-                bigString.append(myDataSet[i].getCourse())
+                bigString.append("- ")
+                        .append(myDataSet[i].getCourse())
+                        .append(myDataSet[i].getExtra() != null ? " > " + myDataSet[i].getExtra() : "")
+                        .append(" >> ")
                         .append(myDataSet[i].getTitle())
                         .append(" (")
                         .append(viewDateFormat.format(myDataSet[i].getDate()))
@@ -262,5 +171,13 @@ public class BackgroundIntentService extends Service {
             }
             createNotification(previewString, bigString.toString());
         }
+    }
+
+    public void webAuthenticationError(AuthFailureError error) {
+        Log.i("BackgroundAct - AuthErr", error.toString());
+    }
+
+    public void webResponseError(VolleyError error) {
+        Log.i("BackgroundAct - RespErr", error.toString());
     }
 }

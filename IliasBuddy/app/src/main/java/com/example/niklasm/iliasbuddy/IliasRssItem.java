@@ -6,16 +6,18 @@ import java.util.Date;
 
 public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
     final private String course;
+    final private String extra;
     final private String title;
-    final private String link;
     final private String description;
+    final private String link;
     final private Date date;
 
-    public IliasRssItem(final String course, final String title, final String link, final String description, final Date date) {
+    IliasRssItem(final String course, final String extra, final String title, final String description, final String link, final Date date) {
         this.course = course;
+        this.extra = extra;
         this.title = title;
-        this.link = link;
         this.description = description;
+        this.link = link;
         this.date = date;
     }
 
@@ -23,16 +25,20 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         return course;
     }
 
+    public String getExtra() {
+        return extra;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    public String getLink() {
-        return link;
-    }
-
     public String getDescription() {
         return description;
+    }
+
+    public String getLink() {
+        return link;
     }
 
     public Date getDate() {
@@ -41,7 +47,7 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
 
     @Override
     public String toString() {
-        return "course="+course+",title="+title+",link="+link+",description="+description+",date="+date.getTime();
+        return "course="+course+",extra="+extra+",title="+title+",description="+description+",link="+link+",date="+date.getTime();
     }
 
     public int compare(final IliasRssItem o1, final IliasRssItem o2) {
@@ -50,7 +56,10 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         // if date is the same check course
         final int courseIsTheSame = o1.getCourse().compareTo(o2.getCourse());
         if (courseIsTheSame != 0) return dateIsTheSame;
-        // if course is the same check title
+        // if course is the same check extra
+        final int extraIsTheSame = o1.getExtra().compareTo(o2.getExtra());
+        if (extraIsTheSame != 0) return extraIsTheSame;
+        // if extra is the same check title
         final int titleIsTheSame = o1.getTitle().compareTo(o2.getTitle());
         if (titleIsTheSame != 0) return titleIsTheSame;
         // if title is the same check description
@@ -59,4 +68,5 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         // if description is the same check link
         return o1.getLink().compareTo(o2.getLink());
     }
+
 }

@@ -3,9 +3,11 @@ package com.example.niklasm.iliasbuddy;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -14,6 +16,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -32,10 +35,22 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.VolleyError;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, IliasXmlWebRequesterInterface {
+
+    private IliasXmlWebRequester webRequester;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -49,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private IliasRssHandler rssHandler;
     private IliasRssDataSaver rssDataSaver;
 
     private AlarmManager am;
@@ -70,17 +84,26 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        String iliasRssUrl = myPrefs.getString(getString(R.string.ilias_url), "nothing_found");
-        String iliasRssUserName = myPrefs.getString(getString(R.string.ilias_user_name), "nothing_found");
-        String iliasRssPassword = myPrefs.getString(getString(R.string.ilias_password), "nothing_found");
+        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_blue_light,
+                android.R.color.holo_red_light);
+        /*
+          Showing Swipe Refresh animation on activity create
+          As animation won't start on onCreate, post runnable is used
+         */
+        mSwipeRefreshLayout.post(new Runnable() {
 
-        if (iliasRssUrl.equals("nothing_found") || (iliasRssUserName.equals("nothing_found") || iliasRssPassword.equals("nothing_found"))) {
-            Intent intent = new Intent(this, SetupActivity.class);
-            startActivity(intent);
-        }
+            @Override
+            public void run() {
+                // load newest changes
+                checkForRssUpdates();
+            }
+        });
 
-        rssHandler = new IliasRssHandler(this, iliasRssUrl, iliasRssUserName, iliasRssPassword);
         rssDataSaver = new IliasRssDataSaver(this, "TestFile.test");
 
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
@@ -91,62 +114,126 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
 
-
         // try to load saved RSS feed
-        final IliasRssItem[] myDataset = rssDataSaver.readRssFeed();
-        if (myDataset != null && myDataset.length > 0) {
-            // save latest object
-            latestRssEntry2 = myDataset[0];
-            latestRssEntry = myDataset[0];
+        final IliasRssItem[] myDataSet = rssDataSaver.readRssFeed();
+        if (myDataSet == null) {
+            rssDataSaver.writeRssFeed(new IliasRssItem[0]);
+            latestRssEntry2 = null;
+            latestRssEntry = null;
             // specify an adapter (see also next example)
-            mAdapter = new MyAdapter(myDataset, this);
+            dataSetLength = 0;
+
+        } else if (myDataSet.length > 0) {
+            // save latest object
+            latestRssEntry2 = myDataSet[0];
+            latestRssEntry = myDataSet[0];
+            // specify an adapter (see also next example)
+            mAdapter = new MyAdapter(myDataSet, this);
             mRecyclerView.setAdapter(mAdapter);
-            dataSetLength = myDataset.length;
+            dataSetLength = myDataSet.length;
 
         } else {
             latestRssEntry = null;
             latestRssEntry2 = null;
         }
 
-        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_green_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_blue_dark);
+        webRequester = new IliasXmlWebRequester(this);
+        checkForRssUpdates();
 
-        /**
-         * Showing Swipe Refresh animation on activity create
-         * As animation won't start on onCreate, post runnable is used
-         */
-        mSwipeRefreshLayout.post(new Runnable() {
+        // test - https://stackoverflow.com/a/12997537/7827128
+        bManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVE_JSON);
+        bManager.registerReceiver(bReceiver, intentFilter);
+        // test - https://stackoverflow.com/a/12997537/7827128
 
-            @Override
-            public void run() {
-
-                mSwipeRefreshLayout.setRefreshing(true);
-
-                // load newest changes
-                checkForRssUpdates();
-            }
-        });
 
         startService();
     }
 
+    // test - https://stackoverflow.com/a/12997537/7827128
+    public static final String RECEIVE_JSON = "com.your.package.RECEIVE_JSON";
+    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction() != null && intent.getAction().equals(RECEIVE_JSON)) {
+                String previewString = intent.getStringExtra("previewString");
+                // String bigString = intent.getStringExtra("bigString");
+
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction("REFRESH", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        checkForRssUpdates();
+                    }
+                });
+                snackbar.show();
+
+                //Do something with the string
+            }
+        }
+    };
+    LocalBroadcastManager bManager;
+    // test - https://stackoverflow.com/a/12997537/7827128
+
+    // test - https://stackoverflow.com/a/12997537/7827128
+    protected void onDestroy(Bundle savedInstanceState) {
+        super.onDestroy();
+        bManager.unregisterReceiver(bReceiver);
+    }
+    // test - https://stackoverflow.com/a/12997537/7827128
+
+
     public void removeColoring() {
         this.latestRssEntry = this.latestRssEntry2;
-        mAdapter.notifyItemRangeChanged(0, this.dataSetLength);
+        if (mAdapter != null) mAdapter.notifyItemRangeChanged(0, this.dataSetLength);
     }
 
     public void openAbout(MenuItem menuItem) {
         startActivity(new Intent(this, AboutActivity.class));
+    }
 
+    public void processIliasXml(final String xmlData) {
+        setLastResponse(xmlData);
+        final InputStream stream = new ByteArrayInputStream(xmlData.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
+        final IliasRssItem[] myDataSet;
+        try {
+            myDataSet = IliasXmlParser.parse(stream);
+        } catch (XmlPullParserException | IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // get the latest RSS entry from the main activity
+        final IliasRssItem latestRssEntry = getLatestRssEntry();
+
+        // only continue if the latest object is different
+        final boolean newEntryFound = latestRssEntry == null || !latestRssEntry.toString().equals(myDataSet[0].toString());
+
+        if (newEntryFound) {
+            Log.i("IliasRssHandler", "New entry found");
+            renderNewList(myDataSet);
+        } else {
+            Log.i("IliasRssHandler", "No new entry found");
+            noNewEntryFound();
+        }
+        refreshIcon(false);
+    }
+
+    public void webAuthenticationError(AuthFailureError error) {
+        Log.i("MainActivity - AuthErr", error.toString());
+        refreshIcon(false);
+        Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show();
+        openSetup(null);
+    }
+
+    public void webResponseError(VolleyError error) {
+        Log.i("MainActivity - RespErr", error.toString());
+        errorSnackbar("Response Error", error.toString());
     }
 
     public void openSettings(MenuItem menuItem) {
         startActivity(new Intent(this, SettingsActivity.class));
-
     }
 
     public IliasRssItem getLatestRssEntry() {
@@ -185,13 +272,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
         snackbar.show();
-
-
     }
 
     public void checkForRssUpdates() {
         mSwipeRefreshLayout.setRefreshing(true);
-        rssHandler.getWebContent();
+        webRequester.getWebContent();
     }
     public void refreshIcon(boolean state) {
         mSwipeRefreshLayout.setRefreshing(state);
@@ -207,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     public void cleanList(MenuItem menuItem) {
         this.rssDataSaver.writeRssFeed(new IliasRssItem[0]);
-        this.rssHandler.reset();
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         final SharedPreferences.Editor e = myPrefs.edit();
         e.putString(getString(R.string.latestItem), "");
@@ -353,7 +437,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             } else {
                 holder.description.setText(Html.fromHtml(entry.getDescription()).toString().replaceAll("\\s+", " "));
                 }
-            holder.course.setText(entry.getCourse());
+            final String course = entry.getExtra() != null ? entry.getCourse() + " \"" + entry.getExtra() +"\"" : entry.getCourse();
+            holder.course.setText(course);
             holder.title.setText(entry.getTitle());
             holder.date.setText(viewDateFormat.format(entry.getDate()));
             holder.time.setText(viewTimeFormat.format(entry.getDate()));

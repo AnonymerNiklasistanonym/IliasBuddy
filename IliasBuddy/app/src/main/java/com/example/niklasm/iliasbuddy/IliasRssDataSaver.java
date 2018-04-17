@@ -24,18 +24,16 @@ public class IliasRssDataSaver {
     }
 
     public IliasRssItem[] readRssFeed() {
-
-        IliasRssItem[] ReturnClass = null;
-
         try {
             final ObjectInputStream input = new ObjectInputStream(new FileInputStream(this.directory
                     + File.separator + this.fileName));
-            ReturnClass = (IliasRssItem[]) input.readObject();
+            final IliasRssItem[] ReturnClass = (IliasRssItem[]) input.readObject();
             input.close();
+            return ReturnClass;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            return null;
         }
-        return ReturnClass;
     }
 
     public void writeRssFeed(IliasRssItem[] saveThisObject) {

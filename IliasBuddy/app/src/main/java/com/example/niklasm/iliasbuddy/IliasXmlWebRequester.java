@@ -3,7 +3,6 @@ package com.example.niklasm.iliasbuddy;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Base64;
-import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -45,11 +44,9 @@ public class IliasXmlWebRequester {
         RequestQueue queue = Volley.newRequestQueue(this.context);
 
         // Request a string response from the provided URL.
-        Log.d("IliasRssHandler - Req", CREDENTIALS.url);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, CREDENTIALS.url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d("IliasRssHandler - Resp", response);
                 classThatImplementsInterface.processIliasXml(response);
             }
         }, new Response.ErrorListener() {
@@ -60,7 +57,6 @@ public class IliasXmlWebRequester {
                     return;
                 }
                 classThatImplementsInterface.webResponseError(error);
-                Log.e("IliasRssHandler - Error", error.toString());
             }
         }) {
             @Override
@@ -77,7 +73,7 @@ public class IliasXmlWebRequester {
         queue.add(stringRequest);
     }
 
-    public class IliasRssCredentials {
+    final private class IliasRssCredentials {
         final String url;
         final String userName;
         final String password;

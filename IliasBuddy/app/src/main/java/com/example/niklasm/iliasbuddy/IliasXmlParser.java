@@ -1,6 +1,6 @@
 package com.example.niklasm.iliasbuddy;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
 import android.util.Xml;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -29,7 +29,7 @@ public class IliasXmlParser {
      *                                or anything other XML related
      * @throws IOException            Input stream errors or I don't know
      */
-    public static IliasRssItem[] parse(InputStream inputStream) throws XmlPullParserException, IOException {
+    public static IliasRssItem[] parse(InputStream inputStream) throws XmlPullParserException, IOException, ParseException {
         try {
             // create XmlPullParser parser for parsing the XML data in the shape of a InputStream
             final XmlPullParser parser = Xml.newPullParser();
@@ -52,7 +52,7 @@ public class IliasXmlParser {
      *                                or anything other XML related
      * @throws IOException            Input stream errors or I don't know
      */
-    private static IliasRssItem[] readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private static IliasRssItem[] readFeed(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
 
         // create ArrayList for all IliasRssItems in XML file
         ArrayList<IliasRssItem> entries = new ArrayList<>();
@@ -75,7 +75,7 @@ public class IliasXmlParser {
         return entries.toArray(new IliasRssItem[0]);
     }
 
-    private static IliasRssItem readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private static IliasRssItem readEntry(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
 
         parser.require(XmlPullParser.START_TAG, ns, "item");
         String[] courseExtraTitleExtraTitle = new String[]{null, null, null, null};
@@ -108,17 +108,12 @@ public class IliasXmlParser {
         return new IliasRssItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1], courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3], description, link, date);
     }
 
-    private static Date readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static Date readDate(XmlPullParser parser) throws IOException, XmlPullParserException, ParseException {
         parser.require(XmlPullParser.START_TAG, ns, "pubDate");
         final String dateString = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, "pubDate");
-        try {
-            final SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
-            return sf1.parse(dateString);
-        } catch (ParseException e) {
-            Log.e("Error Date", e.toString());
-            return null;
-        }
+        @SuppressLint("SimpleDateFormat") final SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
+        return sf1.parse(dateString);
     }
 
     private static String readDescription(XmlPullParser parser) throws IOException, XmlPullParserException {

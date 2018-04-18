@@ -30,7 +30,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:focusable="true"
-        app:rippleColor="@color/fabRippleColor"
+        app:rippleColor="@color/colorPrimaryLight"
         android:src="@drawable/ic_check" />
 
 

@@ -27,9 +27,11 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".AboutActivity"
+            android:parentActivityName=".MainActivity"
             android:label="About" />
         <activity
             android:name=".SetupActivity"
+            android:parentActivityName=".MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/ilias_connection_setup"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -40,6 +42,7 @@
 
         <activity
             android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_settings" />
     </application>
 

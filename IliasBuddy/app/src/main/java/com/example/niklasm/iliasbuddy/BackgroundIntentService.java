@@ -1,10 +1,8 @@
 package com.example.niklasm.iliasbuddy;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
@@ -23,23 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 public class BackgroundIntentService extends Service implements IliasXmlWebRequesterInterface {
-    private IliasXmlWebRequester webRequester;
-
-    private boolean applicationInForeground() {
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningAppProcessInfo> services = activityManager.getRunningAppProcesses();
-        boolean isActivityFound = false;
-
-        if (services.get(0).processName.equalsIgnoreCase(getPackageName())) {
-            isActivityFound = true;
-        }
-
-        return isActivityFound;
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -48,7 +33,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         // Toast.makeText(getApplicationContext(), "BackgroundIntentService onStartCommand", Toast.LENGTH_SHORT).show();
 
         // make a web request with the important data
-        webRequester = new IliasXmlWebRequester(this);
+        IliasXmlWebRequester webRequester = new IliasXmlWebRequester(this);
         webRequester.getWebContent();
 
         // return this so that the service can be restarted
@@ -118,7 +103,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         final IliasRssItem[] myDataSet;
         try {
             myDataSet = IliasXmlParser.parse(stream);
-        } catch (XmlPullParserException | IOException e) {
+        } catch (ParseException | XmlPullParserException | IOException e) {
             e.printStackTrace();
             return;
         }

@@ -31,7 +31,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:focusable="true"
-        app:rippleColor="@color/fabRippleColor"
+        app:rippleColor="@color/colorPrimaryLight"
         app:srcCompat="@drawable/ic_refresh" />
 
 </android.support.design.widget.CoordinatorLayout>

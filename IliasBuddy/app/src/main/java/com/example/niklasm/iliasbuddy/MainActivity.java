@@ -2,6 +2,7 @@ package com.example.niklasm.iliasbuddy;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -49,6 +51,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+    private Snackbar newEntriesMessage;
 
     private IliasXmlWebRequester webRequester;
     private IliasRssItem latestRssEntry;
@@ -80,14 +84,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 String previewString = intent.getStringExtra("previewString");
                 // String bigString = intent.getStringExtra("bigString");
 
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAction("REFRESH", new View.OnClickListener() {
+                newEntriesMessage = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE);
+                newEntriesMessage.setAction("REFRESH", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         checkForRssUpdates();
                     }
                 });
-                snackbar.show();
+                newEntriesMessage.show();
 
                 //Do something with the string
             }
@@ -139,9 +143,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         });
 
         // try to load saved RSS feed
-        final IliasRssItem[] myDataSet = rssDataSaver.readRssFeed();
+        IliasRssItem[] myDataSet;
+        try {
+            myDataSet = rssDataSaver.readRssFeed();
+        } catch (IliasRssDataSaver.IliasRssDataSaverException | IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            myDataSet = null;
+        }
         if (myDataSet == null) {
-            rssDataSaver.writeRssFeed(new IliasRssItem[0]);
+            try {
+                rssDataSaver.writeRssFeed(new IliasRssItem[0]);
+            } catch (IliasRssDataSaver.IliasRssDataSaverException | IOException e) {
+                e.printStackTrace();
+            }
             latestRssEntry2 = null;
             latestRssEntry = null;
             // specify an adapter (see also next example)
@@ -160,6 +174,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             latestRssEntry = null;
             latestRssEntry2 = null;
         }
+
+        if (mAdapter == null) mAdapter = new MyAdapter(Arrays.asList(new IliasRssItem[0]));
 
         webRequester = new IliasXmlWebRequester(this);
         checkForRssUpdates();
@@ -199,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         final IliasRssItem[] myDataSet;
         try {
             myDataSet = IliasXmlParser.parse(stream);
-        } catch (XmlPullParserException | IOException e) {
+        } catch (XmlPullParserException | IOException | ParseException e) {
             e.printStackTrace();
             return;
         }
@@ -275,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void checkForRssUpdates() {
+        if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) newEntriesMessage.dismiss();
         NotificationManager mNotificationManager;
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (mNotificationManager != null) mNotificationManager.cancelAll();
@@ -295,15 +312,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void cleanList(MenuItem menuItem) {
-        this.rssDataSaver.writeRssFeed(new IliasRssItem[0]);
+        try {
+            this.rssDataSaver.writeRssFeed(new IliasRssItem[0]);
+        } catch (IliasRssDataSaver.IliasRssDataSaverException | IOException e) {
+            e.printStackTrace();
+        }
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         final SharedPreferences.Editor e = myPrefs.edit();
         e.putString(getString(R.string.latestItem), "");
         e.apply();
         this.latestRssEntry = null;
         renderNewList(new IliasRssItem[0]);
-        mAdapter.notifyAll();
-        mAdapter.notifyItemRangeRemoved(0, mAdapter.getItemCount());
+        // mAdapter.notifyAll();
+        // mAdapter.notifyItemRangeRemoved(0, mAdapter.getItemCount());
         dataSetLength = 0;
     }
 
@@ -314,7 +335,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         e.putString(getString(R.string.latestItem), newDataSet.length > 0 ? newDataSet[0].toString() : "");
         e.apply();
 
-        this.rssDataSaver.writeRssFeed(newDataSet);
+        try {
+            this.rssDataSaver.writeRssFeed(newDataSet);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -341,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (am != null) { // check every 5 minutes
             am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * 5, pendingIntent);
         }
+        makeNotification();
     }
 
     @Override
@@ -360,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void stopService(MenuItem menuItem) {
         Log.i("MainActivity", "stopService");
         am.cancel(pendingIntent);
+        removeNotification();
     }
 
     public void showLastResponse(MenuItem menuItem) {
@@ -400,6 +427,32 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         checkForRssUpdates();
     }
 
+    final private int NOTIFICATION_ID = 1234;
+
+    private void makeNotification() {
+        Intent intent = new Intent(this, MainActivity.class);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this,
+                NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Notification.Builder builder = new Notification.Builder(this)
+                .setContentTitle("Sticky notification")
+                .setContentText("This notification cannot be removed")
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.ic_ilias_logo_notification);
+        Notification n = builder.build();
+
+        n.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify(NOTIFICATION_ID, n);
+    }
+
+    private void removeNotification() {
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.cancel(NOTIFICATION_ID);
+    }
+
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
         private final List<IliasRssItem> items;
@@ -412,7 +465,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         MyAdapter(List<IliasRssItem> dataSet) {
             this.items = dataSet;
         }
-
 
 
         @Override
@@ -453,8 +505,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             if (entry.getTitleExtra() == null) holder.titleExtraCard.setVisibility(View.GONE);
             else holder.titleExtra.setText(entry.getTitleExtra());
 
-            if (description == null || description.equals("")) holder.description.setVisibility(View.GONE);
-            else holder.description.setText(Html.fromHtml(description).toString().replaceAll("\\s+", " ").trim());
+            if (description == null || description.equals(""))
+                holder.description.setVisibility(View.GONE);
+            else
+                holder.description.setText(Html.fromHtml(description).toString().replaceAll("\\s+", " ").trim());
 
             if ((description == null || description.equals("")) && entry.getTitleExtra() != null) {
                 holder.titleExtra.setText(getResources().getString(R.string.new_file));

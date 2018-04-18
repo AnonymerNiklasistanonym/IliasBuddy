@@ -103,16 +103,13 @@
     <string name="new_file">New file</string>
 
 
-    <string name="title_activity_welcome">Home Screen</string>
     <string name="next">NEXT</string>
     <string name="skip">SKIP</string>
     <string name="start">GOT IT</string>
-    <string name="slide_1_title">Daily Workout</string>
-    <string name="slide_1_desc">Set your daily workout routine by the help of trainer</string>
-    <string name="slide_2_title">Meditation Techniques </string>
-    <string name="slide_2_desc">Learn about the different meditation techniques and practice them</string>
-    <string name="slide_3_title">Diet Chart</string>
-    <string name="slide_3_desc">Make your diet chart by the help of health experts</string>
-    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
-    <string name="play_again">Play Again</string>
+    <string name="slide_1_title">Welcome to the IliasBuddy app</string>
+    <string name="slide_1_desc">Swipe or click NEXT to learn more or start instantly by clicking SKIP</string>
+    <string name="slide_2_title">How it works</string>
+    <string name="slide_2_desc">After you enter the URL and CREDENTIALS of your private rss feed the app checks regularly or if you start it the feed and lists all entries. If it finds a never before seen one it shows you a notification.</string>
+    <string name="slide_3_title">Options</string>
+    <string name="slide_3_desc">If you do not want notifications, or only want to check ever hour, or want to change something else just visit the settings :)</string>
 </resources>

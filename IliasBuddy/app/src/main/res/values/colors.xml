@@ -3,26 +3,26 @@
     <!-- Theme colors -->
     <color name="colorPrimary">#23456f</color>
     <color name="colorPrimaryDark">#152943</color>
-    <color name="colorAccent">#23456f</color>
+    <color name="colorPrimaryLight">#366bae</color>
+    <color name="colorAccent">@color/colorPrimary</color>
 
     <!-- Custom colors -->
     <color name="date">#999999</color>
     <color name="title">#222222</color>
-    <color name="fabRippleColor">#366bae</color>
     <color name="recyclerViewLineColor">#bdbdbd</color>
     <color name="colorNewEntry">#88ffd600</color>
 
 
     <!-- Screens background color-->
-    <color name="bg_slider_screen1">#f4b241</color>
+    <color name="bg_slider_screen1">@color/colorPrimary</color>
     <color name="bg_slider_screen2">#16bc7d</color>
     <color name="bg_slider_screen3">#203d8c</color>
     <!-- dots inactive colors -->
-    <color name="dot_inactive_screen1">#ffa000</color>
+    <color name="dot_inactive_screen1">@color/colorPrimaryDark</color>
     <color name="dot_inactive_screen2">#008c57</color>
     <color name="dot_inactive_screen3">#0e1e49</color>
     <!-- dots active colors -->
-    <color name="dot_active_screen1">#f9c772</color>
+    <color name="dot_active_screen1">@color/colorPrimaryLight</color>
     <color name="dot_active_screen2">#74f7c5</color>
     <color name="dot_active_screen3">#3a67e0</color>
     <array name="array_dot_active">

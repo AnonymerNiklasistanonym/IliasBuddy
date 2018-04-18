@@ -1,7 +1,6 @@
 package com.example.niklasm.iliasbuddy;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,44 +10,44 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
+/**
+ * CLass that save IliasRssItem[] to a file and can read it too
+ */
 public class IliasRssDataSaver {
 
-    final File directory;
-    final private Context context;
-    final private String fileName;
+    final private File directory;
+    final private File iliasRssItemFile;
 
-    public IliasRssDataSaver(final Context context, final String fileName) {
-        this.context = context;
-        this.fileName = fileName;
+    IliasRssDataSaver(final Context context, final String fileName) {
         this.directory = new File(context.getFilesDir().getAbsolutePath() + File.separator + "serialisation");
+        this.iliasRssItemFile = new File(this.directory + File.separator + fileName);
     }
 
-    public IliasRssItem[] readRssFeed() {
-        try {
-            final ObjectInputStream input = new ObjectInputStream(new FileInputStream(this.directory
-                    + File.separator + this.fileName));
-            final IliasRssItem[] ReturnClass = (IliasRssItem[]) input.readObject();
-            input.close();
-            return ReturnClass;
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
+    public IliasRssItem[] readRssFeed() throws IOException, ClassNotFoundException {
+        if (!this.directory.exists()) {
+            throw new IliasRssDataSaverException("readRssFeed() - Directory (" + this.directory.toString() + ") does not exist!");
         }
+        if (!iliasRssItemFile.exists()) {
+            throw new IliasRssDataSaverException("readRssFeed() - File (" + iliasRssItemFile.toString() + ") does not exist!");
+        }
+        final ObjectInputStream input = new ObjectInputStream(new FileInputStream(iliasRssItemFile));
+        final IliasRssItem[] readIliasRssItems = (IliasRssItem[]) input.readObject();
+        input.close();
+        return readIliasRssItems;
     }
 
-    public void writeRssFeed(IliasRssItem[] saveThisObject) {
-
+    public void writeRssFeed(IliasRssItem[] saveThisObject) throws IOException {
         if (!this.directory.exists() && !this.directory.mkdirs()) {
-            Log.e("IliasRssDataSaver Error", "Directory (" + this.directory.toString() + "could not be created!");
+            throw new IliasRssDataSaverException("writeRssFeed() - Directory (" + this.directory.toString() + ") could not be created!");
         }
+        final ObjectOutput out = new ObjectOutputStream(new FileOutputStream(iliasRssItemFile));
+        out.writeObject(saveThisObject);
+        out.close();
+    }
 
-        try {
-            final ObjectOutput out = new ObjectOutputStream(new FileOutputStream(this.directory
-                    + File.separator + this.fileName));
-            out.writeObject(saveThisObject);
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    class IliasRssDataSaverException extends RuntimeException {
+        IliasRssDataSaverException(String message) {
+            super("IliasRssDataSaverException - " + message);
         }
     }
 }

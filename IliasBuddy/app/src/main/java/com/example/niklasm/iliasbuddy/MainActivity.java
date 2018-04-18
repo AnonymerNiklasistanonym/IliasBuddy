@@ -302,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         e.apply();
         this.latestRssEntry = null;
         renderNewList(new IliasRssItem[0]);
+        mAdapter.notifyAll();
         mAdapter.notifyItemRangeRemoved(0, mAdapter.getItemCount());
         dataSetLength = 0;
     }
@@ -321,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         // specify an adapter (see also next example)
 
+        mAdapter.notifyDataSetChanged();
         mAdapter = new MyAdapter(Arrays.asList(newDataSet));
         mRecyclerView.setAdapter(mAdapter);
 
@@ -407,9 +409,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         // Allows to remember the last item shown on screen
         private int lastPosition = -1;
 
-        private MyAdapter(List<IliasRssItem> dataSet) {
+        MyAdapter(List<IliasRssItem> dataSet) {
             this.items = dataSet;
         }
+
+
 
         @Override
         @NonNull
@@ -418,17 +422,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recycler_view_new, parent, false);
             return new ViewHolder(v);
-        }
-
-        public void add(IliasRssItem item, int position) {
-            items.add(position, item);
-            notifyItemInserted(position);
-        }
-
-        public void remove(IliasRssItem item) {
-            int position = items.indexOf(item);
-            items.remove(position);
-            notifyItemRemoved(position);
         }
 
         @Override

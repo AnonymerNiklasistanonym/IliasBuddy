@@ -81,8 +81,9 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(aboutPage);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
     }
 
     @Override
@@ -95,4 +96,5 @@ public class AboutActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

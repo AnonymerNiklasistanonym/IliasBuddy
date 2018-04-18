@@ -106,9 +106,9 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(0, notification);
 
-        Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON);
-        callMainActivity.putExtra("previewString", previewString);
-        callMainActivity.putExtra("bigString", bigString);
+        Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
+                .putExtra("previewString", previewString)
+                .putExtra("bigString", bigString);
         LocalBroadcastManager.getInstance(this).sendBroadcast(callMainActivity);
     }
 

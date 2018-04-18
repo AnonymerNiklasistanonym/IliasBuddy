@@ -13,18 +13,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Class that parses IliasRssItem's from an IliasRssFeed InputStream
+ * (mostly inspired by this tutorial: https://developer.android.com/training/basics/network-ops/xml.html)
+ */
 public class IliasXmlParser {
 
     // We don't use namespaces
     private static final String ns = null;
 
     /**
-     *
      * @param inputStream Contains the XML data String
      * @return Array that contains all listed IliasRssItems from the IliasRssFeed
      * @throws XmlPullParserException If a XML tag is in the wrong place, XML data is incomplete
-     * or anything other XML related
-     * @throws IOException Input stream errors or I don't know
+     *                                or anything other XML related
+     * @throws IOException            Input stream errors or I don't know
      */
     public static IliasRssItem[] parse(InputStream inputStream) throws XmlPullParserException, IOException {
         try {
@@ -42,11 +45,12 @@ public class IliasXmlParser {
 
     /**
      * Extract all listed IliasRssItems from the IliasRssFeed with the given XmlPullParser
+     *
      * @param parser XmlPullParser that has as content the XML data "array" with all entries
      * @return Array that contains all listed IliasRssItems from the IliasRssFeed
      * @throws XmlPullParserException If a XML tag is in the wrong place, XML data is incomplete
-     * or anything other XML related
-     * @throws IOException Input stream errors or I don't know
+     *                                or anything other XML related
+     * @throws IOException            Input stream errors or I don't know
      */
     private static IliasRssItem[] readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
 
@@ -74,7 +78,7 @@ public class IliasXmlParser {
     private static IliasRssItem readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
 
         parser.require(XmlPullParser.START_TAG, ns, "item");
-        String[] courseExtraTitle = new String[]{null, null, null};
+        String[] courseExtraTitleExtraTitle = new String[]{null, null, null, null};
         String link = null;
         String description = null;
         Date date = null;
@@ -86,7 +90,7 @@ public class IliasXmlParser {
             String name = parser.getName();
             switch (name) {
                 case "title":
-                    courseExtraTitle = readCourseExtraTitle(parser);
+                    courseExtraTitleExtraTitle = readCourseExtraTitleTitleExtra(parser);
                     break;
                 case "link":
                     link = readLink(parser);
@@ -101,7 +105,7 @@ public class IliasXmlParser {
                     skip(parser);
             }
         }
-        return new IliasRssItem(courseExtraTitle[0], courseExtraTitle[1], courseExtraTitle[2], description, link, date);
+        return new IliasRssItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1], courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3], description, link, date);
     }
 
     private static Date readDate(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -131,16 +135,19 @@ public class IliasXmlParser {
         return link;
     }
 
-    private static String[] readCourseExtraTitle(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String[] readCourseExtraTitleTitleExtra(XmlPullParser parser) throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, ns, "title");
         final String courseExtraTitle = readText(parser);
         final String courseExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("[") + 1, courseExtraTitle.indexOf("]")).trim();
         final boolean extraExists = courseExtraTitle.contains(">");
-        final String course = extraExists ? courseExtra.substring(0, courseExtra.indexOf(">") - 1).trim() : courseExtra;
+        final String course = extraExists ? courseExtra.substring(0, courseExtra.indexOf(">")).trim() : courseExtra;
         final String extra = extraExists ? courseExtra.substring(courseExtra.indexOf(">") + 1).trim() : null;
-        final String title = courseExtraTitle.substring(courseExtraTitle.indexOf("]") + 1).trim();
+        final String titleTitleExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("]") + 1).trim();
+        final boolean titleExtraExists = titleTitleExtra.contains(":");
+        final String title = titleExtraExists ? titleTitleExtra.substring(titleTitleExtra.indexOf(":") + 1).trim() : titleTitleExtra;
+        final String titleExtra = titleExtraExists ? titleTitleExtra.substring(0, titleTitleExtra.indexOf(":")).trim() : null;
         parser.require(XmlPullParser.END_TAG, ns, "title");
-        return new String[]{course, extra, title};
+        return new String[]{course, extra, titleExtra, title};
     }
 
     // For the tags title and summary, extracts their text values.

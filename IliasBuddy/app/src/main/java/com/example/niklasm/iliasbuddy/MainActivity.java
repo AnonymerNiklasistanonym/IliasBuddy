@@ -2,6 +2,7 @@ package com.example.niklasm.iliasbuddy;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,6 +21,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -47,27 +50,49 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, IliasXmlWebRequesterInterface {
 
-    private IliasXmlWebRequester webRequester;
+    // test - https://stackoverflow.com/a/12997537/7827128
+    public static final String RECEIVE_JSON = "com.your.package.RECEIVE_JSON";
+    LocalBroadcastManager bManager;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
+
+    private IliasXmlWebRequester webRequester;
     private IliasRssItem latestRssEntry;
     private IliasRssItem latestRssEntry2;
     private String lastResponse = null;
-
     private int dataSetLength = 0;
-
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
     private IliasRssDataSaver rssDataSaver;
-
     private AlarmManager am;
     private PendingIntent pendingIntent;
+    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null && intent.getAction().equals(RECEIVE_JSON)) {
+                String previewString = intent.getStringExtra("previewString");
+                // String bigString = intent.getStringExtra("bigString");
+
+                Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction("REFRESH", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        checkForRssUpdates();
+                    }
+                });
+                snackbar.show();
+
+                //Do something with the string
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +103,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         setSupportActionBar(toolbar);
 
         mRecyclerView = findViewById(R.id.my_recycler_view);
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setHasFixedSize(false);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mSwipeRefreshLayout = findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -128,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             latestRssEntry2 = myDataSet[0];
             latestRssEntry = myDataSet[0];
             // specify an adapter (see also next example)
-            mAdapter = new MyAdapter(myDataSet, this);
+            mAdapter = new MyAdapter(Arrays.asList(myDataSet));
             mRecyclerView.setAdapter(mAdapter);
             dataSetLength = myDataSet.length;
 
@@ -150,34 +174,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         startService();
     }
-
-    // test - https://stackoverflow.com/a/12997537/7827128
-    public static final String RECEIVE_JSON = "com.your.package.RECEIVE_JSON";
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction() != null && intent.getAction().equals(RECEIVE_JSON)) {
-                String previewString = intent.getStringExtra("previewString");
-                // String bigString = intent.getStringExtra("bigString");
-
-                Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAction("REFRESH", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        checkForRssUpdates();
-                    }
-                });
-                snackbar.show();
-
-                //Do something with the string
-            }
-        }
-    };
-    LocalBroadcastManager bManager;
     // test - https://stackoverflow.com/a/12997537/7827128
 
     // test - https://stackoverflow.com/a/12997537/7827128
-    protected void onDestroy(Bundle savedInstanceState) {
+    protected void onDestroy() {
         super.onDestroy();
         bManager.unregisterReceiver(bReceiver);
     }
@@ -275,9 +275,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void checkForRssUpdates() {
+        NotificationManager mNotificationManager;
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (mNotificationManager != null) mNotificationManager.cancelAll();
         mSwipeRefreshLayout.setRefreshing(true);
         webRequester.getWebContent();
     }
+
     public void refreshIcon(boolean state) {
         mSwipeRefreshLayout.setRefreshing(state);
     }
@@ -298,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         e.apply();
         this.latestRssEntry = null;
         renderNewList(new IliasRssItem[0]);
+        mAdapter.notifyItemRangeRemoved(0, mAdapter.getItemCount());
         dataSetLength = 0;
     }
 
@@ -315,8 +320,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mRecyclerView.setHasFixedSize(true);
 
         // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(newDataSet, this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new MyAdapter(Arrays.asList(newDataSet));
         mRecyclerView.setAdapter(mAdapter);
 
         dataSetLength = newDataSet.length;
@@ -395,18 +400,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
-        private final IliasRssItem[] dataSet;
+        private final List<IliasRssItem> items;
         private final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM", getResources().getConfiguration().locale);
         private final SimpleDateFormat viewTimeFormat = new SimpleDateFormat("HH:mm", getResources().getConfiguration().locale);
-
-        private Context context;
 
         // Allows to remember the last item shown on screen
         private int lastPosition = -1;
 
-        private MyAdapter(IliasRssItem[] dataSet, Context context) {
-            this.dataSet = dataSet;
-            this.context = context;
+        private MyAdapter(List<IliasRssItem> dataSet) {
+            this.items = dataSet;
         }
 
         @Override
@@ -418,35 +420,74 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             return new ViewHolder(v);
         }
 
+        public void add(IliasRssItem item, int position) {
+            items.add(position, item);
+            notifyItemInserted(position);
+        }
+
+        public void remove(IliasRssItem item) {
+            int position = items.indexOf(item);
+            items.remove(position);
+            notifyItemRemoved(position);
+        }
+
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int positionButDoNotUse) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             // Replace the contents of a view (invoked by the layout manager)
             // - get element from the data set at this position
             // - replace the contents of the view with that element
-            final int position = holder.getAdapterPosition();
-            final IliasRssItem entry = dataSet[holder.getAdapterPosition()];
-            Log.i("MainActivity", "latestRssEntry: " + latestRssEntry);
+            final IliasRssItem entry = items.get(position);
+            final String description = entry.getDescription();
+
+            // CHECK THIS LATER
+            Log.d("MainActivity", "latestRssEntry: " + latestRssEntry);
             if (latestRssEntry == null || latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
-                Log.i("COLOR BACKGROUND", "IT HAPPENED????");
                 holder.background.setBackgroundResource(R.color.colorNewEntry);
-                // Toast.makeText(MainActivity.this, "WOW - there is a new post: " + entry.toString(), Toast.LENGTH_LONG).show();
             }
-            if (entry.getDescription() == null) {
-                holder.description.setVisibility(View.GONE);
-                holder.title.setLines(2);
-            } else {
-                holder.description.setText(Html.fromHtml(entry.getDescription()).toString().replaceAll("\\s+", " "));
-                }
-            final String course = entry.getExtra() != null ? entry.getCourse() + " \"" + entry.getExtra() +"\"" : entry.getCourse();
-            holder.course.setText(course);
-            holder.title.setText(entry.getTitle());
+            // CHECK THIS LATER
+
+            // These views have always these values
+            holder.course.setText(entry.getCourse());
             holder.date.setText(viewDateFormat.format(entry.getDate()));
             holder.time.setText(viewTimeFormat.format(entry.getDate()));
-
-            final ImageView starView = holder.star;
-
             holder.star.setVisibility(View.GONE);
+            holder.title.setText(entry.getTitle());
 
+            // if extra is null hide extra card or else set the text
+            if (entry.getExtra() == null) holder.extraCard.setVisibility(View.GONE);
+            else holder.extra.setText(entry.getExtra());
+
+            if (entry.getTitleExtra() == null) holder.titleExtraCard.setVisibility(View.GONE);
+            else holder.titleExtra.setText(entry.getTitleExtra());
+
+            if (description == null || description.equals("")) holder.description.setVisibility(View.GONE);
+            else holder.description.setText(Html.fromHtml(description).toString().replaceAll("\\s+", " ").trim());
+
+            if ((description == null || description.equals("")) && entry.getTitleExtra() != null) {
+                holder.titleExtra.setText(getResources().getString(R.string.new_file));
+                holder.title.setText(entry.getTitleExtra());
+                holder.titleExtraCard.setCardBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+            }
+
+            /* if there is no description make title longer and hide it
+            if (description == null || description.equals("")) {
+                holder.description.setVisibility(View.GONE);
+                holder.title.setLines(2);
+                holder.title.setText(titleExtra);
+                holder.titleExtra.setText(context.getResources().getString(R.string.new_file));
+                holder.titleExtraCard.setCardBackgroundColor(context.getResources().getColor(android.R.color.holo_red_dark));
+            } else {
+            }
+
+            // if there is no title extra and descripton hide label
+            if (titleExtra == null && !(description == null || description.equals(""))) {
+                holder.titleExtraCard.setVisibility(View.GONE);
+            } else {
+                holder.titleExtra.setText(titleExtra);
+            }*/
+
+
+            /*final ImageView starView = holder.star;
             holder.star.setOnClickListener(new View.OnClickListener() {
                 private boolean clicked = false;
                 @Override
@@ -460,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     }
                     clicked = !clicked;
                 }
-            });
+            });*/
 
             setAnimation(holder.itemView, position);
         }
@@ -469,13 +510,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
          * Here is the key method to apply the animation
          * https://stackoverflow.com/a/26748274/7827128
          */
-        private void setAnimation(View viewToAnimate, int position)
-        {
+        private void setAnimation(View viewToAnimate, int position) {
             // If the bound view wasn't previously displayed on screen, it's animated
-            if (position > lastPosition)
-            {
+            if (position > lastPosition) {
                 // R.anim.slide_up, slide_in_left
-                Animation animation = AnimationUtils.loadAnimation(context, R.anim.fall_down);
+                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fall_down);
                 viewToAnimate.startAnimation(animation);
                 lastPosition = position;
             }
@@ -483,8 +522,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         @Override
         public int getItemCount() {
-            // Return the size of the data set (invoked by the layout manager)
-            return dataSet.length;
+            return items.size();
         }
 
         /**
@@ -493,30 +531,35 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
          * view holder
          */
         public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-            final public TextView course, title, date, time, description;
+            final public TextView course, title, date, time, description, extra, titleExtra;
             final public LinearLayout background;
             final public ImageView star;
+            final public CardView extraCard, titleExtraCard;
 
-            private ViewHolder(View view) {
-                super(view);
+            private ViewHolder(View itemView) {
+                super(itemView);
                 // add on click listener to each view holder
-                view.setOnClickListener(this);
+                itemView.setOnClickListener(this);
                 // set the views of the view holder
-                background = view.findViewById(R.id.background);
-                course = view.findViewById(R.id.course);
-                date = view.findViewById(R.id.date);
-                title = view.findViewById(R.id.title);
-                description = view.findViewById(R.id.description);
-                time = view.findViewById(R.id.time);
-                star = view.findViewById(R.id.star);
+                background = itemView.findViewById(R.id.background);
+                course = itemView.findViewById(R.id.course);
+                date = itemView.findViewById(R.id.date);
+                description = itemView.findViewById(R.id.description);
+                extra = itemView.findViewById(R.id.extra);
+                extraCard = itemView.findViewById(R.id.extraCard);
+                star = itemView.findViewById(R.id.star);
+                time = itemView.findViewById(R.id.time);
+                title = itemView.findViewById(R.id.title);
+                titleExtra = itemView.findViewById(R.id.titleExtra);
+                titleExtraCard = itemView.findViewById(R.id.titleExtraCard);
             }
 
             @Override
             public void onClick(final View view) {
                 final int itemPosition = mRecyclerView.getChildLayoutPosition(view);
-                final IliasRssItem entry = dataSet[itemPosition];
+                final IliasRssItem entry = items.get(itemPosition);
 
-                if (entry.getDescription() == null) {
+                if (entry.getDescription() == null || entry.getDescription().equals("")) {
                     // if there is no description this means it was an upload
                     // therefore instantly link to the Ilias page
                     openUrl(entry.getLink());

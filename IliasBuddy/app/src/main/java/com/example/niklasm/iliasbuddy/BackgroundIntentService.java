@@ -63,7 +63,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
     public void createNotification(String previewString, String bigString) {
 
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        final String latestItem = myPrefs.getString(getString(R.string.lastNotification),"nothing_found");
+        final String latestItem = myPrefs.getString(getString(R.string.lastNotification), "nothing_found");
 
         if (!latestItem.equals("nothing_found") && latestItem.equals(bigString)) {
             Log.i("BackgroundIntentService", "Do not make a new notification, the text is the same");
@@ -125,7 +125,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
 
         // get latest item string form shared preferences
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
-        final String latestItem = myPrefs.getString(getString(R.string.latestItem),"nothing_found");
+        final String latestItem = myPrefs.getString(getString(R.string.latestItem), "nothing_found");
 
         int latestEntry = -1;
         boolean searchingForNewElements = true;
@@ -143,9 +143,9 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
             for (IliasRssItem entry : myDataSet) {
                 bigString.append("- ")
                         .append(entry.getCourse())
-                        .append(" > ")
-                        .append(entry.getExtra())
+                        .append(entry.getExtra() != null ? " > " + entry.getExtra() : "")
                         .append(" >> ")
+                        .append(entry.getTitleExtra() != null ? entry.getTitleExtra() + ": " : "")
                         .append(entry.getTitle())
                         .append(" (")
                         .append(viewDateFormat.format(entry.getDate()))

@@ -26,30 +26,6 @@ public class IliasXmlWebRequester {
         this.context = (Context) classThatImplementsInterface;
     }
 
-    public class IliasRssCredentials {
-        final String url;
-        final String userName;
-        final String password;
-
-        IliasRssCredentials(final String url, final String userName, final String password) {
-            this.url = url;
-            this.userName = userName;
-            this.password = password;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-    }
-
     private String getSharedPreferenceStringOrNull(final SharedPreferences myPrefs, final int stringId) {
         return myPrefs.getString(context.getResources().getString(stringId), null);
     }
@@ -91,9 +67,7 @@ public class IliasXmlWebRequester {
             public Map<String, String> getHeaders() {
                 final Map<String, String> headers = new HashMap<>();
                 final String credentials = CREDENTIALS.getUserName() + ":" + CREDENTIALS.getPassword();
-                Log.i("IliasRssHandler - cred", credentials);
                 final String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
-                Log.i("IliasRssHandler - auth", auth);
                 headers.put("Content-Type", "application/json; charset=UTF-8");
                 headers.put("Authorization", auth);
                 return headers;
@@ -101,6 +75,30 @@ public class IliasXmlWebRequester {
         };
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+    }
+
+    public class IliasRssCredentials {
+        final String url;
+        final String userName;
+        final String password;
+
+        IliasRssCredentials(final String url, final String userName, final String password) {
+            this.url = url;
+            this.userName = userName;
+            this.password = password;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getPassword() {
+            return password;
+        }
     }
 
 }

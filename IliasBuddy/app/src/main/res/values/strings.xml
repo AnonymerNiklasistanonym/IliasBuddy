@@ -100,5 +100,6 @@
     <string name="action_about">About</string>
 
     <string name="nothing_found">nothing_found</string>
+    <string name="new_file">New file</string>
 
 </resources>

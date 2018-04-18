@@ -13,9 +13,9 @@ import java.io.ObjectOutputStream;
 
 public class IliasRssDataSaver {
 
+    final File directory;
     final private Context context;
     final private String fileName;
-    final File directory;
 
     public IliasRssDataSaver(final Context context, final String fileName) {
         this.context = context;

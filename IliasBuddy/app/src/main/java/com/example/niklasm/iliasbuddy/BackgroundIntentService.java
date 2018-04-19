@@ -49,7 +49,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         return null;
     }
 
-    public void createNotification(String previewString, String bigString) {
+    public void createNotification(String titleString, String previewString, String bigString) {
 
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
         final String latestItem = myPrefs.getString(getString(R.string.lastNotification), "nothing_found");
@@ -74,7 +74,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 .setDefaults(notification2.defaults)
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setColor(ContextCompat.getColor(BackgroundIntentService.this, R.color.colorPrimary))
-                .setContentTitle("Ilias Buddy Notification!")
+                .setContentTitle(titleString)
                 .setLights(getResources().getColor(R.color.colorPrimary), 3000, 3000)
                 .setContentText(previewString);
 
@@ -140,25 +140,46 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                         .append(viewDateFormat.format(entry.getDate()))
                         .append(")\n");
             }
-            createNotification(previewString, bigString.toString());
+            createNotification("New Ilias entries! (Setup was successful)", previewString, bigString.toString());
         } else if (latestEntry == 0) {
-            Log.i("BackgroundIntentService", "No new entry found");
+            Log.d("BackgroundIntentService", "No new entry found");
         } else {
-            Log.i("BackgroundIntentService", "New entries found");
-            final String previewString = latestEntry == 1 ? "one new entry found" : latestEntry + " new entries found";
-            final StringBuilder bigString = new StringBuilder(previewString + "\n");
             final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
-            for (int i = 0; i < latestEntry; i++) {
-                bigString.append("- ")
-                        .append(myDataSet[i].getCourse())
-                        .append(myDataSet[i].getExtra() != null ? " > " + myDataSet[i].getExtra() : "")
-                        .append(" >> ")
-                        .append(myDataSet[i].getTitle())
+            if (latestEntry == 1) {
+                Log.d("BackgroundIntentService", "New entry found");
+
+                final String previewString = "New entry found (" + myDataSet[0].getCourse() + (myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "") + ")";
+                final String bigString = new StringBuilder(previewString + "\n")
+                        .append(myDataSet[0].getCourse())
+                        .append(myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "")
+                        .append("\n")
+                        .append(myDataSet[0].getTitleExtra() != null ? myDataSet[0].getTitleExtra() + ": " :  "")
+                        .append(myDataSet[0].getTitle())
                         .append(" (")
-                        .append(viewDateFormat.format(myDataSet[i].getDate()))
-                        .append(")\n");
+                        .append(viewDateFormat.format(myDataSet[0].getDate()))
+                        .append(")\n\n")
+                        .append(myDataSet[0].getDescription())
+                        .toString();
+                createNotification("New Ilias entry!", previewString, bigString);
+
+            } else {
+                Log.d("BackgroundIntentService", "New entries found");
+
+                final String previewString = latestEntry + " new entries found (" + myDataSet[0].getCourse() + ", " + myDataSet[1].getCourse() + ",... )";
+                final StringBuilder bigString = new StringBuilder(previewString + "\n");
+                for (int i = 0; i < latestEntry; i++) {
+                    bigString.append("- ")
+                            .append(myDataSet[i].getCourse())
+                            .append(myDataSet[i].getExtra() != null ? " > " + myDataSet[i].getExtra() : "")
+                            .append("\n  ")
+                            .append(myDataSet[i].getTitleExtra() != null ? myDataSet[i].getTitleExtra() + ": " : "")
+                            .append(myDataSet[i].getTitle())
+                            .append(" (")
+                            .append(viewDateFormat.format(myDataSet[i].getDate()))
+                            .append(")\n");
+                }
+                createNotification(latestEntry + " new Ilias entries!", previewString, bigString.toString());
             }
-            createNotification(previewString, bigString.toString());
         }
     }
 

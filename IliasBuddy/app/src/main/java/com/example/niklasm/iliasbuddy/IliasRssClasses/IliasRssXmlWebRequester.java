@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy;
+package com.example.niklasm.iliasbuddy.IliasRssClasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,16 +11,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.niklasm.iliasbuddy.R;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class IliasXmlWebRequester {
+public class IliasRssXmlWebRequester {
 
-    final private IliasXmlWebRequesterInterface classThatImplementsInterface;
+    final private IliasRssXmlWebRequesterInterface classThatImplementsInterface;
     final private Context context;
 
-    IliasXmlWebRequester(IliasXmlWebRequesterInterface classThatImplementsInterface) {
+    public IliasRssXmlWebRequester(IliasRssXmlWebRequesterInterface classThatImplementsInterface) {
         this.classThatImplementsInterface = classThatImplementsInterface;
         this.context = (Context) classThatImplementsInterface;
     }

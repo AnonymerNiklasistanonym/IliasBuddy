@@ -12,19 +12,16 @@
     <color name="recyclerViewLineColor">#bdbdbd</color>
     <color name="colorNewEntry">#88ffd600</color>
 
-
-    <!-- Screens background color-->
+    <!-- Slide introduction screen colors -->
     <color name="bg_slider_screen1">@color/colorPrimary</color>
-    <color name="bg_slider_screen2">#16bc7d</color>
-    <color name="bg_slider_screen3">#203d8c</color>
-    <!-- dots inactive colors -->
+    <color name="bg_slider_screen2">#d50000</color>
+    <color name="bg_slider_screen3">#2e7d32</color>
     <color name="dot_inactive_screen1">@color/colorPrimaryDark</color>
-    <color name="dot_inactive_screen2">#008c57</color>
-    <color name="dot_inactive_screen3">#0e1e49</color>
-    <!-- dots active colors -->
+    <color name="dot_inactive_screen2">#b71c1c</color>
+    <color name="dot_inactive_screen3">#1b5e20</color>
     <color name="dot_active_screen1">@color/colorPrimaryLight</color>
-    <color name="dot_active_screen2">#74f7c5</color>
-    <color name="dot_active_screen3">#3a67e0</color>
+    <color name="dot_active_screen2">#ff3d00</color>
+    <color name="dot_active_screen3">#00c853</color>
     <array name="array_dot_active">
         <item>@color/dot_active_screen1</item>
         <item>@color/dot_active_screen2</item>
@@ -35,5 +32,4 @@
         <item>@color/dot_inactive_screen2</item>
         <item>@color/dot_inactive_screen3</item>
     </array>
-
 </resources>

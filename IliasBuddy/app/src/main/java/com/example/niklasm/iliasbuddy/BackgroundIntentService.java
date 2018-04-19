@@ -14,6 +14,10 @@ import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssItem;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlParser;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequester;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequesterInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -24,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public class BackgroundIntentService extends Service implements IliasXmlWebRequesterInterface {
+public class BackgroundIntentService extends Service implements IliasRssXmlWebRequesterInterface {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -33,7 +37,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         // Toast.makeText(getApplicationContext(), "BackgroundIntentService onStartCommand", Toast.LENGTH_SHORT).show();
 
         // make a web request with the important data
-        IliasXmlWebRequester webRequester = new IliasXmlWebRequester(this);
+        IliasRssXmlWebRequester webRequester = new IliasRssXmlWebRequester(this);
         webRequester.getWebContent();
 
         // return this so that the service can be restarted
@@ -79,7 +83,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         builder.setStyle(bigText);
 
         Intent resultIntent = new Intent(this, MainActivity.class);
-        resultIntent.putExtra(getString(R.string.render_new_elements), true);
+        resultIntent.putExtra(MainActivity.NEW_ENTRY_FOUND, true);
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -89,7 +93,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         notification.flags = Notification.FLAG_AUTO_CANCEL;
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(0, notification);
+        notificationManager.notify(MainActivity.NEW_ENTRY_FOUND_NOTIFICATION_ID, notification);
 
         Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
                 .putExtra("previewString", previewString)
@@ -102,7 +106,7 @@ public class BackgroundIntentService extends Service implements IliasXmlWebReque
         final InputStream stream = new ByteArrayInputStream(xmlData.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
         final IliasRssItem[] myDataSet;
         try {
-            myDataSet = IliasXmlParser.parse(stream);
+            myDataSet = IliasRssXmlParser.parse(stream);
         } catch (ParseException | XmlPullParserException | IOException e) {
             e.printStackTrace();
             return;

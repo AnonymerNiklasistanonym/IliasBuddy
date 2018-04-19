@@ -106,10 +106,10 @@
     <string name="next">NEXT</string>
     <string name="skip">SKIP</string>
     <string name="start">GOT IT</string>
-    <string name="slide_1_title">Welcome to the IliasBuddy app</string>
+    <string name="slide_1_title">Welcome to the IliasBuddy app :)</string>
     <string name="slide_1_desc">Swipe or click NEXT to learn more or start instantly by clicking SKIP</string>
-    <string name="slide_2_title">How it works</string>
-    <string name="slide_2_desc">After you enter the URL and CREDENTIALS of your private rss feed the app checks regularly or if you start it the feed and lists all entries. If it finds a never before seen one it shows you a notification.</string>
-    <string name="slide_3_title">Options</string>
-    <string name="slide_3_desc">If you do not want notifications, or only want to check ever hour, or want to change something else just visit the settings :)</string>
+    <string name="slide_2_title">How the app works</string>
+    <string name="slide_2_desc">After you enter your private Ilias feed URL, user name and password (not your normal Ilias password!) the app checks this feed and extracts all the information</string>
+    <string name="slide_3_title">Features</string>
+    <string name="slide_3_desc">The app can check the feed frequently in the background, can show you notifications if it finds new entries and many more things - toggle and change the features in the settings</string>
 </resources>

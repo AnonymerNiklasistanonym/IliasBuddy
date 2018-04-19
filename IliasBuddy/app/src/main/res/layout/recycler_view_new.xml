@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
@@ -13,23 +12,23 @@
 
     <LinearLayout
         android:id="@+id/background"
-        android:paddingTop="@dimen/row_padding_vertical"
-        android:paddingBottom="@dimen/row_padding_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/row_padding_vertical"
+        android:paddingTop="@dimen/row_padding_vertical">
 
         <ImageView
             android:id="@+id/star"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/row_padding_vertical"
+            android:layout_marginRight="@dimen/row_padding_vertical"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:layout_marginLeft="@dimen/row_padding_vertical"
-            android:layout_marginRight="@dimen/row_padding_vertical"
             app:srcCompat="@drawable/ic_star"
-        tools:ignore="VectorDrawableCompat" />
+            tools:ignore="VectorDrawableCompat" />
 
         <!--
         android:paddingBottom="@dimen/row_padding_vertical"
@@ -43,9 +42,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:orientation="vertical"
             android:paddingLeft="@dimen/row_padding_vertical"
-            android:paddingRight="@dimen/row_padding_vertical"
-            android:orientation="vertical">
+            android:paddingRight="@dimen/row_padding_vertical">
 
             <!-- Course text view -->
 
@@ -152,9 +151,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:paddingLeft="@dimen/row_padding_vertical"
-            android:paddingRight="@dimen/row_padding_vertical"
-            android:orientation="vertical">
+            android:paddingRight="@dimen/row_padding_vertical">
 
             <!-- Date text view -->
             <TextView
@@ -171,13 +170,12 @@
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
-                android:gravity="center"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:textColor="@color/date"
                 android:textSize="@dimen/recyclerViewFontSizeDate"
                 tools:text="18:32" />
-
 
 
         </LinearLayout>
@@ -187,7 +185,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:background="#c0c0c0"/>
+        android:background="#c0c0c0" />
 
 
     <!-- Gray line below the row object

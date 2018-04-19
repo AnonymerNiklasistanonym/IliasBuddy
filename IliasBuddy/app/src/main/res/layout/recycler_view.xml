@@ -11,8 +11,8 @@
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
-    card_view:cardUseCompatPadding="true"
-    card_view:cardCornerRadius="4dp">
+    card_view:cardCornerRadius="4dp"
+    card_view:cardUseCompatPadding="true">
 
     <LinearLayout
         android:id="@+id/background"

@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy;
+package com.example.niklasm.iliasbuddy.IliasRssClasses;
 
 import java.io.Serializable;
 import java.util.Comparator;

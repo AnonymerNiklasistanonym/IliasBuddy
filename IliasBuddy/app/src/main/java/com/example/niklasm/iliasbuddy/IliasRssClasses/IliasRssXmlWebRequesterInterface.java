@@ -1,9 +1,9 @@
-package com.example.niklasm.iliasbuddy;
+package com.example.niklasm.iliasbuddy.IliasRssClasses;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 
-public interface IliasXmlWebRequesterInterface {
+public interface IliasRssXmlWebRequesterInterface {
     void processIliasXml(String xmlData);
 
     void webAuthenticationError(AuthFailureError authenticationError);

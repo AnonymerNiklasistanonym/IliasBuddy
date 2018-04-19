@@ -44,6 +44,11 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssCache;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssItem;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlParser;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequester;
+import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequesterInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -55,45 +60,43 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, IliasXmlWebRequesterInterface {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface {
 
     // test - https://stackoverflow.com/a/12997537/7827128
-    public static final String RECEIVE_JSON = "com.your.package.RECEIVE_JSON";
-    LocalBroadcastManager bManager;
-
+    final public static String RECEIVE_JSON = "FOUND_A_NEW_ENTRY";
+    final public static String NEW_ENTRY_FOUND = "NEW_ENTRY_FOUND";
+    final public static int NEW_ENTRY_FOUND_NOTIFICATION_ID = 42424242;
+    final private static int FIXED_NOTIFICATION_ID = 1234;
+    final private static String STOP_BACKGROUND_SERVICE = "STOP_BACKGROUND_SERVICE";
+    private LocalBroadcastManager bManager;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
     private Snackbar newEntriesMessage;
-
-    private IliasXmlWebRequester webRequester;
+    private IliasRssXmlWebRequester webRequester;
     private IliasRssItem latestRssEntry;
     private IliasRssItem latestRssEntry2;
     private String lastResponse = null;
     private int dataSetLength = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private IliasRssDataSaver rssDataSaver;
+    private IliasRssCache rssDataSaver;
     private AlarmManager am;
     private PendingIntent pendingIntent;
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            // test - https://stackoverflow.com/a/12997537/7827128
             if (intent.getAction() != null && intent.getAction().equals(RECEIVE_JSON)) {
-                String previewString = intent.getStringExtra("previewString");
-                // String bigString = intent.getStringExtra("bigString");
-
-                newEntriesMessage = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE);
-                newEntriesMessage.setAction("REFRESH", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        checkForRssUpdates();
-                    }
-                });
+                final String previewString = intent.getStringExtra("previewString");
+                newEntriesMessage = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE)
+                        .setAction("REFRESH", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                checkForRssUpdates();
+                            }
+                        });
                 newEntriesMessage.show();
-
-                //Do something with the string
             }
         }
     };
@@ -108,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         mRecyclerView = findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(false);
-        mLayoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -132,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
 
-        rssDataSaver = new IliasRssDataSaver(this, "TestFile.test");
+        rssDataSaver = new IliasRssCache(this, "TestFile.test");
 
         findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,14 +149,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         IliasRssItem[] myDataSet;
         try {
             myDataSet = rssDataSaver.readRssFeed();
-        } catch (IliasRssDataSaver.IliasRssDataSaverException | IOException | ClassNotFoundException e) {
+        } catch (IliasRssCache.IliasRssDataSaverException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
             myDataSet = null;
         }
         if (myDataSet == null) {
             try {
                 rssDataSaver.writeRssFeed(new IliasRssItem[0]);
-            } catch (IliasRssDataSaver.IliasRssDataSaverException | IOException e) {
+            } catch (IliasRssCache.IliasRssDataSaverException | IOException e) {
                 e.printStackTrace();
             }
             latestRssEntry2 = null;
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         if (mAdapter == null) mAdapter = new MyAdapter(Arrays.asList(new IliasRssItem[0]));
 
-        webRequester = new IliasXmlWebRequester(this);
+        webRequester = new IliasRssXmlWebRequester(this);
         checkForRssUpdates();
 
         // test - https://stackoverflow.com/a/12997537/7827128
@@ -187,18 +190,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bManager.registerReceiver(bReceiver, intentFilter);
         // test - https://stackoverflow.com/a/12997537/7827128
 
-
-        startService();
+        startBackgroundService();
     }
-    // test - https://stackoverflow.com/a/12997537/7827128
 
-    // test - https://stackoverflow.com/a/12997537/7827128
     protected void onDestroy() {
         super.onDestroy();
         bManager.unregisterReceiver(bReceiver);
     }
-    // test - https://stackoverflow.com/a/12997537/7827128
-
 
     public void removeColoring() {
         this.latestRssEntry = this.latestRssEntry2;
@@ -214,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         final InputStream stream = new ByteArrayInputStream(xmlData.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
         final IliasRssItem[] myDataSet;
         try {
-            myDataSet = IliasXmlParser.parse(stream);
+            myDataSet = IliasRssXmlParser.parse(stream);
         } catch (XmlPullParserException | IOException | ParseException e) {
             e.printStackTrace();
             return;
@@ -227,10 +225,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         final boolean newEntryFound = latestRssEntry == null || !latestRssEntry.toString().equals(myDataSet[0].toString());
 
         if (newEntryFound) {
-            Log.i("IliasRssHandler", "New entry found");
+            Log.i("MainActivity", "New entry found");
             renderNewList(myDataSet);
         } else {
-            Log.i("IliasRssHandler", "No new entry found");
+            Log.i("MainActivity", "NO new entry found");
             noNewEntryFound();
         }
         refreshIcon(false);
@@ -291,10 +289,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void checkForRssUpdates() {
-        if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) newEntriesMessage.dismiss();
+        if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued())
+            newEntriesMessage.dismiss();
         NotificationManager mNotificationManager;
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager != null) mNotificationManager.cancelAll();
+        if (mNotificationManager != null)
+            mNotificationManager.cancel(NEW_ENTRY_FOUND_NOTIFICATION_ID);
         mSwipeRefreshLayout.setRefreshing(true);
         webRequester.getWebContent();
     }
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void cleanList(MenuItem menuItem) {
         try {
             this.rssDataSaver.writeRssFeed(new IliasRssItem[0]);
-        } catch (IliasRssDataSaver.IliasRssDataSaverException | IOException e) {
+        } catch (IliasRssCache.IliasRssDataSaverException | IOException e) {
             e.printStackTrace();
         }
         SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
@@ -357,49 +357,78 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         this.latestRssEntry2 = newDataSet.length > 0 ? newDataSet[0] : null;
     }
 
-    public void startService() {
-        Log.i("MainActivity", "startService");
-        //Create a new PendingIntent and add it to the AlarmManager
-        Intent intent = new Intent(getApplicationContext(), BackgroundIntentService.class);
-        pendingIntent = PendingIntent.getService(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        am = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
-        if (am != null) { // check every 5 minutes
-            am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * 5, pendingIntent);
-        }
-        makeNotification();
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        // gets called if an intent to this Activity was executed
         Log.i("MainActivity", "onNewIntent");
-        if (intent.getBooleanExtra(getString(R.string.render_new_elements), false)) {
+
+        // check if new elements were found
+        if (intent.getBooleanExtra(NEW_ENTRY_FOUND, false)) {
             Log.i("MainActivity", "onNewIntent " + getString(R.string.render_new_elements));
             checkForRssUpdates();
+        }
+
+        if (intent.getBooleanExtra(STOP_BACKGROUND_SERVICE, true)) {
+            stopBackgroundService();
         }
     }
 
     public void restartService(MenuItem menuItem) {
-        startService();
+        stopBackgroundService();
+        startBackgroundService();
+    }
+
+    private void startBackgroundService() {
+        Log.d("MainActivity", "startBackgroundService()");
+
+        // Create a new Intent that calls the BackgroundIntentService class
+        final Intent intent = new Intent(getApplicationContext(), BackgroundIntentService.class);
+        // and add it to a pending Intent
+        pendingIntent = PendingIntent.getService(getApplicationContext(), 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // and add this Intent to the alarm manager
+        am = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+        // call the pending intent every ... minutes
+        final int minutes = 5;
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * minutes, pendingIntent);
+
+        // also make a sticky notification so that the user knows the background service is running
+        makeStickyNotification();
+    }
+
+    private void stopBackgroundService() {
+        Log.d("MainActivity", "stopBackgroundService()");
+
+        // cancel the alarm
+        Objects.requireNonNull(am).cancel(pendingIntent);
+
+        // also remove the sticky notification so that the user knows the background service is not running
+        removeStickyNotification();
     }
 
     public void stopService(MenuItem menuItem) {
-        Log.i("MainActivity", "stopService");
-        am.cancel(pendingIntent);
-        removeNotification();
+        Log.d("MainActivity", "stopService(MenuItem)");
+
+        // stop the background service
+        stopBackgroundService();
     }
 
     public void showLastResponse(MenuItem menuItem) {
-        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+        Log.d("MainActivity", "showLastResponse(MenuItem)");
+
+        // show popup with last response
+        final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Last response")
                 .setMessage((lastResponse != null) ? lastResponse : "NO RESPONSE UNTIL NOW")
-                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                .setCancelable(true)
+                .setNeutralButton(getString(R.string.go_back), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
                     }
                 })
-                .create();
-        alertDialog.show();
+                .show();
+        final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
+        textView.setTextIsSelectable(true);
     }
 
     @Override
@@ -427,31 +456,41 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         checkForRssUpdates();
     }
 
-    final private int NOTIFICATION_ID = 1234;
+    private void makeStickyNotification() {
+        Log.d("MainActivity", "makeStickyNotification()");
 
-    private void makeNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this,
-                NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Notification.Builder builder = new Notification.Builder(this)
-                .setContentTitle("Sticky notification")
-                .setContentText("This notification cannot be removed")
-                .setContentIntent(pendingIntent)
-                .setSmallIcon(R.drawable.ic_ilias_logo_notification);
-        Notification n = builder.build();
-
-        n.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(NOTIFICATION_ID, n);
+        // create PendingIntent for opening the app on click
+        final Intent openAppIntent = new Intent(this, MainActivity.class);
+        final PendingIntent openAppPendingIntent = PendingIntent.getActivity(this,
+                0, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // create PendingIntent for stopping the background service
+        final Intent stopServiceIntent = new Intent(this, MainActivity.class)
+                .setAction(STOP_BACKGROUND_SERVICE);
+        final PendingIntent stopServicePendingIntent = PendingIntent.getService(this, 0,
+                stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // build sticky notification
+        final Notification stickyNotification = new Notification.Builder(this)
+                .setContentTitle("IliasBuddy - Running in the background")
+                .setContentText("Click to open the app or expand to stop the background service")
+                .setContentIntent(openAppPendingIntent)
+                .addAction(new Notification.Action(R.drawable.ic_close, "Stop background service", stopServicePendingIntent))
+                .setSmallIcon(R.drawable.ic_ilias_logo_notification)
+                .setPriority(Notification.PRIORITY_MIN)
+                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setAutoCancel(false) // on click the notification does not disappear
+                .setOngoing(true) // make it not clear-able
+                .build();
+        // show the notification
+        NotificationManagerCompat.from(this).notify(FIXED_NOTIFICATION_ID, stickyNotification);
     }
 
-    private void removeNotification() {
+    private void removeStickyNotification() {
+        Log.d("MainActivity", "removeStickyNotification()");
+
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.cancel(NOTIFICATION_ID);
+        notificationManager.cancel(FIXED_NOTIFICATION_ID);
     }
+
 
     public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
@@ -485,7 +524,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             final String description = entry.getDescription();
 
             // CHECK THIS LATER
-            Log.d("MainActivity", "latestRssEntry: " + latestRssEntry);
             if (latestRssEntry == null || latestRssEntry.getDate().getTime() < entry.getDate().getTime()) {
                 holder.background.setBackgroundResource(R.color.colorNewEntry);
             }
@@ -612,10 +650,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     openUrl(entry.getLink());
                 } else {
                     // if not this must be a legit message for which a popup dialog will be opened
-                    final AlertDialog alertDialogBuilder = new AlertDialog.Builder(
-                            MainActivity.this)
+                    final String message = ">> " + entry.getTitle() + "\n\n" + Html.fromHtml(entry.getDescription());
+                    final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
                             .setTitle(entry.getCourse() + " (" + viewDateFormat.format(entry.getDate()) + ")")
-                            .setMessage(">> " + entry.getTitle() + "\n\n" + Html.fromHtml(entry.getDescription()))
+                            .setMessage(message)
                             .setCancelable(true)
                             .setPositiveButton(getString(R.string.open_in_ilias), new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
@@ -627,8 +665,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                                     dialog.cancel();
                                 }
                             })
-                            .create();
-                    alertDialogBuilder.show();
+                            .show();
+                    final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
+                    textView.setTextIsSelectable(true);
                 }
             }
         }

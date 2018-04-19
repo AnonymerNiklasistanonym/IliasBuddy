@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy;
+package com.example.niklasm.iliasbuddy.IliasRssClasses;
 
 import android.annotation.SuppressLint;
 import android.util.Xml;
@@ -17,7 +17,7 @@ import java.util.Date;
  * Class that parses IliasRssItem's from an IliasRssFeed InputStream
  * (mostly inspired by this tutorial: https://developer.android.com/training/basics/network-ops/xml.html)
  */
-public class IliasXmlParser {
+public class IliasRssXmlParser {
 
     // We don't use namespaces
     private static final String ns = null;

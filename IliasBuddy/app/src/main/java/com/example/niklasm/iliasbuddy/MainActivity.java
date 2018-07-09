@@ -3,11 +3,11 @@ package com.example.niklasm.iliasbuddy;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -27,7 +28,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,11 +44,11 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssCache;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssItem;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlParser;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequester;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequesterInterface;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssCache;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequester;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequesterInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -80,39 +80,32 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private String lastResponse = null;
     private int dataSetLength = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private IliasRssCache rssDataSaver;
-    private AlarmManager am;
-    private PendingIntent pendingIntent;
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(final Context context, @NonNull final Intent intent) {
             // test - https://stackoverflow.com/a/12997537/7827128
-            if (intent.getAction() != null && intent.getAction().equals(RECEIVE_JSON)) {
+            if (intent.getAction() != null && intent.getAction().equals(MainActivity.RECEIVE_JSON)) {
                 final String previewString = intent.getStringExtra("previewString");
                 newEntriesMessage = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("REFRESH", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                checkForRssUpdates();
-                            }
-                        });
+                        .setAction("REFRESH", view -> checkForRssUpdates());
                 newEntriesMessage.show();
             }
         }
     };
+    private IliasRssCache rssDataSaver;
+    private AlarmManager am;
+    private PendingIntent pendingIntent;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         // Make sure this is before calling super.onCreate
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
         mRecyclerView = findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(false);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mSwipeRefreshLayout = findViewById(R.id.swipe_container);
@@ -126,37 +119,27 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
           Showing Swipe Refresh animation on activity create
           As animation won't start on onCreate, post runnable is used
          */
-        mSwipeRefreshLayout.post(new Runnable() {
-
-            @Override
-            public void run() {
-                // load newest changes
-                checkForRssUpdates();
-            }
-        });
+        mSwipeRefreshLayout.post(this::checkForRssUpdates);
 
         rssDataSaver = new IliasRssCache(this, "TestFile.test");
 
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeColoring();
-                checkForRssUpdates();
-            }
+        findViewById(R.id.fab).setOnClickListener(view -> {
+            removeColoring();
+            checkForRssUpdates();
         });
 
         // try to load saved RSS feed
         IliasRssItem[] myDataSet;
         try {
-            myDataSet = rssDataSaver.readRssFeed();
-        } catch (IliasRssCache.IliasRssDataSaverException | IOException | ClassNotFoundException e) {
+            myDataSet = rssDataSaver.getCache();
+        } catch (IliasRssCache.IliasRssCacheException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
             myDataSet = null;
         }
         if (myDataSet == null) {
             try {
-                rssDataSaver.writeRssFeed(new IliasRssItem[0]);
-            } catch (IliasRssCache.IliasRssDataSaverException | IOException e) {
+                rssDataSaver.setCache(new IliasRssItem[0]);
+            } catch (IliasRssCache.IliasRssCacheException | IOException e) {
                 e.printStackTrace();
             }
             latestRssEntry2 = null;
@@ -178,38 +161,44 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             latestRssEntry2 = null;
         }
 
-        if (mAdapter == null) mAdapter = new MyAdapter(Arrays.asList(new IliasRssItem[0]));
+        if (mAdapter == null) {
+            mAdapter = new MyAdapter(Arrays.asList(new IliasRssItem[0]));
+        }
 
         webRequester = new IliasRssXmlWebRequester(this);
         checkForRssUpdates();
 
         // test - https://stackoverflow.com/a/12997537/7827128
         bManager = LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RECEIVE_JSON);
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MainActivity.RECEIVE_JSON);
         bManager.registerReceiver(bReceiver, intentFilter);
         // test - https://stackoverflow.com/a/12997537/7827128
 
         startBackgroundService();
     }
 
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         bManager.unregisterReceiver(bReceiver);
     }
 
     public void removeColoring() {
-        this.latestRssEntry = this.latestRssEntry2;
-        if (mAdapter != null) mAdapter.notifyItemRangeChanged(0, this.dataSetLength);
+        latestRssEntry = latestRssEntry2;
+        if (mAdapter != null) {
+            mAdapter.notifyItemRangeChanged(0, dataSetLength);
+        }
     }
 
-    public void openAbout(MenuItem menuItem) {
+    public void openAbout(final MenuItem menuItem) {
         startActivity(new Intent(this, AboutActivity.class));
     }
 
-    public void processIliasXml(final String xmlData) {
-        setLastResponse(xmlData);
-        final InputStream stream = new ByteArrayInputStream(xmlData.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
+    @Override
+    public void processIliasXml(final String FEED_XML_DATA) {
+        setLastResponse(FEED_XML_DATA);
+        final InputStream stream = new ByteArrayInputStream(FEED_XML_DATA.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
         final IliasRssItem[] myDataSet;
         try {
             myDataSet = IliasRssXmlParser.parse(stream);
@@ -234,24 +223,26 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         refreshIcon(false);
     }
 
-    public void webAuthenticationError(AuthFailureError error) {
+    @Override
+    public void webAuthenticationError(final AuthFailureError error) {
         Log.i("MainActivity - AuthErr", error.toString());
         refreshIcon(false);
         Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show();
         openSetup(null);
     }
 
-    public void webResponseError(VolleyError error) {
+    @Override
+    public void webResponseError(final VolleyError error) {
         Log.i("MainActivity - RespErr", error.toString());
         errorSnackbar("Response Error", error.toString());
     }
 
-    public void openSettings(MenuItem menuItem) {
+    public void openSettings(final MenuItem menuItem) {
         startActivity(new Intent(this, SettingsActivity.class));
     }
 
     public IliasRssItem getLatestRssEntry() {
-        return this.latestRssEntry;
+        return latestRssEntry;
     }
 
     public void noNewEntryFound() {
@@ -260,84 +251,79 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // setContentView(R.layout.myLayout);
         Log.i("MainActivity", "Configuration changed - " + newConfig.toString());
     }
 
     public void errorSnackbar(final String title, final String message) {
-        Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), title, Snackbar.LENGTH_LONG);
+        final Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), title, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.RED); //to change the color of action text
-        snackbar.setAction("MORE", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(title)
-                        .setMessage(message)
-                        .setNeutralButton("OK",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                })
-                        .create();
-                alertDialog.show();
-            }
+        snackbar.setAction("MORE", view -> {
+            final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setNeutralButton("OK",
+                            (dialog, which) -> dialog.dismiss())
+                    .create();
+            alertDialog.show();
         });
         snackbar.show();
     }
 
     public void checkForRssUpdates() {
-        if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued())
+        if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) {
             newEntriesMessage.dismiss();
-        NotificationManager mNotificationManager;
+        }
+        final NotificationManager mNotificationManager;
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager != null)
-            mNotificationManager.cancel(NEW_ENTRY_FOUND_NOTIFICATION_ID);
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(MainActivity.NEW_ENTRY_FOUND_NOTIFICATION_ID);
+        }
         mSwipeRefreshLayout.setRefreshing(true);
         webRequester.getWebContent();
     }
 
-    public void refreshIcon(boolean state) {
+    public void refreshIcon(final boolean state) {
         mSwipeRefreshLayout.setRefreshing(state);
     }
 
     public void setLastResponse(final String response) {
-        this.lastResponse = response;
+        lastResponse = response;
     }
 
-    public void openSetup(MenuItem menuItem) {
+    public void openSetup(final MenuItem menuItem) {
         startActivity(new Intent(this, SetupActivity.class));
     }
 
-    public void cleanList(MenuItem menuItem) {
+    public void cleanList(final MenuItem menuItem) {
         try {
-            this.rssDataSaver.writeRssFeed(new IliasRssItem[0]);
-        } catch (IliasRssCache.IliasRssDataSaverException | IOException e) {
+            rssDataSaver.setCache(new IliasRssItem[0]);
+        } catch (IliasRssCache.IliasRssCacheException | IOException e) {
             e.printStackTrace();
         }
-        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
         final SharedPreferences.Editor e = myPrefs.edit();
         e.putString(getString(R.string.latestItem), "");
         e.apply();
-        this.latestRssEntry = null;
+        latestRssEntry = null;
         renderNewList(new IliasRssItem[0]);
         // mAdapter.notifyAll();
         // mAdapter.notifyItemRangeRemoved(0, mAdapter.getItemCount());
         dataSetLength = 0;
     }
 
-    public void renderNewList(IliasRssItem[] newDataSet) {
+    public void renderNewList(final IliasRssItem[] newDataSet) {
 
-        SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
         final SharedPreferences.Editor e = myPrefs.edit();
         e.putString(getString(R.string.latestItem), newDataSet.length > 0 ? newDataSet[0].toString() : "");
         e.apply();
 
         try {
-            this.rssDataSaver.writeRssFeed(newDataSet);
-        } catch (IOException e1) {
+            rssDataSaver.setCache(newDataSet);
+        } catch (final IOException e1) {
             e1.printStackTrace();
         }
 
@@ -354,27 +340,27 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         dataSetLength = newDataSet.length;
 
         // this.latestRssEntry = newDataSet.length > 0 ? newDataSet[0] : null;
-        this.latestRssEntry2 = newDataSet.length > 0 ? newDataSet[0] : null;
+        latestRssEntry2 = newDataSet.length > 0 ? newDataSet[0] : null;
     }
 
     @Override
-    protected void onNewIntent(Intent intent) {
+    protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         // gets called if an intent to this Activity was executed
         Log.i("MainActivity", "onNewIntent");
 
         // check if new elements were found
-        if (intent.getBooleanExtra(NEW_ENTRY_FOUND, false)) {
+        if (intent.getBooleanExtra(MainActivity.NEW_ENTRY_FOUND, false)) {
             Log.i("MainActivity", "onNewIntent " + getString(R.string.render_new_elements));
             checkForRssUpdates();
         }
 
-        if (intent.getBooleanExtra(STOP_BACKGROUND_SERVICE, true)) {
+        if (intent.getBooleanExtra(MainActivity.STOP_BACKGROUND_SERVICE, true)) {
             stopBackgroundService();
         }
     }
 
-    public void restartService(MenuItem menuItem) {
+    public void restartService(final MenuItem menuItem) {
         stopBackgroundService();
         startBackgroundService();
     }
@@ -406,14 +392,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         removeStickyNotification();
     }
 
-    public void stopService(MenuItem menuItem) {
+    public void stopService(final MenuItem menuItem) {
         Log.d("MainActivity", "stopService(MenuItem)");
 
         // stop the background service
         stopBackgroundService();
     }
 
-    public void showLastResponse(MenuItem menuItem) {
+    public void showLastResponse(final MenuItem menuItem) {
         Log.d("MainActivity", "showLastResponse(MenuItem)");
 
         // show popup with last response
@@ -421,28 +407,24 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 .setTitle("Last response")
                 .setMessage((lastResponse != null) ? lastResponse : "NO RESPONSE UNTIL NOW")
                 .setCancelable(true)
-                .setNeutralButton(getString(R.string.go_back), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
+                .setNeutralButton(getString(R.string.go_back), (dialog1, id) -> dialog1.cancel())
                 .show();
         final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
         textView.setTextIsSelectable(true);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
-    public void openCampus(MenuItem item) {
+    public void openCampus(final MenuItem item) {
         openUrl("https://campus.uni-stuttgart.de/cusonline/webnav.ini");
     }
 
-    public void openIlias(MenuItem item) {
+    public void openIlias(final MenuItem item) {
         openUrl("https://ilias3.uni-stuttgart.de/login.php?client_id=Uni_Stuttgart&lang=de");
     }
 
@@ -465,15 +447,36 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 0, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         // create PendingIntent for stopping the background service
         final Intent stopServiceIntent = new Intent(this, MainActivity.class)
-                .setAction(STOP_BACKGROUND_SERVICE);
+                .setAction(MainActivity.STOP_BACKGROUND_SERVICE);
         final PendingIntent stopServicePendingIntent = PendingIntent.getService(this, 0,
                 stopServiceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        // setup oreo notification channel
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final String CHANNEL_ID = "GG WP";
+        // https://stackoverflow.com/a/47974065
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Log.i("IMPORTANT", "OREO DETECTED");
+            final CharSequence name = "main_activity_channel";
+            final String Description = "Oreo notification channel";
+            final int importance = NotificationManager.IMPORTANCE_HIGH;
+            final NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            mChannel.setDescription(Description);
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.RED);
+            mChannel.enableVibration(true);
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mChannel.setShowBadge(false);
+            assert notificationManager != null;
+            notificationManager.createNotificationChannel(mChannel);
+        }
         // build sticky notification
-        final Notification stickyNotification = new Notification.Builder(this)
+        final NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_close, "Stop background service", stopServicePendingIntent).build();
+
+        final Notification stickyNotification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("IliasBuddy - Running in the background")
                 .setContentText("Click to open the app or expand to stop the background service")
                 .setContentIntent(openAppPendingIntent)
-                .addAction(new Notification.Action(R.drawable.ic_close, "Stop background service", stopServicePendingIntent))
+                .addAction(action)
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setPriority(Notification.PRIORITY_MIN)
                 .setColor(getResources().getColor(R.color.colorPrimary))
@@ -481,14 +484,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 .setOngoing(true) // make it not clear-able
                 .build();
         // show the notification
-        NotificationManagerCompat.from(this).notify(FIXED_NOTIFICATION_ID, stickyNotification);
+        NotificationManagerCompat.from(this).notify(MainActivity.FIXED_NOTIFICATION_ID, stickyNotification);
     }
 
     private void removeStickyNotification() {
         Log.d("MainActivity", "removeStickyNotification()");
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.cancel(FIXED_NOTIFICATION_ID);
+        final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.cancel(MainActivity.FIXED_NOTIFICATION_ID);
     }
 
 
@@ -501,22 +504,22 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         // Allows to remember the last item shown on screen
         private int lastPosition = -1;
 
-        MyAdapter(List<IliasRssItem> dataSet) {
-            this.items = dataSet;
+        MyAdapter(final List<IliasRssItem> dataSet) {
+            items = dataSet;
         }
 
 
         @Override
         @NonNull
-        public MyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public MyAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
             // Create new views (invoked by the layout manager)
-            View v = LayoutInflater.from(parent.getContext())
+            final View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recycler_view_new, parent, false);
             return new ViewHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
             // Replace the contents of a view (invoked by the layout manager)
             // - get element from the data set at this position
             // - replace the contents of the view with that element
@@ -537,16 +540,23 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             holder.title.setText(entry.getTitle());
 
             // if extra is null hide extra card or else set the text
-            if (entry.getExtra() == null) holder.extraCard.setVisibility(View.GONE);
-            else holder.extra.setText(entry.getExtra());
+            if (entry.getExtra() == null) {
+                holder.extraCard.setVisibility(View.GONE);
+            } else {
+                holder.extra.setText(entry.getExtra());
+            }
 
-            if (entry.getTitleExtra() == null) holder.titleExtraCard.setVisibility(View.GONE);
-            else holder.titleExtra.setText(entry.getTitleExtra());
+            if (entry.getTitleExtra() == null) {
+                holder.titleExtraCard.setVisibility(View.GONE);
+            } else {
+                holder.titleExtra.setText(entry.getTitleExtra());
+            }
 
-            if (description == null || description.equals(""))
+            if (description == null || description.equals("")) {
                 holder.description.setVisibility(View.GONE);
-            else
+            } else {
                 holder.description.setText(Html.fromHtml(description).toString().replaceAll("\\s+", " ").trim());
+            }
 
             if ((description == null || description.equals("")) && entry.getTitleExtra() != null) {
                 holder.titleExtra.setText(getResources().getString(R.string.new_file));
@@ -595,11 +605,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
          * Here is the key method to apply the animation
          * https://stackoverflow.com/a/26748274/7827128
          */
-        private void setAnimation(View viewToAnimate, int position) {
+        private void setAnimation(final View viewToAnimate, final int position) {
             // If the bound view wasn't previously displayed on screen, it's animated
             if (position > lastPosition) {
                 // R.anim.slide_up, slide_in_left
-                Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fall_down);
+                final Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fall_down);
                 viewToAnimate.startAnimation(animation);
                 lastPosition = position;
             }
@@ -621,7 +631,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             final public ImageView star;
             final public CardView extraCard, titleExtraCard;
 
-            private ViewHolder(View itemView) {
+            private ViewHolder(final View itemView) {
                 super(itemView);
                 // add on click listener to each view holder
                 itemView.setOnClickListener(this);
@@ -655,16 +665,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                             .setTitle(entry.getCourse() + " (" + viewDateFormat.format(entry.getDate()) + ")")
                             .setMessage(message)
                             .setCancelable(true)
-                            .setPositiveButton(getString(R.string.open_in_ilias), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    openUrl(entry.getLink());
-                                }
-                            })
-                            .setNegativeButton(getString(R.string.go_back), new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    dialog.cancel();
-                                }
-                            })
+                            .setPositiveButton(getString(R.string.open_in_ilias), (dialog1, id) -> openUrl(entry.getLink()))
+                            .setNegativeButton(getString(R.string.go_back), (dialog12, id) -> dialog12.cancel())
                             .show();
                     final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
                     textView.setTextIsSelectable(true);

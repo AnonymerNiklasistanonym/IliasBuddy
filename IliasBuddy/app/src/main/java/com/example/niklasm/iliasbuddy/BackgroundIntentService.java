@@ -1,23 +1,27 @@
 package com.example.niklasm.iliasbuddy;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssItem;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlParser;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequester;
-import com.example.niklasm.iliasbuddy.IliasRssClasses.IliasRssXmlWebRequesterInterface;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequester;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequesterInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -31,27 +35,35 @@ import java.text.SimpleDateFormat;
 public class BackgroundIntentService extends Service implements IliasRssXmlWebRequesterInterface {
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         Log.i("BackgroundIntentService", "onStartCommand");
         // make visible that service started
         // Toast.makeText(getApplicationContext(), "BackgroundIntentService onStartCommand", Toast.LENGTH_SHORT).show();
 
         // make a web request with the important data
-        IliasRssXmlWebRequester webRequester = new IliasRssXmlWebRequester(this);
+        final IliasRssXmlWebRequester webRequester = new IliasRssXmlWebRequester(this);
         webRequester.getWebContent();
 
+        Toast.makeText(this, "BackgroundIntentService started", Toast.LENGTH_LONG).show();
+
         // return this so that the service can be restarted
-        return START_NOT_STICKY;
+        return Service.START_NOT_STICKY;
     }
 
     @Override
-    public IBinder onBind(Intent arg0) {
+    public void onDestroy() {
+        Log.i("BackgroundIntentService", "onDestroy");
+        Toast.makeText(this, "BackgroundIntentService Stopped", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public IBinder onBind(final Intent arg0) {
         return null;
     }
 
-    public void createNotification(String titleString, String previewString, String bigString) {
+    public void createNotification(final String titleString, final String previewString, final String bigString) {
 
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", BackgroundIntentService.MODE_PRIVATE);
         final String latestItem = myPrefs.getString(getString(R.string.lastNotification), "nothing_found");
 
         if (!latestItem.equals("nothing_found") && latestItem.equals(bigString)) {
@@ -66,11 +78,30 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         e.putString(getString(R.string.lastNotification), bigString);
         e.apply();
 
-        Notification notification2 = new Notification();
+        final Notification notification2 = new Notification();
         notification2.defaults |= Notification.DEFAULT_SOUND;
         notification2.defaults |= Notification.DEFAULT_VIBRATE;
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "CHANNEL")
+        final NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final String CHANNEL_ID = "my_channel_01";
+
+        // https://stackoverflow.com/a/47974065
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Log.i("IMPORTANT", "OREO DETECTED");
+            final CharSequence name = "my_channel";
+            final String Description = "This is my channel";
+            final int importance = NotificationManager.IMPORTANCE_HIGH;
+            final NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            mChannel.setDescription(Description);
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.RED);
+            mChannel.enableVibration(true);
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mChannel.setShowBadge(false);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setDefaults(notification2.defaults)
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setColor(ContextCompat.getColor(BackgroundIntentService.this, R.color.colorPrimary))
@@ -78,32 +109,32 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 .setLights(getResources().getColor(R.color.colorPrimary), 3000, 3000)
                 .setContentText(previewString);
 
-        NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
+        final NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
         bigText.bigText(bigString);
         builder.setStyle(bigText);
 
-        Intent resultIntent = new Intent(this, MainActivity.class);
+        final Intent resultIntent = new Intent(this, MainActivity.class);
         resultIntent.putExtra(MainActivity.NEW_ENTRY_FOUND, true);
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
 
-        Notification notification = builder.build();
+        final Notification notification = builder.build();
         notification.flags = Notification.FLAG_AUTO_CANCEL;
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(MainActivity.NEW_ENTRY_FOUND_NOTIFICATION_ID, notification);
 
-        Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
+        final Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
                 .putExtra("previewString", previewString)
                 .putExtra("bigString", bigString);
         LocalBroadcastManager.getInstance(this).sendBroadcast(callMainActivity);
     }
 
-    public void processIliasXml(final String xmlData) {
+    @Override
+    public void processIliasXml(final String FEED_XML_DATA) {
         Log.i("BackgroundIntentService", "parseXml");
-        final InputStream stream = new ByteArrayInputStream(xmlData.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
+        final InputStream stream = new ByteArrayInputStream(FEED_XML_DATA.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
         final IliasRssItem[] myDataSet;
         try {
             myDataSet = IliasRssXmlParser.parse(stream);
@@ -113,7 +144,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         }
 
         // get latest item string form shared preferences
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", MODE_PRIVATE);
+        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", BackgroundIntentService.MODE_PRIVATE);
         final String latestItem = myPrefs.getString(getString(R.string.latestItem), "nothing_found");
 
         int latestEntry = -1;
@@ -129,7 +160,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             final String previewString = myDataSet.length + " new entries (all are new)";
             final StringBuilder bigString = new StringBuilder(previewString + "\n");
             final SimpleDateFormat viewDateFormat = new SimpleDateFormat("dd.MM HH:mm", getResources().getConfiguration().locale);
-            for (IliasRssItem entry : myDataSet) {
+            for (final IliasRssItem entry : myDataSet) {
                 bigString.append("- ")
                         .append(entry.getCourse())
                         .append(entry.getExtra() != null ? " > " + entry.getExtra() : "")
@@ -153,7 +184,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                         .append(myDataSet[0].getCourse())
                         .append(myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "")
                         .append("\n")
-                        .append(myDataSet[0].getTitleExtra() != null ? myDataSet[0].getTitleExtra() + ": " :  "")
+                        .append(myDataSet[0].getTitleExtra() != null ? myDataSet[0].getTitleExtra() + ": " : "")
                         .append(myDataSet[0].getTitle())
                         .append(" (")
                         .append(viewDateFormat.format(myDataSet[0].getDate()))
@@ -183,11 +214,13 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         }
     }
 
-    public void webAuthenticationError(AuthFailureError error) {
+    @Override
+    public void webAuthenticationError(final AuthFailureError error) {
         Log.i("BackgroundAct - AuthErr", error.toString());
     }
 
-    public void webResponseError(VolleyError error) {
+    @Override
+    public void webResponseError(final VolleyError error) {
         Log.i("BackgroundAct - RespErr", error.toString());
     }
 }

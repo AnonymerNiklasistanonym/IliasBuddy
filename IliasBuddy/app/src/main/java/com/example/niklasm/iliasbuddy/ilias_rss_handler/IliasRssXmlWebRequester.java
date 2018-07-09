@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.IliasRssClasses;
+package com.example.niklasm.iliasbuddy.ilias_rss_handler;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,9 +21,9 @@ public class IliasRssXmlWebRequester {
     final private IliasRssXmlWebRequesterInterface classThatImplementsInterface;
     final private Context context;
 
-    public IliasRssXmlWebRequester(IliasRssXmlWebRequesterInterface classThatImplementsInterface) {
+    public IliasRssXmlWebRequester(final IliasRssXmlWebRequesterInterface classThatImplementsInterface) {
         this.classThatImplementsInterface = classThatImplementsInterface;
-        this.context = (Context) classThatImplementsInterface;
+        context = (Context) classThatImplementsInterface;
     }
 
     private String getSharedPreferenceStringOrNull(final SharedPreferences myPrefs, final int stringId) {
@@ -42,17 +42,17 @@ public class IliasRssXmlWebRequester {
 
         final IliasRssCredentials CREDENTIALS = getCredentialsAndUrl();
 
-        RequestQueue queue = Volley.newRequestQueue(this.context);
+        final RequestQueue queue = Volley.newRequestQueue(context);
 
         // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, CREDENTIALS.url, new Response.Listener<String>() {
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, CREDENTIALS.url, new Response.Listener<String>() {
             @Override
-            public void onResponse(String response) {
+            public void onResponse(final String response) {
                 classThatImplementsInterface.processIliasXml(response);
             }
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onErrorResponse(final VolleyError error) {
                 if (error instanceof AuthFailureError) {
                     classThatImplementsInterface.webAuthenticationError((AuthFailureError) error);
                     return;

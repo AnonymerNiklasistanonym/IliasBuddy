@@ -1,5 +1,4 @@
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.niklasm.iliasbuddy.MainActivity">
@@ -46,13 +45,13 @@
         app:showAsAction="never" />
 
     <item
-        android:title="@string/action_about"
         android:onClick="openAbout"
+        android:title="@string/action_about"
         app:showAsAction="never" />
 
     <item
-        android:title="@string/action_settings"
         android:onClick="openSettings"
+        android:title="@string/action_settings"
         app:showAsAction="never" />
 
 </menu>

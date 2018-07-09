@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -235,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void webResponseError(final VolleyError error) {
         Log.i("MainActivity - RespErr", error.toString());
         errorSnackbar("Response Error", error.toString());
+        openSetup(null);
     }
 
     public void openSettings(final MenuItem menuItem) {
@@ -264,6 +266,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
                     .setTitle(title)
                     .setMessage(message)
+                    .setNeutralButton("SETTINGS",
+                            (dialog, which) -> openSetup())
                     .setNeutralButton("OK",
                             (dialog, which) -> dialog.dismiss())
                     .create();
@@ -294,6 +298,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void openSetup(final MenuItem menuItem) {
+        openSetup();
+    }
+
+    public void openSetup() {
         startActivity(new Intent(this, SetupActivity.class));
     }
 
@@ -479,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 .addAction(action)
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setPriority(Notification.PRIORITY_MIN)
-                .setColor(getResources().getColor(R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
                 .setAutoCancel(false) // on click the notification does not disappear
                 .setOngoing(true) // make it not clear-able
                 .build();
@@ -570,11 +578,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 holder.title.setLines(2);
                 holder.title.setText(titleExtra);
                 holder.titleExtra.setText(context.getResources().getString(R.string.new_file));
-                holder.titleExtraCard.setCardBackgroundColor(context.getResources().getColor(android.R.color.holo_red_dark));
+                holder.titleExtraCard.setCardBackgroundColor(ContextCompat.getColor(context, R.color.holo_red_dark));
             } else {
             }
 
-            // if there is no title extra and descripton hide label
+            // if there is no title extra and description hide label
             if (titleExtra == null && !(description == null || description.equals(""))) {
                 holder.titleExtraCard.setVisibility(View.GONE);
             } else {

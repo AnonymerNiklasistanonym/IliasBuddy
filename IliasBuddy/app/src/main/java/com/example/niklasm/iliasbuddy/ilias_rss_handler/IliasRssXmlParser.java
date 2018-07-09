@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Class that parses IliasRssItem's from an IliasRssFeed InputStream
@@ -116,7 +117,7 @@ public class IliasRssXmlParser {
             }
         }
         return new IliasRssItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
-                courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3], description, link, date);
+                courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3], description, Objects.requireNonNull(link), Objects.requireNonNull(date));
     }
 
     private static Date readDate(@NonNull final XmlPullParser parser) throws IOException, XmlPullParserException, ParseException {

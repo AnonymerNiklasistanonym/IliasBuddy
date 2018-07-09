@@ -7,8 +7,6 @@ import android.util.Base64;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.niklasm.iliasbuddy.R;
@@ -45,20 +43,13 @@ public class IliasRssXmlWebRequester {
         final RequestQueue queue = Volley.newRequestQueue(context);
 
         // Request a string response from the provided URL.
-        final StringRequest stringRequest = new StringRequest(Request.Method.GET, CREDENTIALS.url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(final String response) {
-                classThatImplementsInterface.processIliasXml(response);
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, CREDENTIALS.url,
+                classThatImplementsInterface::processIliasXml, error -> {
+            if (error instanceof AuthFailureError) {
+                classThatImplementsInterface.webAuthenticationError((AuthFailureError) error);
+                return;
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(final VolleyError error) {
-                if (error instanceof AuthFailureError) {
-                    classThatImplementsInterface.webAuthenticationError((AuthFailureError) error);
-                    return;
-                }
-                classThatImplementsInterface.webResponseError(error);
-            }
+            classThatImplementsInterface.webResponseError(error);
         }) {
             @Override
             public Map<String, String> getHeaders() {

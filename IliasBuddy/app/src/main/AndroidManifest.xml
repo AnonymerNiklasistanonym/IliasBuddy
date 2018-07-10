@@ -51,7 +51,7 @@
             android:label="Word service"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <receiver android:name=".background_service.MyStartServiceReceiver">
+        <receiver android:name=".background_service.BootCompletedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -61,6 +61,7 @@
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".background_service.BackgroundServiceManager" />
     </application>
 
 </manifest>

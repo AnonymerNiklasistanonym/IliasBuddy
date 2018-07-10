@@ -12,9 +12,11 @@ public class TestJobService extends JobService {
     @Override
     public boolean onStartJob(final JobParameters params) {
         Log.i("TestJobService", "onStartJob");
-        final Intent service = new Intent(getApplicationContext(), BackgroundIntentService.class);
-        getApplicationContext().startService(service);
-        Util.scheduleJob(getApplicationContext()); // reschedule the job
+        // run background service
+        getApplicationContext()
+                .startService(new Intent(getApplicationContext(), BackgroundIntentService.class));
+        // reschedule the job
+        Util.scheduleJob(getApplicationContext());
         return true;
     }
 

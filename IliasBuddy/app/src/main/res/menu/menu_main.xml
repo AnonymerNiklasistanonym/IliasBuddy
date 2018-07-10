@@ -3,21 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.niklasm.iliasbuddy.MainActivity">
 
-    <!-- Icon - open C@mpus -->
-    <item
-        android:icon="@drawable/ic_campus_logo"
-        android:onClick="openCampus"
-        android:title="@string/action_open_campus"
-        app:showAsAction="ifRoom" />
-
-    <!-- Icon - open Ilias -->
+    <!-- Icon (if room) - open Ilias -->
     <item
         android:icon="@drawable/ic_ilias_logo"
         android:onClick="openIlias"
         android:title="@string/action_open_ilias"
         app:showAsAction="ifRoom" />
 
-    <!-- Options -->
+    <!-- Icon (if room) - open C@mpus -->
+    <item
+        android:icon="@drawable/ic_campus_logo"
+        android:onClick="openCampus"
+        android:title="@string/action_open_campus"
+        app:showAsAction="ifRoom" />
+
+    <!-- Other options behind the three dots -->
 
     <item
         android:onClick="openSetup"

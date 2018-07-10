@@ -18,22 +18,22 @@ import android.util.Log;
 import com.example.niklasm.iliasbuddy.MainActivity;
 import com.example.niklasm.iliasbuddy.R;
 
+import java.util.Objects;
+
 public class Util {
 
     final private static int FIXED_NOTIFICATION_ID = 1234;
     final private static String STOP_BACKGROUND_SERVICE = "STOP_BACKGROUND_SERVICE";
 
     public static void scheduleJob(final Context context) {
+        Util.makeStickyNotification(context);
         Log.i("Util", "scheduleJob - begin");
         final ComponentName serviceComponent = new ComponentName(context, TestJobService.class);
         final JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
-        builder.setPeriodic(5 * 60 * 1000); // wait 5min
+        builder.setPeriodic(5 * 60 * 1000); // wait 5min before executing the service again
         final JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
-        assert jobScheduler != null;
-        jobScheduler.schedule(builder.build());
+        Objects.requireNonNull(jobScheduler).schedule(builder.build());
         Log.i("Util", "scheduleJob - end");
-
-        Util.makeStickyNotification(context);
     }
 
     private static void makeStickyNotification(final Context CONTEXT) {
@@ -73,7 +73,7 @@ public class Util {
         final Notification stickyNotification = new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
                 .setContentTitle("IliasBuddy - Running in the background")
                 .setContentText("Click to open the app or expand to stop the background service")
-                //.setContentIntent(openAppPendingIntent)
+                .setContentIntent(openAppPendingIntent)
                 //.addAction(action)
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setPriority(Notification.PRIORITY_MIN)

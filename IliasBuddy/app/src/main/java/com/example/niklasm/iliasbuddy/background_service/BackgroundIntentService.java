@@ -51,7 +51,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         final IliasRssXmlWebRequester webRequester = new IliasRssXmlWebRequester(this);
         webRequester.getWebContent();
 
-        Toast.makeText(this, "BackgroundIntentService started", Toast.LENGTH_LONG).show();
+        // Debug information
+        //Toast.makeText(this, "BackgroundIntentService started", Toast.LENGTH_LONG).show();
 
         // return this so that the service can be restarted
         return Service.START_NOT_STICKY;

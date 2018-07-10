@@ -32,7 +32,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     // Allows to remember the last item shown on screen
     private int lastPosition = -1;
 
-    public IliasRssItemListAdapter(final List<IliasRssItem> dataSet, @NonNull final Context CONTEXT, @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
+    public IliasRssItemListAdapter(final List<IliasRssItem> dataSet, @NonNull final Context CONTEXT,
+                                   @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
         items = dataSet;
         viewDateFormat = new SimpleDateFormat("dd.MM", CONTEXT.getResources().getConfiguration().locale);
         viewTimeFormat = new SimpleDateFormat("HH:mm", CONTEXT.getResources().getConfiguration().locale);
@@ -43,7 +44,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
 
     @Override
     @NonNull
-    public IliasRssItemListAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+    public IliasRssItemListAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent,
+                                                                 final int viewType) {
         // Create new views (invoked by the layout manager)
         final View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.recycler_view_new, parent, false);
@@ -59,7 +61,9 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         final String description = entry.getDescription();
 
         // CHECK THIS LATER
-        if (ADAPTER_INTERFACE.listAdapterGetLatestEntry().getDate().getTime() < entry.getDate().getTime()) {
+        if (ADAPTER_INTERFACE.listAdapterGetLatestEntry() == null ||
+                ADAPTER_INTERFACE.listAdapterGetLatestEntry().getDate().getTime()
+                        < entry.getDate().getTime()) {
             holder.background.setBackgroundResource(R.color.colorNewEntry);
         }
         // CHECK THIS LATER
@@ -87,13 +91,17 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         if (description == null || description.equals("")) {
             holder.description.setVisibility(View.GONE);
         } else {
-            holder.description.setText(Html.fromHtml(description).toString().replaceAll("\\s+", " ").trim());
+            holder.description.setText(Html.fromHtml(description)
+                    .toString()
+                    .replaceAll("\\s+", " ")
+                    .trim());
         }
 
         if ((description == null || description.equals("")) && entry.getTitleExtra() != null) {
             holder.titleExtra.setText(CONTEXT.getResources().getString(R.string.new_file));
             holder.title.setText(entry.getTitleExtra());
-            holder.titleExtraCard.setCardBackgroundColor(ContextCompat.getColor(CONTEXT, android.R.color.holo_red_dark));
+            holder.titleExtraCard.setCardBackgroundColor(
+                    ContextCompat.getColor(CONTEXT, android.R.color.holo_red_dark));
         }
 
             /* if there is no description make title longer and hide it
@@ -198,8 +206,10 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                         .setTitle(entry.getCourse() + " (" + viewDateFormat.format(entry.getDate()) + ")")
                         .setMessage(message)
                         .setCancelable(true)
-                        .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias), (dialog1, id) -> ADAPTER_INTERFACE.listAdapterOpenUrl(entry.getLink()))
-                        .setNegativeButton(CONTEXT.getString(R.string.go_back), (dialog12, id) -> dialog12.cancel())
+                        .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
+                                (dialog1, id) -> ADAPTER_INTERFACE.listAdapterOpenUrl(entry.getLink()))
+                        .setNegativeButton(CONTEXT.getString(R.string.go_back),
+                                (dialog12, id) -> dialog12.cancel())
                         .show();
                 final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
                 textView.setTextIsSelectable(true);

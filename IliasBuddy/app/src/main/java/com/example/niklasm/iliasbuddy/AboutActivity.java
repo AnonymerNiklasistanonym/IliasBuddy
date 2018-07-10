@@ -21,50 +21,25 @@ public class AboutActivity extends AppCompatActivity {
 
         final View aboutPage = new AboutPage(this)
                 .isRTL(false)
-                .setDescription("Description of the app")
+                .setDescription(getString(R.string.about_app_description))
                 //.setImage(R.drawable.ic_launcher_foreground)
-                .addItem(new Element().setTitle("Version " + BuildConfig.VERSION_NAME))
-                .addItem(new Element().setTitle("License").setOnClickListener(view -> {
+                .addItem(new Element().setTitle(getString(R.string.word_version) + " " + BuildConfig.VERSION_NAME))
+                .addItem(new Element().setTitle(getString(R.string.word_license)).setOnClickListener(view -> {
                     AlertDialog alertDialog = new AlertDialog.Builder(AboutActivity.this)
-                            .setTitle("License")
-                            .setMessage("MIT License\n" +
-                                    "\n" +
-                                    "Copyright (c) 2018 Niklas\n" +
-                                    "\n" +
-                                    "Permission is hereby granted, free of charge, to any person obtaining a copy\n" +
-                                    "of this software and associated documentation files (the \"Software\"), to deal\n" +
-                                    "in the Software without restriction, including without limitation the rights\n" +
-                                    "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n" +
-                                    "copies of the Software, and to permit persons to whom the Software is\n" +
-                                    "furnished to do so, subject to the following conditions:\n" +
-                                    "\n" +
-                                    "The above copyright notice and this permission notice shall be included in all\n" +
-                                    "copies or substantial portions of the Software.\n" +
-                                    "\n" +
-                                    "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n" +
-                                    "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n" +
-                                    "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n" +
-                                    "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n" +
-                                    "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n" +
-                                    "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n" +
-                                    "SOFTWARE.")
-                            .setNeutralButton("BACK",
+                            .setTitle(getString(R.string.word_license))
+                            .setMessage(getString(R.string.about_app_license))
+                            .setNeutralButton(getString(R.string.word_back),
                                     (dialog, which) -> dialog.dismiss())
                             .create();
                     alertDialog.show();
                 }))
-                .addItem(new Element().setTitle("Open source licenses").setOnClickListener(view -> {
-                    OssLicensesMenuActivity.setActivityTitle(getString(R.string.custom_license_title));
+                .addItem(new Element().setTitle(getString(R.string.word_open_source_licenses)).setOnClickListener(view -> {
+                    OssLicensesMenuActivity.setActivityTitle(getString(R.string.word_open_source_licenses));
                     startActivity(new Intent(AboutActivity.this, OssLicensesMenuActivity.class));
                 }))
-                //.addGroup("Connect with us")
-                //.addEmail("elmehdi.sakout@gmail.com")
-                .addWebsite("https://github.com/AnonymerNiklasistanonym/IliasBuddy", "Visit website with source code and bug tracker")
-                //.addFacebook("the.medy")
-                //.addTwitter("medyo80")
-                //.addYoutube("UCdPQtdWIsg7_pi4mrRu46vA")
-                //.addPlayStore("com.ideashower.readitlater.pro")
-                .addGitHub("AnonymerNiklasistanonym", "AnonymerNiklasistanonym on GitHub")
+                .addWebsite(getString(R.string.url_ilias_buddy_repository), getString(R.string.url_ilias_buddy_repository_title))
+                //.addPlayStore("com.ideashower.readitlater.pro") // later
+                .addGitHub(getString(R.string.author_github_user_name), getString(R.string.author_github_user_name_title))
                 .create();
 
         setContentView(aboutPage);

@@ -15,7 +15,6 @@
     <string name="action_clean_list">Clean downloaded list</string>
     <string name="render_new_elements">GET_NEW_ELEMENTS</string>
     <string name="lastNotification">LAST_NOTIFICATION_TEXT</string>
-    <string name="custom_license_title">Open source licenses</string>
 
     <!-- Strings related to setup activity -->
     <string name="ilias_connection_setup">Setup Ilias RSS connection</string>
@@ -112,4 +111,16 @@
     <string name="slide_2_desc">After you enter your private Ilias feed URL, user name and password (not your normal Ilias password!) the app checks this feed and extracts all the information</string>
     <string name="slide_3_title">Features</string>
     <string name="slide_3_desc">The app can check the feed frequently in the background, can show you notifications if it finds new entries and many more things - toggle and change the features in the settings</string>
+    <string name="about_app_description">App description</string>
+    <string name="word_version">Version</string>
+    <string name="word_license">License</string>
+    <string name="about_app_license">MIT License\n\nCopyright © 2018 Niklas\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+    <string name="word_back">BACK</string>
+    <string name="word_ok">OK</string>
+    <string name="word_open_source_licenses">Open source licenses</string>
+    <string name="url_ilias_buddy_repository">https://github.com/AnonymerNiklasistanonym/IliasBuddy</string>
+    <string name="url_ilias_buddy_repository_title">Visit website with source code and bug tracker</string>
+    <string name="author_github_user_name">AnonymerNiklasistanonym</string>
+    <string name="author_github_user_name_title">AnonymerNiklasistanonym on GitHub</string>
+    <string name="popup_help_html_content"><![CDATA[<p>To use this service you need to visit Ilias and click on the orange <b>RSS</b> button to get to the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias news feed</a>.</p><p>From there you need to copy the private feed url and replace the <b>password</b> with a password you set in the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias settings</a> (you get there by clicking the settings symbol at the top right of the same card you just clicked the orange RSS button.</p><p>Then insert the url in the first text field and your username (The name string in the url without any spaces) and your just set password and click the check button.</p>]]></string>
 </resources>

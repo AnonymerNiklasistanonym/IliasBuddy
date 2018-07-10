@@ -70,10 +70,12 @@ public class SetupActivity extends AppCompatActivity {
     public void openHelp(final MenuItem menu) {
         final AlertDialog alertDialog = new AlertDialog.Builder(SetupActivity.this)
                 .setTitle(R.string.help_instructions)
-                .setMessage(Html.fromHtml("<p>To use this service you need to visit Ilias and click on the orange <b>RSS</b> button to get to the <a href='https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus'>Ilias news feed</a>.</p><p>From there you need to copy the private feed url and replace the <b>password</b> with a password you set in the <a href='https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus'>Ilias settings</a> (you get there by clicking the settings symbol at the top right of the same card you just clicked the orange RSS button.</p><p>Then insert the url in the first text field and your username (The name string in the url without any spaces) and your just set password and click the check button.</p>"))
-                .setNeutralButton("OK", (dialog, which) -> dialog.dismiss())
+                .setMessage(Html.fromHtml(getString(R.string.popup_help_html_content)))
+                .setNeutralButton(R.string.word_ok, (dialog, which) -> dialog.dismiss())
                 .show();
-        ((TextView) Objects.requireNonNull(alertDialog.findViewById(android.R.id.message))).setMovementMethod(LinkMovementMethod.getInstance());
+        ((TextView) Objects.requireNonNull(alertDialog
+                .findViewById(android.R.id.message)))
+                .setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override

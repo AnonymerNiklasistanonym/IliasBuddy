@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private IliasRssXmlWebRequester webRequester;
     private IliasRssItem latestRssEntry;
     private IliasRssItem latestRssEntry2;
-    private BackgroundServiceManager backgroundServiceManager;
     private String lastResponse = null;
     private int dataSetLength = 0;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -360,15 +359,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void startBackgroundService() {
         Log.d("MainActivity", "startBackgroundService()");
-        backgroundServiceManager = new BackgroundServiceManager(getApplicationContext());
-        backgroundServiceManager.startBackgroundService();
+        BackgroundServiceManager.startBackgroundService(getApplicationContext());
     }
 
     private void stopBackgroundService() {
         Log.d("MainActivity", "stopBackgroundService()");
-        if (backgroundServiceManager != null) {
-            backgroundServiceManager.stopBackgroundService();
-        }
+        BackgroundServiceManager.stopBackgroundService(getApplicationContext());
     }
 
     public void stopService(final MenuItem menuItem) {

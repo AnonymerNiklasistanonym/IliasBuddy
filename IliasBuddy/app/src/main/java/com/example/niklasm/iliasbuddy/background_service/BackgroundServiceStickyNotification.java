@@ -22,13 +22,8 @@ public class BackgroundServiceStickyNotification {
     final private static String CHANNEL_ID = "BackgroundServiceStickyNotification";
     final private static CharSequence CHANNEL_NAME = "Sticky background service is active";
     final private static String CHANNEL_Description = "Shows sticky notification when background service is activated";
-    final private Context CONTEXT;
 
-    BackgroundServiceStickyNotification(final Context CONTEXT) {
-        this.CONTEXT = CONTEXT;
-    }
-
-    public void show() {
+    public static void show(final Context CONTEXT) {
         Log.d("BackgroundServiceSti...", "show()");
 
         // create PendingIntent for opening the app on click
@@ -77,7 +72,7 @@ public class BackgroundServiceStickyNotification {
         NotificationManagerCompat.from(CONTEXT).notify(BackgroundServiceStickyNotification.NOTIFICATION_ID, stickyNotification);
     }
 
-    public void hide() {
+    public static void hide(final Context CONTEXT) {
         Log.d("BackgroundServiceSti...", "hide()");
         NotificationManagerCompat.from(CONTEXT).cancel(BackgroundServiceStickyNotification.NOTIFICATION_ID);
     }

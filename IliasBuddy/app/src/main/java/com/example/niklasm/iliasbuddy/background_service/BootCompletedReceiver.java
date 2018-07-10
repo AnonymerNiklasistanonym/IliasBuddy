@@ -11,11 +11,7 @@ public class BootCompletedReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         Log.i("BootCompletedReceiver", "onReceive - begin");
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            context.startActivity(
-                    new Intent(context,
-                            BackgroundServiceManager.class)
-                            .putExtra(BackgroundServiceManager.INTENT_EXTRA_NAME,
-                                    BackgroundServiceManager.START_BACKGROUND_SERVICE));
+            BackgroundServiceManager.startBackgroundService(context);
         }
         Log.i("BootCompletedReceiver", "onReceive - end");
     }

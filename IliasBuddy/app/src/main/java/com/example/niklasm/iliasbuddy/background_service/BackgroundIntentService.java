@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy;
+package com.example.niklasm.iliasbuddy.background_service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
+import com.example.niklasm.iliasbuddy.MainActivity;
+import com.example.niklasm.iliasbuddy.R;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequester;
@@ -31,8 +33,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 public class BackgroundIntentService extends Service implements IliasRssXmlWebRequesterInterface {
+
+    public final static String NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING = "previewString";
+    public final static String NOTIFICATION_INTENT_EXTRA_BIG_STRING = "bigString";
+    private final static String LATEST_ITEM_NOT_FOUND = "nothing_found";
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
@@ -64,9 +71,9 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
     public void createNotification(final String titleString, final String previewString, final String bigString) {
 
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", BackgroundIntentService.MODE_PRIVATE);
-        final String latestItem = myPrefs.getString(getString(R.string.lastNotification), "nothing_found");
+        final String latestItem = myPrefs.getString(getString(R.string.lastNotification), BackgroundIntentService.LATEST_ITEM_NOT_FOUND);
 
-        if (!latestItem.equals("nothing_found") && latestItem.equals(bigString)) {
+        if (!latestItem.equals(BackgroundIntentService.LATEST_ITEM_NOT_FOUND) && latestItem.equals(bigString)) {
             Log.i("BackgroundIntentService", "Do not make a new notification, the text is the same");
             return;
         } else {
@@ -98,7 +105,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             mChannel.enableVibration(true);
             mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
             mChannel.setShowBadge(false);
-            notificationManager.createNotificationChannel(mChannel);
+            Objects.requireNonNull(notificationManager).createNotificationChannel(mChannel);
         }
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
@@ -106,7 +113,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setColor(ContextCompat.getColor(BackgroundIntentService.this, R.color.colorPrimary))
                 .setContentTitle(titleString)
-                .setLights(getResources().getColor(R.color.colorPrimary), 3000, 3000)
+                .setLights(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary), 3000, 3000)
                 .setContentText(previewString);
 
         final NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
@@ -123,11 +130,11 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         final Notification notification = builder.build();
         notification.flags = Notification.FLAG_AUTO_CANCEL;
 
-        notificationManager.notify(MainActivity.NEW_ENTRY_FOUND_NOTIFICATION_ID, notification);
+        Objects.requireNonNull(notificationManager).notify(MainActivity.NEW_ENTRY_FOUND_NOTIFICATION_ID, notification);
 
         final Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
-                .putExtra("previewString", previewString)
-                .putExtra("bigString", bigString);
+                .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING, previewString)
+                .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_BIG_STRING, bigString);
         LocalBroadcastManager.getInstance(this).sendBroadcast(callMainActivity);
     }
 

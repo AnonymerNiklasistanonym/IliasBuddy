@@ -38,11 +38,10 @@ public class BackgroundServiceStickyNotification {
                         PendingIntent.FLAG_UPDATE_CURRENT);
         // create PendingIntent for stopping the background service
         final PendingIntent stopServicePendingIntent =
-                PendingIntent.getService(CONTEXT, 0,
-                        new Intent(CONTEXT, BackgroundServiceManager.class)
-                                .putExtra(BackgroundServiceManager.INTENT_EXTRA_NAME,
-                                        BackgroundServiceManager.STOP_BACKGROUND_SERVICE),
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.getActivity(CONTEXT, 0,
+                        new Intent(CONTEXT, MainActivity.class)
+                                .putExtra(MainActivity.STOP_BACKGROUND_SERVICE, true),
+                        PendingIntent.FLAG_CANCEL_CURRENT);
 
 
         final NotificationManager notificationManager =

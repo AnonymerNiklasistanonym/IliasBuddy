@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.example.niklasm.iliasbuddy.BackgroundIntentService;
-
 import java.util.Objects;
 
 public class BackgroundServiceManager {

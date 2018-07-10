@@ -39,17 +39,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".BackgroundIntentService"
+            android:name=".background_service.BackgroundIntentService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </service>
-
-        <service
-            android:name=".background_service.TestJobService"
-            android:label="Word service"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver android:name=".background_service.BootCompletedReceiver">
             <intent-filter>

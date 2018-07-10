@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
+import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssCache;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     final public static String RECEIVE_JSON = "FOUND_A_NEW_ENTRY";
     final public static String NEW_ENTRY_FOUND = "NEW_ENTRY_FOUND";
     final public static int NEW_ENTRY_FOUND_NOTIFICATION_ID = 42424242;
-    final private static String STOP_BACKGROUND_SERVICE = "STOP_BACKGROUND_SERVICE";
+    public final static String STOP_BACKGROUND_SERVICE = "STOP_BACKGROUND_SERVICE";
     private LocalBroadcastManager bManager;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -70,9 +71,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         public void onReceive(final Context context, @NonNull final Intent intent) {
             // test - https://stackoverflow.com/a/12997537/7827128
             if (intent.getAction() != null && intent.getAction().equals(MainActivity.RECEIVE_JSON)) {
-                final String previewString = intent.getStringExtra("previewString");
+                final String previewString = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
                 newEntriesMessage = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("REFRESH", view -> checkForRssUpdates());
+                        .setAction(R.string.word_refresh, view -> checkForRssUpdates());
                 newEntriesMessage.show();
             }
         }
@@ -338,6 +339,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onNewIntent(intent);
         // gets called if an intent to this Activity was executed
         Log.i("MainActivity", "onNewIntent");
+
+        // xd never gets called ever ... I am so bad
 
         // check if new elements were found
         if (intent.getBooleanExtra(MainActivity.NEW_ENTRY_FOUND, false)) {

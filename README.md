@@ -28,7 +28,7 @@ You need three things:
 8. Insert in the app the new URL, user name and password and click the check icon at the bottom right.
   (If you cannot find the input of these three things click the three points at the right top and click then in the menu 'Open Setup' to get there)
 
-## Create signed `.apk`
+## Create signed `.apk` (using Android Studio v3)
 
 1. Select `Build` in the menu bar
 2. Select in the new menu `Generate Signed APK`
@@ -41,6 +41,5 @@ You need three things:
       6. Select `OK`
    2. Otherwise select the `.jks` file vie `Choose existing...`
 3. Then click `Next` and select `release` as Build Type
-4. Select the checkbox `V1 (Jar Signature)` and `V2`
+4. Select the checkbox `V1 (Jar Signature)` (and `V2` - was not necessary when I tried it)
 5. Select `Finish` and find your generated signed APK in the `\IliasBuddy\app` directory
-

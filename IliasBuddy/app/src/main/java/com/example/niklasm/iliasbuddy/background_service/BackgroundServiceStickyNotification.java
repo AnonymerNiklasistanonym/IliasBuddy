@@ -15,8 +15,8 @@ public class BackgroundServiceStickyNotification {
     final private static String CHANNEL_ID = "BackgroundServiceStickyNotification";
     final private static CharSequence CHANNEL_NAME = "Sticky background service is active";
     final private static String CHANNEL_DESCRIPTION = "Shows sticky notification when background service is activated";
-    final private static String CONTENT_TITLE = "IliasBuddy - Running in the background";
-    final private static String CONTENT_TEXT = "Click to open the app or expand to stop the background service";
+    final private static String CONTENT_TITLE = "IliasBuddy";
+    final private static String CONTENT_TEXT = "Background service is active";
     final private static String ACTION_TITLE = "Stop background service";
 
     public static void show(final Context CONTEXT) {

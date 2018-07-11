@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, @NonNull final Intent intent) {
+            Log.i("MainActivity", "Intents get catched in here - " + intent.getAction());
+
             // test - https://stackoverflow.com/a/12997537/7827128
             if (intent.getAction() != null && intent.getAction().equals(MainActivity.RECEIVE_JSON)) {
                 final String previewString = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
@@ -296,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
         final SharedPreferences.Editor e = myPrefs.edit();
         e.putString(getString(R.string.latestItem), "");
+        e.putString(getString(R.string.lastNotification), "");
         e.apply();
         latestRssEntry = null;
         renderNewList(new IliasRssItem[0]);

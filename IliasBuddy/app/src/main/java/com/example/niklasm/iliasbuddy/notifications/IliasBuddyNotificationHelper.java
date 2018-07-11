@@ -114,6 +114,7 @@ public class IliasBuddyNotificationHelper {
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
                 .setAutoCancel(false) // on click the notification does not disappear
                 .setOngoing(true) // make it not clear-able
+                .setShowWhen(false) // do not display timestamp
                 .build();
     }
 

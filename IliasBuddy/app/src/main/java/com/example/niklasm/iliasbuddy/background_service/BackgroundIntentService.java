@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -57,6 +58,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
         if (!latestItem.equals(BackgroundIntentService.LATEST_ITEM_NOT_FOUND) && latestItem.equals(bigString)) {
             Log.i("BackgroundIntentService", "Do not make a new notification, the text is the same");
+            Log.i("BackgroundIntentService", "latestItem: " + latestItem);
+            Log.i("BackgroundIntentService", "bigString: " + bigString);
             return;
         } else {
             Log.i("BackgroundIntentService", "Make a new notification, the text is NOT the same");
@@ -134,18 +137,21 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             Log.i("BackgroundIntentService", "One new entry was found");
 
             final String previewString = myDataSet[0].getCourse() + (myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "");
-            final String bigString = previewString + "\n" +
-                    NEW_ENTRIES[0].toStringNotificationPreview(VIEW_DATE_FORMAT) +
-                    "\n\n" + myDataSet[0].getDescription();
+            final String bigString = NEW_ENTRIES[0].toStringNotificationPreview(VIEW_DATE_FORMAT)
+                    + "\n\n" + Html.fromHtml(myDataSet[0].getDescription());
 
             createNotification("One new Ilias entry!", previewString, bigString, 1);
         } else {
             Log.i("BackgroundIntentService", "More than one new entry was found");
 
             final String previewString = "(" + myDataSet[0].getCourse() + ", " + myDataSet[1].getCourse() + ",... )";
-            final StringBuilder bigString = new StringBuilder(previewString);
-            for (final IliasRssItem entry : NEW_ENTRIES) {
-                bigString.append("\n- ").append(entry.toStringNotificationPreview(VIEW_DATE_FORMAT));
+            final StringBuilder bigString = new StringBuilder("");
+            for (int i = 0; i < NEW_ENTRIES.length; i++) {
+                final IliasRssItem entry = NEW_ENTRIES[i];
+                bigString
+                        .append("- ")
+                        .append(entry.toStringNotificationPreview(VIEW_DATE_FORMAT))
+                        .append(i != NEW_ENTRIES.length - 1 ? "\n" : "");
             }
 
             createNotification(myDataSet.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length);

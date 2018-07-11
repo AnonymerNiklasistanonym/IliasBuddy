@@ -3,6 +3,7 @@ package com.example.niklasm.iliasbuddy.ilias_rss_handler;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -60,6 +61,12 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         return "course=" + COURSE + ",extra=" + EXTRA + ",titleExtra=" + TITLE_EXTRA +
                 ",title=" + TITLE + ",description=" + DESCRIPTION + ",link=" + LINK +
                 ",date=" + DATE.getTime();
+    }
+
+    public String toStringNotificationPreview(final SimpleDateFormat viewDateFormat) {
+        return getCourse() + (getExtra() != null ? " > " + getExtra() : "") + " >> " +
+                (getTitleExtra() != null ? getTitleExtra() + ": " : "") + getTitle() + " (" +
+                viewDateFormat.format(getDate()) + ")";
     }
 
     @Override

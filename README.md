@@ -26,4 +26,21 @@ You need three things:
 6. Save the password
 7. Replace in the before copied private feed URL 'password' with your just set password
 8. Insert in the app the new URL, user name and password and click the check icon at the bottom right.
-(If you cannot find the input of these three things click the three points at the right top and click then in the menu 'Open Setup' to get there)
+  (If you cannot find the input of these three things click the three points at the right top and click then in the menu 'Open Setup' to get there)
+
+## Create signed `.apk`
+
+1. Select `Build` in the menu bar
+2. Select in the new menu `Generate Signed APK`
+   1. If you not already created a key select `Create new...`
+      1. Choose a path and file name by clicking `...`
+      2. Enter a password for the key store path
+      3. Enter key alias specifically for this app
+      4. Enter another key password specifically for this app 
+      5. Enter your a name
+      6. Select `OK`
+   2. Otherwise select the `.jks` file vie `Choose existing...`
+3. Then click `Next` and select `release` as Build Type
+4. Select the checkbox `V1 (Jar Signature)` and `V2`
+5. Select `Finish` and find your generated signed APK in the `\IliasBuddy\app` directory
+

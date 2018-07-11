@@ -69,6 +69,11 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
                 viewDateFormat.format(getDate()) + ")";
     }
 
+    public String toStringNotificationPreview2(final SimpleDateFormat viewDateFormat) {
+        return ">> " + (getTitleExtra() != null ? getTitleExtra() + ": " : "") + getTitle() + "\n(" +
+                viewDateFormat.format(getDate()) + ")";
+    }
+
     @Override
     public int compare(final IliasRssItem OBJECT_1, final IliasRssItem OBJECT_2) {
         final int DATE_IS_THE_SAME = OBJECT_1.getDate().compareTo(OBJECT_2.getDate());

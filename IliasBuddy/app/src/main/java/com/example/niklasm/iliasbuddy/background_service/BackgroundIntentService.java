@@ -137,7 +137,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             Log.i("BackgroundIntentService", "One new entry was found");
 
             final String previewString = myDataSet[0].getCourse() + (myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "");
-            final String bigString = NEW_ENTRIES[0].toStringNotificationPreview(VIEW_DATE_FORMAT)
+            final String bigString = NEW_ENTRIES[0].toStringNotificationPreview2(VIEW_DATE_FORMAT)
                     + "\n\n" + Html.fromHtml(myDataSet[0].getDescription());
 
             createNotification("One new Ilias entry!", previewString, bigString, 1, new String[]{bigString});
@@ -153,7 +153,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 bigString.append("- ").append(inboxArray[i]).append((i != NEW_ENTRIES.length - 1 ? "\n" : ""));
             }
 
-            createNotification(myDataSet.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length, inboxArray);
+            createNotification(NEW_ENTRIES.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length, inboxArray);
         }
     }
 

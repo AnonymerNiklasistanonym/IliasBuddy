@@ -54,38 +54,60 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+
         // Replace the contents of a view (invoked by the layout manager)
         // - get element from the data set at this position
         // - replace the contents of the view with that element
-        final IliasRssItem entry = items.get(position);
-        final String description = entry.getDescription();
+        final IliasRssItem CURRENT_ENTRY = items.get(position);
+        final String description = CURRENT_ENTRY.getDescription();
+
+        // reset holder
+        holder.background.setBackgroundResource(android.R.color.white);
+        holder.course.setVisibility(View.VISIBLE);
+        holder.course.setText("");
+        holder.date.setVisibility(View.VISIBLE);
+        holder.date.setText("");
+        holder.time.setVisibility(View.VISIBLE);
+        holder.time.setText("");
+        holder.star.setVisibility(View.VISIBLE);
+        holder.title.setVisibility(View.VISIBLE);
+        holder.title.setText("");
+        holder.extra.setVisibility(View.VISIBLE);
+        holder.extra.setText("");
+        holder.description.setVisibility(View.VISIBLE);
+        holder.description.setText("");
+        holder.extraCard.setVisibility(View.VISIBLE);
+        holder.titleExtraCard.setVisibility(View.VISIBLE);
+        holder.titleExtraCard.setCardBackgroundColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary));
+        holder.titleExtra.setVisibility(View.VISIBLE);
+        holder.titleExtra.setText("");
 
         // CHECK THIS LATER
         if (ADAPTER_INTERFACE.listAdapterGetLatestEntry() == null ||
                 ADAPTER_INTERFACE.listAdapterGetLatestEntry().getDate().getTime()
-                        < entry.getDate().getTime()) {
+                        < CURRENT_ENTRY.getDate().getTime()) {
             holder.background.setBackgroundResource(R.color.colorNewEntry);
         }
         // CHECK THIS LATER
 
         // These views have always these values
-        holder.course.setText(entry.getCourse());
-        holder.date.setText(viewDateFormat.format(entry.getDate()));
-        holder.time.setText(viewTimeFormat.format(entry.getDate()));
+        holder.course.setText(CURRENT_ENTRY.getCourse());
+        holder.date.setText(viewDateFormat.format(CURRENT_ENTRY.getDate()));
+        holder.time.setText(viewTimeFormat.format(CURRENT_ENTRY.getDate()));
         holder.star.setVisibility(View.GONE);
-        holder.title.setText(entry.getTitle());
+        holder.title.setText(CURRENT_ENTRY.getTitle());
 
         // if extra is null hide extra card or else set the text
-        if (entry.getExtra() == null) {
+        if (CURRENT_ENTRY.getExtra() == null) {
             holder.extraCard.setVisibility(View.GONE);
         } else {
-            holder.extra.setText(entry.getExtra());
+            holder.extra.setText(CURRENT_ENTRY.getExtra());
         }
 
-        if (entry.getTitleExtra() == null) {
+        if (CURRENT_ENTRY.getTitleExtra() == null) {
             holder.titleExtraCard.setVisibility(View.GONE);
         } else {
-            holder.titleExtra.setText(entry.getTitleExtra());
+            holder.titleExtra.setText(CURRENT_ENTRY.getTitleExtra());
         }
 
         if (description == null || description.equals("")) {
@@ -97,9 +119,9 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     .trim());
         }
 
-        if ((description == null || description.equals("")) && entry.getTitleExtra() != null) {
+        if ((description == null || description.equals("")) && CURRENT_ENTRY.getTitleExtra() != null) {
             holder.titleExtra.setText(CONTEXT.getResources().getString(R.string.new_file));
-            holder.title.setText(entry.getTitleExtra());
+            holder.title.setText(CURRENT_ENTRY.getTitleExtra());
             holder.titleExtraCard.setCardBackgroundColor(
                     ContextCompat.getColor(CONTEXT, android.R.color.holo_red_dark));
         }

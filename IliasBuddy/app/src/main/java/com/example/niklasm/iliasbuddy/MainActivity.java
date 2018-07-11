@@ -1,6 +1,5 @@
 package com.example.niklasm.iliasbuddy;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +29,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
+import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceNewEntriesNotification;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssCache;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItemListAdapter;
@@ -68,13 +68,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, @NonNull final Intent intent) {
-            Log.i("MainActivity", "Intents get catched in here - " + intent.getAction());
+            Log.i("MainActivity", "Broadcasts intents get in here - " + intent.getAction());
 
             // test - https://stackoverflow.com/a/12997537/7827128
             if (intent.getAction() != null && intent.getAction().equals(MainActivity.RECEIVE_JSON)) {
-                final String previewString = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
-                newEntriesMessage = Snackbar.make(findViewById(R.id.fab), previewString, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.word_refresh, view -> checkForRssUpdates());
+                final String PREVIEW_STRING = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
+                final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService.NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
+                final String BIG_STRING = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_BIG_STRING);
+                Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY >> BIG_STRING: " + BIG_STRING);
+                Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY >> MESSAGE_COUNT: " + MESSAGE_COUNT);
+                Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY >> PREVIEW_STRING: " + PREVIEW_STRING);
+                newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.word_refresh, view -> {
+                            // pull newest changes
+                            checkForRssUpdates();
+                        });
                 newEntriesMessage.show();
             }
         }
@@ -261,14 +269,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     public void checkForRssUpdates() {
+        // dismiss notification
+        BackgroundServiceNewEntriesNotification.hide(this);
+        // dismiss snackbar
         if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) {
             newEntriesMessage.dismiss();
         }
-        final NotificationManager mNotificationManager;
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (mNotificationManager != null) {
-            mNotificationManager.cancel(MainActivity.NEW_ENTRY_FOUND_NOTIFICATION_ID);
-        }
+        // refresh list
         mSwipeRefreshLayout.setRefreshing(true);
         webRequester.getWebContent();
     }
@@ -340,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         // gets called if an intent to this Activity was executed
-        Log.i("MainActivity", "onNewIntent");
+        Log.i("MainActivity", "onNewIntent WOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOW");
 
         // xd never gets called ever ... I am so bad
 
@@ -430,5 +437,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public void onRefresh() {
         removeColoring();
         checkForRssUpdates();
+    }
+
+    public void sendIntent(final MenuItem item) {
+        final Intent myIntent = new Intent(MainActivity.this, MainActivity.class);
+        myIntent.putExtra("some_key", "String data");
+        startActivity(myIntent);
     }
 }

@@ -4,11 +4,14 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.example.niklasm.iliasbuddy.R;
 
@@ -23,16 +26,20 @@ public class IliasBuddyNotificationHelper {
                                                           final String CONTENT_TITLE,
                                                           final String CONTENT_TEXT,
                                                           final String CONTENT_TEXT_BIG,
+                                                          final String[] CONTENT_TEXT_ARRAY,
                                                           final Intent ONCLICK_INTENT,
                                                           final int MESSAGE_COUNT) {
 
-        // create PendingIntent for opening the app on click
+        Log.i("NotificationHelper", ONCLICK_INTENT.toString());
+        // Create the TaskStackBuilder and add the intent, which inflates the back stack
+        final TaskStackBuilder stackBuilder = TaskStackBuilder.create(CONTEXT);
+        stackBuilder.addNextIntentWithParentStack(ONCLICK_INTENT);
+        // Get the PendingIntent containing the entire back stack
         final PendingIntent openAppPendingIntent =
-                PendingIntent.getActivity(CONTEXT, 0, ONCLICK_INTENT,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // setup oreo notification channel - https://stackoverflow.com/a/47974065
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager notificationManager =
                     (NotificationManager) CONTEXT.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -43,13 +50,28 @@ public class IliasBuddyNotificationHelper {
             mChannel.enableLights(true);
             mChannel.enableVibration(true);
             mChannel.setShowBadge(true);
-            mChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);
             Objects.requireNonNull(notificationManager).createNotificationChannel(mChannel);
         }
 
         final Notification notification2 = new Notification();
         notification2.defaults |= Notification.DEFAULT_SOUND;
         notification2.defaults |= Notification.DEFAULT_VIBRATE;
+
+        final NotificationCompat.Style NOTIFICATION_STYLE;
+        if (CONTENT_TEXT_ARRAY.length > 1) {
+            final NotificationCompat.InboxStyle NOTIFICATION_STYLE_2 = new NotificationCompat.InboxStyle();
+            //.setBigContentTitle("Big content title")
+            //.setSummaryText(MESSAGE_COUNT + "entries");
+
+            for (final String LINE : CONTENT_TEXT_ARRAY) {
+                NOTIFICATION_STYLE_2.addLine(LINE);
+            }
+            NOTIFICATION_STYLE = NOTIFICATION_STYLE_2;
+        } else {
+            NOTIFICATION_STYLE = new NotificationCompat.BigTextStyle()
+                    .bigText(CONTENT_TEXT_ARRAY[0])
+                    .setBigContentTitle(CONTENT_TEXT_BIG);
+        }
 
         // build sticky notification
         return new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
@@ -61,7 +83,7 @@ public class IliasBuddyNotificationHelper {
                 .setPriority(Notification.PRIORITY_MAX)
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
                 .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary), 3000, 3000)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(CONTENT_TEXT_BIG))
+                .setStyle(NOTIFICATION_STYLE)
                 .setAutoCancel(true) // on click the notification does not disappear
                 .setNumber(MESSAGE_COUNT)
                 .build();

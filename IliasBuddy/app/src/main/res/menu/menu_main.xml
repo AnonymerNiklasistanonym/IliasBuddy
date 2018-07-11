@@ -54,4 +54,9 @@
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
+    <item
+        android:onClick="sendIntent"
+        android:title="@string/send_intent"
+        app:showAsAction="never" />
+
 </menu>

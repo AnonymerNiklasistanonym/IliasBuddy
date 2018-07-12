@@ -39,7 +39,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         Log.i("BackgroundIntentService", "onStartCommand");
 
         // make a web request with the important data
-        final IliasRssXmlWebRequester webRequester = new IliasRssXmlWebRequester(this);
+        final IliasRssXmlWebRequester webRequester =
+                new IliasRssXmlWebRequester(this);
         webRequester.getWebContent();
 
         // return this so that the service can be restarted
@@ -51,10 +52,15 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         return null;
     }
 
-    public void createNotification(final String titleString, final String previewString, final String bigString, final int MESSAGE_COUNT, final String[] INBOX_MESSAGES, final String URL) {
+    public void createNotification(final String titleString, final String previewString,
+                                   final String bigString, final int MESSAGE_COUNT,
+                                   final String[] INBOX_MESSAGES, final String URL) {
 
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", BackgroundIntentService.MODE_PRIVATE);
-        final String latestItem = myPrefs.getString(getString(R.string.lastNotification), BackgroundIntentService.LATEST_ITEM_NOT_FOUND);
+        final SharedPreferences myPrefs =
+                android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        final String latestItem =
+                myPrefs.getString(getString(R.string.lastNotification),
+                        BackgroundIntentService.LATEST_ITEM_NOT_FOUND);
 
         if (!latestItem.equals(BackgroundIntentService.LATEST_ITEM_NOT_FOUND) && latestItem.equals(bigString)) {
             Log.i("BackgroundIntentService", "Do not make a new notification, the text is the same");
@@ -66,9 +72,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         }
 
         // if new notification save the old String
-        final SharedPreferences.Editor e = myPrefs.edit();
-        e.putString(getString(R.string.lastNotification), bigString);
-        e.apply();
+        myPrefs.edit().putString(getString(R.string.lastNotification), bigString).apply();
 
         final Intent ON_CLICK = new Intent(this, MainActivity.class)
                 .putExtra(MainActivity.NEW_ENTRY_FOUND, true)
@@ -124,7 +128,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         }
 
         // get latest item string form shared preferences
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", BackgroundIntentService.MODE_PRIVATE);
+
+        final SharedPreferences myPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
         final String latestItem = myPrefs.getString(getString(R.string.latestItem), null);
 
         final IliasRssItem[] NEW_ENTRIES = getNewElements(myDataSet, latestItem);

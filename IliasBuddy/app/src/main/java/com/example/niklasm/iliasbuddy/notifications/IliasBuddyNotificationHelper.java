@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
@@ -21,11 +22,11 @@ import java.util.Objects;
 
 public class IliasBuddyNotificationHelper {
 
-    public static Notification createNewEntryNotification(final Context CONTEXT,
-                                                          final String CHANNEL_ID,
-                                                          final CharSequence CHANNEL_NAME,
+    public static Notification createNewEntryNotification(@NonNull final Context CONTEXT,
+                                                          @NonNull final String CHANNEL_ID,
+                                                          @NonNull final CharSequence CHANNEL_NAME,
                                                           final String CHANNEL_DESCRIPTION,
-                                                          final String CONTENT_TITLE,
+                                                          @NonNull final String CONTENT_TITLE,
                                                           final String CONTENT_TEXT,
                                                           final String CONTENT_TEXT_BIG,
                                                           final String[] CONTENT_TEXT_ARRAY,
@@ -76,8 +77,6 @@ public class IliasBuddyNotificationHelper {
                     .setBigContentTitle(CONTENT_TEXT);
         }
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(CONTEXT, 0, new Intent(Intent.ACTION_VIEW, Uri.parse(URL)), PendingIntent.FLAG_UPDATE_CURRENT);
-
         // build new entries notification
         final NotificationCompat.Builder NOTIFICATION_BUILDER = new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
                 .setContentTitle(CONTENT_TITLE)
@@ -103,7 +102,9 @@ public class IliasBuddyNotificationHelper {
                     new NotificationCompat.Action.Builder(
                             R.drawable.ic_open_in_browser_black,
                             CONTEXT.getString(R.string.open_in_ilias),
-                            pendingIntent).build());
+                            PendingIntent.getActivity(CONTEXT,
+                                    0, new Intent(Intent.ACTION_VIEW, Uri.parse(URL)),
+                                    PendingIntent.FLAG_UPDATE_CURRENT)).build());
         }
 
         return NOTIFICATION_BUILDER.build();

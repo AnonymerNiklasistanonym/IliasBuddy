@@ -127,7 +127,7 @@
     <string name="word_ok">OK</string>
     <string name="word_open_source_licenses">Open source licenses</string>
     <string name="url_ilias_buddy_repository">https://github.com/AnonymerNiklasistanonym/IliasBuddy</string>
-    <string name="url_ilias_buddy_repository_title">Visit website with source code and bug tracker</string>
+    <string name="url_ilias_buddy_repository_title">Website with source code + bug tracker</string>
     <string name="author_github_user_name">AnonymerNiklasistanonym</string>
     <string name="author_github_user_name_title">AnonymerNiklasistanonym on GitHub</string>
     <string name="popup_help_html_content"><![CDATA[<p>To use this service you need to visit Ilias and click on the orange <b>RSS</b> button to get to the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias news feed</a>.</p><p>From there you need to copy the private feed url and replace the <b>password</b> with a password you set in the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias settings</a> (you get there by clicking the settings symbol at the top right of the same card you just clicked the orange RSS button.</p><p>Then insert the url in the first text field and your username (The name string in the url without any spaces) and your just set password and click the check button.</p>]]></string>
@@ -140,4 +140,7 @@
     <string name="deleteSetupToken">Delete setup token</string>
     <string name="slide_3_picture_desc">Phone that vibrates and has a speech bubble coming from it\'s center which contains a sound symbol</string>
     <string name="slide_2_picture_desc">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
+    <string name="pref_title_enable_campus_shortcut">pref_title_enable_campus_shortcut</string>
+    <string name="pref_description_enable_campus_shortcut">Show Campus icon shortcut in the action bar next to the Ilias icon</string>
+    <string name="pref_summary_activate_background_notifications">If on the device will look in the background for feed updates and push notifications</string>
 </resources>

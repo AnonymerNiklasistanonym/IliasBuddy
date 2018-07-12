@@ -5,6 +5,7 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="activate_background_notifications"
+        android:summary="@string/pref_summary_activate_background_notifications"
         android:title="@string/pref_title_background_notifications" />
 
     <!-- Allows the user to choose a ringtone in the 'notification' category. -->

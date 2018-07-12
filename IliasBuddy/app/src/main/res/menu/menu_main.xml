@@ -12,6 +12,7 @@
 
     <!-- Icon (if room) - open C@mpus -->
     <item
+        android:id="@+id/campus_icon"
         android:icon="@drawable/ic_campus_logo_48dp"
         android:onClick="openCampus"
         android:title="@string/action_open_campus"
@@ -21,13 +22,13 @@
 
     <item
         android:icon="@drawable/ic_main_activity_menu_item_setup_black"
-        android:onClick="openSetup"
+        android:onClick="menuOpenSetupActivity"
         android:title="@string/action_setup"
         app:showAsAction="never" />
 
     <item
         android:icon="@drawable/ic_about_black"
-        android:onClick="openAbout"
+        android:onClick="menuOpenAboutActivity"
         android:title="@string/action_about"
         app:showAsAction="never" />
 
@@ -47,19 +48,19 @@
                 android:title="@string/action_last_response"
                 app:showAsAction="never" />
             <item
-                android:onClick="cleanList"
+                android:onClick="menuDevOptionCleanList"
                 android:title="@string/action_clean_list"
                 app:showAsAction="never" />
             <item
-                android:onClick="sendIntent"
+                android:onClick="menuDevOptionSendIntent"
                 android:title="@string/send_intent"
                 app:showAsAction="never" />
             <item
-                android:onClick="exampleNotification"
+                android:onClick="menuDevOptionExampleNotification"
                 android:title="@string/example_notification"
                 app:showAsAction="never" />
             <item
-                android:onClick="deleteSetupToken"
+                android:onClick="menuDevOptionSetFirstLaunch"
                 android:title="@string/deleteSetupToken"
                 app:showAsAction="never" />
         </menu>

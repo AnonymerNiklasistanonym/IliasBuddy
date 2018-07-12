@@ -22,7 +22,6 @@ public class AboutActivity extends AppCompatActivity {
         final View aboutPage = new AboutPage(this)
                 .isRTL(false)
                 .setDescription(getString(R.string.about_app_description))
-                //.setImage(R.drawable.ic_launcher_foreground)
                 .addItem(new Element().setTitle(getString(R.string.word_version) + " " + BuildConfig.VERSION_NAME))
                 .addItem(new Element().setTitle(getString(R.string.word_license)).setOnClickListener(view -> {
                     AlertDialog alertDialog = new AlertDialog.Builder(AboutActivity.this)

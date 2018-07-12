@@ -24,15 +24,14 @@ public class IliasRssCache {
     /**
      * Constructor
      *
-     * @param context  (Context) - Needed for getting the application file directory
-     * @param fileName (String) - Name of the file in which the IliasRssItem array will be saved
+     * @param context (Context) - Needed for getting the application file directory
      */
-    public IliasRssCache(@NonNull final Context context, final String fileName) {
+    public IliasRssCache(@NonNull final Context context) {
         final File ILIAS_RSS_CACHE_DIRECTORY =
                 new File(context.getFilesDir().getAbsolutePath() +
                         File.separator + "ilias_rss_cache");
         ILIAS_RSS_CACHE_FILE =
-                new File(ILIAS_RSS_CACHE_DIRECTORY + File.separator + fileName);
+                new File(ILIAS_RSS_CACHE_DIRECTORY + File.separator + "TestFile.test");
     }
 
     /**

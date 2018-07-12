@@ -22,6 +22,8 @@ import java.util.Objects;
 
 public class WelcomeActivity extends AppCompatActivity {
 
+    private static final String FIRST_TIME_PREF_NAME = "intro_slider-welcome";
+    private static final String FIRST_TIME_IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
     private ViewPager viewPager;
     private LinearLayout dotsLayout;
     private int[] layouts;
@@ -53,16 +55,23 @@ public class WelcomeActivity extends AppCompatActivity {
         public void onPageScrollStateChanged(final int arg0) {
         }
     };
-    private PreferenceManager prefManager;
+
+    public static boolean isFirstTimeLaunch(final Context CONTEXT) {
+        return CONTEXT.getSharedPreferences(WelcomeActivity.FIRST_TIME_PREF_NAME, Context.MODE_PRIVATE)
+                .getBoolean(WelcomeActivity.FIRST_TIME_IS_FIRST_TIME_LAUNCH, true);
+    }
+
+    public static void setFirstTimeLaunch(final Context CONTEXT, final boolean IS_FIRST_TIME) {
+        CONTEXT.getSharedPreferences(WelcomeActivity.FIRST_TIME_PREF_NAME, Context.MODE_PRIVATE)
+                .edit().putBoolean(WelcomeActivity.FIRST_TIME_IS_FIRST_TIME_LAUNCH, IS_FIRST_TIME).apply();
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Checking for first time launch - before calling setContentView()
-        prefManager = new PreferenceManager(this);
-        // prefManager.setFirstTimeLaunch(true);
-        if (!prefManager.isFirstTimeLaunch()) {
+        if (!WelcomeActivity.isFirstTimeLaunch(this)) {
             launchHomeScreen();
             finish();
         }
@@ -134,7 +143,7 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
     private void launchHomeScreen() {
-        prefManager.setFirstTimeLaunch(false);
+        WelcomeActivity.setFirstTimeLaunch(this, false);
         startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
         finish();
     }
@@ -181,4 +190,5 @@ public class WelcomeActivity extends AppCompatActivity {
             container.removeView(view);
         }
     }
+
 }

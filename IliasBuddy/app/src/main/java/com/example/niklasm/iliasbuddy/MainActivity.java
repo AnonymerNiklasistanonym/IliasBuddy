@@ -4,11 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
@@ -48,167 +48,182 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface, IliasRssItemListAdapterInterface {
+public class MainActivity extends AppCompatActivity implements
+        SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface,
+        IliasRssItemListAdapterInterface {
 
     // test - https://stackoverflow.com/a/12997537/7827128
     final public static String RECEIVE_JSON = "FOUND_A_NEW_ENTRY";
     final public static String NEW_ENTRY_FOUND = "NEW_ENTRY_FOUND";
-    final public static int NEW_ENTRY_FOUND_NOTIFICATION_ID = 42424242;
     public final static String STOP_BACKGROUND_SERVICE = "STOP_BACKGROUND_SERVICE";
-    private LocalBroadcastManager bManager;
-    private RecyclerView mRecyclerView;
+    private LocalBroadcastManager broadcastManager;
+    private RecyclerView rssEntryRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private Snackbar newEntriesMessage;
-    private IliasRssXmlWebRequester webRequester;
+    private IliasRssXmlWebRequester iliasRssXmlWebRequester;
     private IliasRssItem latestRssEntry;
-    private IliasRssItem latestRssEntry2;
+    private IliasRssItem latestRssEntryNewIliasRssFeedEntries;
     private String lastResponse = null;
-    private int dataSetLength = 0;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(final Context context, @NonNull final Intent intent) {
-            Log.i("MainActivity", "Broadcasts intents get in here - " + intent.getAction());
-
-            // test - https://stackoverflow.com/a/12997537/7827128
-            if (intent.getAction() != null && intent.getAction().equals(MainActivity.RECEIVE_JSON)) {
-                final String PREVIEW_STRING = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
-                final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService.NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
-                final String BIG_STRING = intent.getStringExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_BIG_STRING);
-                Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY >> BIG_STRING: " + BIG_STRING);
-                Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY >> MESSAGE_COUNT: " + MESSAGE_COUNT);
-                Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY >> PREVIEW_STRING: " + PREVIEW_STRING);
-                newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING, Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.word_refresh, view -> {
-                            // pull newest changes
-                            checkForRssUpdates();
-                        });
-                newEntriesMessage.show();
-            }
-        }
-    };
-    private IliasRssCache rssDataSaver;
+    private int currentDataSetLength = 0;
+    private SwipeRefreshLayout rssEntryRecyclerViewSwipeToRefreshLayout;
+    private BroadcastReceiver broadcastReceiver;
+    private IliasRssCache iliasRssFeedCacheManager;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        // Make sure this is before calling super.onCreate
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar(findViewById(R.id.toolbar));
 
-        mRecyclerView = findViewById(R.id.my_recycler_view);
-        mRecyclerView.setHasFixedSize(false);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        mSwipeRefreshLayout = findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_green_light,
-                android.R.color.holo_blue_light,
-                android.R.color.holo_red_light);
         /*
-          Showing Swipe Refresh animation on activity create
-          As animation won't start on onCreate, post runnable is used
+          SETUP things
          */
-        mSwipeRefreshLayout.post(this::checkForRssUpdates);
 
-        rssDataSaver = new IliasRssCache(this, "TestFile.test");
+        // setup the recycler view
+        rssEntryRecyclerView = findViewById(R.id.my_recycler_view);
+        rssEntryRecyclerView.setHasFixedSize(true);
+        rssEntryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        rssEntryRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        // setup the swipe to refresh layout
+        rssEntryRecyclerViewSwipeToRefreshLayout = findViewById(R.id.swipe_container);
+        rssEntryRecyclerViewSwipeToRefreshLayout.setOnRefreshListener(this);
+        rssEntryRecyclerViewSwipeToRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_orange_light, android.R.color.holo_green_light,
+                android.R.color.holo_blue_light, android.R.color.holo_red_light);
+        // refresh on onCreate does not work (Animation, etc.) thus we use the post runnable
+        rssEntryRecyclerViewSwipeToRefreshLayout.post(this::checkForRssUpdates);
+
+        // setup floating action button action
         findViewById(R.id.fab).setOnClickListener(view -> {
-            removeColoring();
+            updateLatestRssEntryToNewestEntry();
             checkForRssUpdates();
         });
 
+        // setup broadcast receiver
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(final Context context, @NonNull final Intent intent) {
+                Log.i("MainActivity", "BroadcastReceiver::onReceive > Intent: "
+                        + intent.getAction());
+
+                if (intent.getAction() != null &&
+                        intent.getAction().equals(MainActivity.RECEIVE_JSON)) {
+                    final String PREVIEW_STRING = intent.getStringExtra(BackgroundIntentService
+                            .NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
+                    final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService
+                            .NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
+                    final String BIG_STRING = intent.getStringExtra(BackgroundIntentService
+                            .NOTIFICATION_INTENT_EXTRA_BIG_STRING);
+                    Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY\n" +
+                            ">> BIG_STRING: " + BIG_STRING + "\n" +
+                            ">> MESSAGE_COUNT: " + MESSAGE_COUNT + "\n" +
+                            ">> PREVIEW_STRING: " + PREVIEW_STRING);
+
+                    // create snack bar message that refreshes feed on action click
+                    newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
+                            Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.word_refresh, view -> checkForRssUpdates());
+                    newEntriesMessage.show();
+                }
+            }
+        };
+
+        // setup broadcast manager
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MainActivity.RECEIVE_JSON);
+        broadcastManager.registerReceiver(broadcastReceiver, intentFilter);
+
+        // setup cache manager
+        iliasRssFeedCacheManager = new IliasRssCache(this);
+
+        // setup web request manager
+        iliasRssXmlWebRequester = new IliasRssXmlWebRequester(this);
+
+        /*
+          Load data & Co
+         */
+
         // try to load saved RSS feed
-        IliasRssItem[] myDataSet;
+        IliasRssItem[] myDataSet = null;
         try {
-            myDataSet = rssDataSaver.getCache();
+            myDataSet = iliasRssFeedCacheManager.getCache();
         } catch (IliasRssCache.IliasRssCacheException | IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            myDataSet = null;
         }
+
         if (myDataSet == null) {
             try {
-                rssDataSaver.setCache(new IliasRssItem[0]);
+                iliasRssFeedCacheManager.setCache(new IliasRssItem[0]);
             } catch (IliasRssCache.IliasRssCacheException | IOException e) {
                 e.printStackTrace();
             }
-            latestRssEntry2 = null;
+            latestRssEntryNewIliasRssFeedEntries = null;
             latestRssEntry = null;
             // specify an adapter (see also next example)
-            dataSetLength = 0;
+            currentDataSetLength = 0;
 
         } else if (myDataSet.length > 0) {
             // save latest object
-            latestRssEntry2 = myDataSet[0];
+            latestRssEntryNewIliasRssFeedEntries = myDataSet[0];
             latestRssEntry = myDataSet[0];
             // specify an adapter (see also next example)
-            mAdapter = new IliasRssItemListAdapter(Arrays.asList(myDataSet), this, this);
-            mRecyclerView.setAdapter(mAdapter);
-            dataSetLength = myDataSet.length;
+            mAdapter = new IliasRssItemListAdapter(Arrays.asList(myDataSet), this,
+                    this);
+            rssEntryRecyclerView.setAdapter(mAdapter);
+            currentDataSetLength = myDataSet.length;
 
         } else {
             latestRssEntry = null;
-            latestRssEntry2 = null;
+            latestRssEntryNewIliasRssFeedEntries = null;
         }
 
         if (mAdapter == null) {
-            mAdapter = new IliasRssItemListAdapter(Arrays.asList(new IliasRssItem[0]), this, this);
+            mAdapter = new IliasRssItemListAdapter(Arrays.asList(new IliasRssItem[0]),
+                    this, this);
         }
 
-        webRequester = new IliasRssXmlWebRequester(this);
+
+        // Start background service if there is not already one running and only if settings say so
+        if (!BackgroundServiceManager.isAlarmManagerCurrentlyActivated() &&
+                android.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                        .getBoolean("activate_background_notifications", true)) {
+            BackgroundServiceManager.startBackgroundService(this);
+        }
+
+        // check on create if there was a RSS feed update
         checkForRssUpdates();
-
-        // test - https://stackoverflow.com/a/12997537/7827128
-        bManager = LocalBroadcastManager.getInstance(this);
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MainActivity.RECEIVE_JSON);
-        bManager.registerReceiver(bReceiver, intentFilter);
-        // test - https://stackoverflow.com/a/12997537/7827128
-
-
-        // check if background service is already active
-        if (BackgroundServiceManager.isAlarmManagerCurrentlyActivated()) {
-            Log.d("MainActivity", "Background service is already active");
-        } else {
-            Log.d("MainActivity", "Background service is not active");
-            // activate background service if activate_background_notifications is "on"
-            if (android.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                    .getBoolean("activate_background_notifications", true)) {
-                Log.d("MainActivity", "activate_background_notifications = true");
-                startBackgroundService();
-            } else {
-                Log.d("MainActivity", "activate_background_notifications = false");
-            }
-        }
     }
 
-    public void exampleNotification(final MenuItem menuItem) {
-        BackgroundServiceNewEntriesNotification.show(this, "titleString", "previewString", "bigString", new String[]{"one", "two", "three"}, new Intent(this, MainActivity.class), 42, "https://ilias3.uni-stuttgart.de");
+    public void menuDevOptionExampleNotification(final MenuItem menuItem) {
+        BackgroundServiceNewEntriesNotification.show(this, "titleString",
+                "previewString", "bigString",
+                new String[]{"one", "two", "three"},
+                new Intent(this, MainActivity.class),
+                42, "https://ilias3.uni-stuttgart.de");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bManager.unregisterReceiver(bReceiver);
+        broadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
-    public void removeColoring() {
-        latestRssEntry = latestRssEntry2;
+    public void updateLatestRssEntryToNewestEntry() {
+        latestRssEntry = latestRssEntryNewIliasRssFeedEntries;
         if (mAdapter != null) {
-            mAdapter.notifyItemRangeChanged(0, dataSetLength);
+            mAdapter.notifyItemRangeChanged(0, currentDataSetLength);
         }
     }
 
-    public void openAbout(final MenuItem menuItem) {
+    public void menuOpenAboutActivity(final MenuItem menuItem) {
         startActivity(new Intent(this, AboutActivity.class));
     }
 
     @Override
     public void processIliasXml(final String FEED_XML_DATA) {
-        setLastResponse(FEED_XML_DATA);
+        devOptionSetLastResponse(FEED_XML_DATA);
         final InputStream stream = new ByteArrayInputStream(FEED_XML_DATA.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
         final IliasRssItem[] myDataSet;
         try {
@@ -231,22 +246,22 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             Log.i("MainActivity", "NO new entry found");
             noNewEntryFound();
         }
-        refreshIcon(false);
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void webAuthenticationError(final AuthFailureError error) {
         Log.i("MainActivity - AuthErr", error.toString());
-        refreshIcon(false);
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
         Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show();
-        openSetup(null);
+        menuOpenSetupActivity(null);
     }
 
     @Override
     public void webResponseError(final VolleyError error) {
         Log.i("MainActivity - RespErr", error.toString());
         errorSnackBar("Response Error", error.toString());
-        openSetup(null);
+        menuOpenSetupActivity(null);
     }
 
     public void openSettings(final MenuItem menuItem) {
@@ -277,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     .setTitle(title)
                     .setMessage(message)
                     .setNeutralButton("SETTINGS",
-                            (dialog, which) -> openSetup())
+                            (dialog, which) -> openSetupActivity())
                     .setNeutralButton("OK",
                             (dialog, which) -> dialog.dismiss())
                     .create();
@@ -286,88 +301,94 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         snackbar.show();
     }
 
-    public void checkForRssUpdates() {
-        // dismiss notification
+    /**
+     * Check if there are any new RSS entries + start necessary visual animation
+     */
+    private void checkForRssUpdates() {
+        // dismiss new entries notification
         BackgroundServiceNewEntriesNotification.hide(this);
-        // dismiss snackbar
+        // dismiss new entries snack bar
         if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) {
             newEntriesMessage.dismiss();
         }
-        // refresh list
-        mSwipeRefreshLayout.setRefreshing(true);
-        webRequester.getWebContent();
+        // activate refresh animation of SwipeToRefreshLayout
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(true);
+        // check Ilias RSS feed
+        iliasRssXmlWebRequester.getWebContent();
     }
 
-    public void refreshIcon(final boolean state) {
-        mSwipeRefreshLayout.setRefreshing(state);
+    /**
+     * Save latest response of Ilias RSS feed website
+     *
+     * @param RESPONSE (String) - Current website data as a String
+     */
+    public void devOptionSetLastResponse(final String RESPONSE) {
+        lastResponse = RESPONSE;
     }
 
-    public void setLastResponse(final String response) {
-        lastResponse = response;
+    public void menuOpenSetupActivity(final MenuItem menuItem) {
+        openSetupActivity();
     }
 
-    public void openSetup(final MenuItem menuItem) {
-        openSetup();
-    }
-
-    public void openSetup() {
+    /**
+     * Open activity 'Setup' in which the user can enter the RSS feed URL and his credentials
+     */
+    private void openSetupActivity() {
         startActivity(new Intent(this, SetupActivity.class));
     }
 
-    public void cleanList(final MenuItem menuItem) {
+    public void menuDevOptionCleanList(final MenuItem menuItem) {
+        devOptionCleanRssEntryList();
+    }
+
+    /**
+     * Clear current saved RSS feed
+     */
+    public void devOptionCleanRssEntryList() {
+        // clear cache by saving empty Feed
         try {
-            rssDataSaver.setCache(new IliasRssItem[0]);
+            iliasRssFeedCacheManager.setCache(new IliasRssItem[0]);
         } catch (IliasRssCache.IliasRssCacheException | IOException e) {
             e.printStackTrace();
         }
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
-        final SharedPreferences.Editor e = myPrefs.edit();
-        e.putString(getString(R.string.latestItem), "");
-        e.putString(getString(R.string.lastNotification), "");
-        e.apply();
+        // clear latest item and latest notification from preferences
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putString(getString(R.string.latestItem), "")
+                .putString(getString(R.string.lastNotification), "")
+                .apply();
+        // set latestRssEntry to null
         latestRssEntry = null;
+        // render empty list to override the current one
         renderNewList(new IliasRssItem[0]);
-        // mAdapter.notifyAll();
-        // mAdapter.notifyItemRangeRemoved(0, mAdapter.getItemCount());
-        dataSetLength = 0;
+        currentDataSetLength = 0;
     }
 
-    public void renderNewList(final IliasRssItem[] newDataSet) {
-
-        final SharedPreferences myPrefs = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
-        final SharedPreferences.Editor e = myPrefs.edit();
-        e.putString(getString(R.string.latestItem), newDataSet.length > 0 ? newDataSet[0].toString() : "");
-        e.apply();
-
+    public void renderNewList(final IliasRssItem[] NEW_ILIAS_RSS_FEED_ENTRIES) {
+        // save latest element of new data set in preferences
+        PreferenceManager.getDefaultSharedPreferences(this).edit()
+                .putString(getString(R.string.latestItem),
+                        NEW_ILIAS_RSS_FEED_ENTRIES.length > 0 ?
+                                NEW_ILIAS_RSS_FEED_ENTRIES[0].toString() : "").apply();
+        // set new cache
         try {
-            rssDataSaver.setCache(newDataSet);
+            iliasRssFeedCacheManager.setCache(NEW_ILIAS_RSS_FEED_ENTRIES);
         } catch (final IOException e1) {
             e1.printStackTrace();
         }
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // specify an adapter (see also next example)
-
-        mAdapter.notifyDataSetChanged();
-        mAdapter = new IliasRssItemListAdapter(Arrays.asList(newDataSet), this, this);
-        mRecyclerView.setAdapter(mAdapter);
-
-        dataSetLength = newDataSet.length;
-
-        // this.latestRssEntry = newDataSet.length > 0 ? newDataSet[0] : null;
-        latestRssEntry2 = newDataSet.length > 0 ? newDataSet[0] : null;
+        // specify a new adapter with the new data set
+        mAdapter = new IliasRssItemListAdapter(Arrays.asList(NEW_ILIAS_RSS_FEED_ENTRIES),
+                this, this);
+        rssEntryRecyclerView.setAdapter(mAdapter);
+        currentDataSetLength = NEW_ILIAS_RSS_FEED_ENTRIES.length;
+        latestRssEntryNewIliasRssFeedEntries = currentDataSetLength > 0 ?
+                NEW_ILIAS_RSS_FEED_ENTRIES[0] : null;
     }
 
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         // gets called if an intent to this Activity was executed
-        Log.i("MainActivity", "onNewIntent WOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOWOW");
-
-        // xd never gets called ever ... I am so bad
+        Log.i("MainActivity", "why the hell does this not catch any intent...");
 
         // check if new elements were found
         if (intent.getBooleanExtra(MainActivity.NEW_ENTRY_FOUND, false)) {
@@ -376,30 +397,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
 
         if (intent.getBooleanExtra(MainActivity.STOP_BACKGROUND_SERVICE, true)) {
-            stopBackgroundService();
+            BackgroundServiceManager.stopBackgroundService(this);
         }
-    }
-
-    public void restartService(final MenuItem menuItem) {
-        stopBackgroundService();
-        startBackgroundService();
-    }
-
-    private void startBackgroundService() {
-        Log.d("MainActivity", "startBackgroundService()");
-        BackgroundServiceManager.startBackgroundService(getApplicationContext());
-    }
-
-    private void stopBackgroundService() {
-        Log.d("MainActivity", "stopBackgroundService()");
-        BackgroundServiceManager.stopBackgroundService(getApplicationContext());
-    }
-
-    public void stopService(final MenuItem menuItem) {
-        Log.d("MainActivity", "stopService(MenuItem)");
-
-        // stop the background service
-        stopBackgroundService();
     }
 
     public void showLastResponse(final MenuItem menuItem) {
@@ -420,6 +419,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        // disable campus icon if the setting says so
+        menu.findItem(R.id.campus_icon).setVisible(PreferenceManager.getDefaultSharedPreferences(this)
+                .getBoolean("enable_campus_shortcut", true));
         return true;
     }
 
@@ -431,7 +433,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         openUrl("https://ilias3.uni-stuttgart.de/login.php?client_id=Uni_Stuttgart&lang=de");
     }
 
-
+    /**
+     * Open a website in the device browser
+     *
+     * @param URL (String) - Website link/address
+     */
     private void openUrl(final String URL) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL)));
     }
@@ -448,23 +454,23 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public int listAdapterGetRecyclerViewChildLayoutPosition(final View view) {
-        return mRecyclerView.getChildLayoutPosition(view);
+        return rssEntryRecyclerView.getChildLayoutPosition(view);
     }
 
     @Override
     public void onRefresh() {
-        removeColoring();
+        // remove all colors
+        updateLatestRssEntryToNewestEntry();
+        // check for feed updates
         checkForRssUpdates();
     }
 
-    public void sendIntent(final MenuItem item) {
-        final Intent myIntent = new Intent(MainActivity.this, MainActivity.class);
-        myIntent.putExtra("some_key", "String data");
-        startActivity(myIntent);
+    public void menuDevOptionSendIntent(final MenuItem item) {
+        startActivity(new Intent(this, MainActivity.class)
+                .putExtra("some_key", "String data"));
     }
 
-    public void deleteSetupToken(final MenuItem item) {
-        final PreferenceManager prefManager = new PreferenceManager(this);
-        prefManager.setFirstTimeLaunch(true);
+    public void menuDevOptionSetFirstLaunch(final MenuItem item) {
+        WelcomeActivity.setFirstTimeLaunch(this, true);
     }
 }

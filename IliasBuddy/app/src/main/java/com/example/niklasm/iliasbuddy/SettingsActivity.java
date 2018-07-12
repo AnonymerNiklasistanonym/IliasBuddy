@@ -45,11 +45,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
     private static final Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
         String stringValue = value.toString();
 
-        Log.i("SettingsActivity", "OnPreferenceChangeListener:\nnew value: " + value.toString() + "\npreference: " + preference.getKey());
-
         if (preference instanceof ListPreference) {
-            Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof ListPreference");
-
             // For list preferences, look up the correct display value in
             // the preference's 'entries' list.
             ListPreference listPreference = (ListPreference) preference;
@@ -62,7 +58,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
                             : null);
 
         } else if (preference instanceof RingtonePreference) {
-            Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof RingtonePreference");
             // For ringtone preferences, look up the correct display value
             // using RingtoneManager.
             if (TextUtils.isEmpty(stringValue)) {
@@ -85,7 +80,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
             }
 
         } else {
-            Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof else");
             // For all other preferences, set the summary to the value's
             // simple string representation.
             preference.setSummary(stringValue);
@@ -115,9 +109,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(SettingsActivity.sBindPreferenceSummaryToValueListener);
 
-        Log.i("SettingsActivity", "bindPreferenceSummaryToValue >> preference: " + preference.getKey());
-
-
         // Trigger the listener immediately with the preference's
         // current value.
         SettingsActivity.sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
@@ -128,12 +119,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
-                                          final String key) {
+                                          final String KEY) {
 
-        Log.i("SettingsActivity", "onSharedPreferenceChanged() >> key: " + key);
+        Log.i("SettingsActivity", "onSharedPreferenceChanged() >> key: " + KEY);
 
-
-        switch (key) {
+        switch (KEY) {
             case "activate_background_notifications":
                 // Background notifications on/off
                 if (sharedPreferences.getBoolean("activate_background_notifications", true)) {
@@ -151,11 +141,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
                 break;
             default:
         }
-        /*if (key.equals(KEY_PREF_SYNC_CONN)) {
-            final Preference connectionPref = findPreference(key);
-            // Set summary to be the user-description for the selected value
-            connectionPref.setSummary(sharedPreferences.getString(key, ""));
-        }*/
     }
 
     @Override

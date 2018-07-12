@@ -30,12 +30,12 @@
     <string name="ilias_url">ilias_url</string>
     <string name="ilias_user_name">ilias_user_name</string>
     <string name="ilias_password">ilias_password</string>
-    <string name="title_activity_settings">Settings (not working)</string>
+    <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
+    <string name="pref_header_general">General (does not work)</string>
 
     <string name="pref_title_social_recommendations">Enable social recommendations</string>
     <string name="pref_description_social_recommendations">Recommendations for people to contact

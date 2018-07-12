@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -28,7 +29,8 @@ public class IliasBuddyNotificationHelper {
                                                           final String CONTENT_TEXT_BIG,
                                                           final String[] CONTENT_TEXT_ARRAY,
                                                           final Intent ONCLICK_INTENT,
-                                                          final int MESSAGE_COUNT) {
+                                                          final int MESSAGE_COUNT,
+                                                          final String URL) {
 
         Log.i("NotificationHelper", ONCLICK_INTENT.toString());
         // Create the TaskStackBuilder and add the intent, which inflates the back stack
@@ -70,11 +72,13 @@ public class IliasBuddyNotificationHelper {
         } else {
             NOTIFICATION_STYLE = new NotificationCompat.BigTextStyle()
                     .bigText(CONTENT_TEXT_ARRAY[0])
-                    .setBigContentTitle(CONTENT_TEXT_BIG);
+                    .setBigContentTitle(CONTENT_TEXT);
         }
 
-        // build sticky notification
-        return new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
+        final PendingIntent pendingIntent = PendingIntent.getActivity(CONTEXT, 0, new Intent(Intent.ACTION_VIEW, Uri.parse(URL)), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // build new entries notification
+        final NotificationCompat.Builder NOTIFICATION_BUILDER = new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
                 .setDefaults(notification2.defaults)
                 .setContentTitle(CONTENT_TITLE)
                 .setContentText(CONTENT_TEXT)
@@ -85,8 +89,18 @@ public class IliasBuddyNotificationHelper {
                 .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary), 3000, 3000)
                 .setStyle(NOTIFICATION_STYLE)
                 .setAutoCancel(true) // on click the notification does not disappear
-                .setNumber(MESSAGE_COUNT)
-                .build();
+                .setNumber(MESSAGE_COUNT);
+
+        // only add additional action if there is an URL
+        if (URL != null) {
+            NOTIFICATION_BUILDER.addAction(
+                    new NotificationCompat.Action.Builder(
+                            R.drawable.ic_open_in_browser_black,
+                            CONTEXT.getString(R.string.open_in_ilias),
+                            pendingIntent).build());
+        }
+
+        return NOTIFICATION_BUILDER.build();
     }
 
     public static Notification createStickyNotification(final Context CONTEXT,
@@ -130,7 +144,7 @@ public class IliasBuddyNotificationHelper {
                 .setContentTitle(CONTENT_TITLE)
                 .setContentText(CONTENT_TEXT)
                 .setContentIntent(openAppPendingIntent)
-                .addAction(new NotificationCompat.Action.Builder(ACTION_ICON, ACTION_TITLE, actionPendingIntent).build())
+                //.addAction(new NotificationCompat.Action.Builder(ACTION_ICON, ACTION_TITLE, actionPendingIntent).build())
                 .setSmallIcon(R.drawable.ic_ilias_logo_notification)
                 .setPriority(Notification.PRIORITY_MIN)
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))

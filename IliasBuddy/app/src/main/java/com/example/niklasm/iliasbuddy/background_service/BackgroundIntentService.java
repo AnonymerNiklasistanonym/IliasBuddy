@@ -51,7 +51,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         return null;
     }
 
-    public void createNotification(final String titleString, final String previewString, final String bigString, final int MESSAGE_COUNT, final String[] INBOX_MESSAGES) {
+    public void createNotification(final String titleString, final String previewString, final String bigString, final int MESSAGE_COUNT, final String[] INBOX_MESSAGES, final String URL) {
 
         final SharedPreferences myPrefs = getSharedPreferences("myPrefs", BackgroundIntentService.MODE_PRIVATE);
         final String latestItem = myPrefs.getString(getString(R.string.lastNotification), BackgroundIntentService.LATEST_ITEM_NOT_FOUND);
@@ -74,7 +74,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 .putExtra(MainActivity.NEW_ENTRY_FOUND, true)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        BackgroundServiceNewEntriesNotification.show(this, titleString, previewString, bigString, INBOX_MESSAGES, ON_CLICK, MESSAGE_COUNT);
+        BackgroundServiceNewEntriesNotification.show(this, titleString, previewString, bigString, INBOX_MESSAGES, ON_CLICK, MESSAGE_COUNT, URL);
 
         final Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
                 .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING, previewString)
@@ -140,7 +140,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             final String bigString = NEW_ENTRIES[0].toStringNotificationPreview2(VIEW_DATE_FORMAT)
                     + "\n\n" + Html.fromHtml(myDataSet[0].getDescription());
 
-            createNotification("One new Ilias entry!", previewString, bigString, 1, new String[]{bigString});
+            createNotification("One new Ilias entry!", previewString, bigString, 1, new String[]{bigString}, myDataSet[0].getLink());
         } else {
             Log.i("BackgroundIntentService", "More than one new entry was found");
 
@@ -153,7 +153,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 bigString.append("- ").append(inboxArray[i]).append((i != NEW_ENTRIES.length - 1 ? "\n" : ""));
             }
 
-            createNotification(NEW_ENTRIES.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length, inboxArray);
+            createNotification(NEW_ENTRIES.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length, inboxArray, null);
         }
     }
 

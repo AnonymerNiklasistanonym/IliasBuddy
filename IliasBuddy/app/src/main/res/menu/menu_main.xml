@@ -25,26 +25,6 @@
         app:showAsAction="never" />
 
     <item
-        android:onClick="showLastResponse"
-        android:title="@string/action_last_response"
-        app:showAsAction="never" />
-
-    <item
-        android:onClick="stopService"
-        android:title="@string/action_stop_service"
-        app:showAsAction="never" />
-
-    <item
-        android:onClick="restartService"
-        android:title="@string/action_start_service"
-        app:showAsAction="never" />
-
-    <item
-        android:onClick="cleanList"
-        android:title="@string/action_clean_list"
-        app:showAsAction="never" />
-
-    <item
         android:onClick="openAbout"
         android:title="@string/action_about"
         app:showAsAction="never" />
@@ -55,8 +35,30 @@
         app:showAsAction="never" />
 
     <item
-        android:onClick="sendIntent"
-        android:title="@string/send_intent"
-        app:showAsAction="never" />
+        android:title="@string/sub_menu_developer_options"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:onClick="showLastResponse"
+                android:title="@string/action_last_response"
+                app:showAsAction="never" />
+            <item
+                android:onClick="cleanList"
+                android:title="@string/action_clean_list"
+                app:showAsAction="never" />
+            <item
+                android:onClick="sendIntent"
+                android:title="@string/send_intent"
+                app:showAsAction="never" />
+            <item
+                android:onClick="stopService"
+                android:title="@string/action_stop_service"
+                app:showAsAction="never" />
+            <item
+                android:onClick="restartService"
+                android:title="@string/action_start_service"
+                app:showAsAction="never" />
+        </menu>
+    </item>
 
 </menu>

@@ -4,7 +4,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_open_ilias">Open Ilias</string>
     <string name="action_open_campus">Open C@mpus</string>
-    <string name="action_setup">Open setup</string>
+    <string name="action_setup">Setup</string>
     <string name="action_last_response">Show last response</string>
     <string name="open_in_ilias">Open in Ilias</string>
     <string name="go_back">Go back</string>
@@ -58,20 +58,28 @@
     </string-array>
 
     <string-array name="pref_sync_frequency_titles">
+        <item>1 minute</item>
+        <item>2 minutes</item>
         <item>5 minutes</item>
-        <item>15 minutes</item>
+        <item>10 minutes</item>
         <item>30 minutes</item>
         <item>1 hour</item>
-        <item>3 hours</item>
+        <item>2 hours</item>
         <item>6 hours</item>
+        <item>12 hours</item>
+        <item>1 day</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
+        <item>1</item>
+        <item>2</item>
         <item>5</item>
-        <item>15</item>
+        <item>10</item>
         <item>30</item>
         <item>60</item>
-        <item>180</item>
+        <item>120</item>
         <item>360</item>
+        <item>720</item>
+        <item>1440</item>
     </string-array>
 
     <string-array name="list_preference_entries">
@@ -125,4 +133,5 @@
     <string name="popup_help_html_content"><![CDATA[<p>To use this service you need to visit Ilias and click on the orange <b>RSS</b> button to get to the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias news feed</a>.</p><p>From there you need to copy the private feed url and replace the <b>password</b> with a password you set in the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias settings</a> (you get there by clicking the settings symbol at the top right of the same card you just clicked the orange RSS button.</p><p>Then insert the url in the first text field and your username (The name string in the url without any spaces) and your just set password and click the check button.</p>]]></string>
     <string name="word_refresh">REFRESH</string>
     <string name="send_intent">Send intent</string>
+    <string name="sub_menu_developer_options">Developer options</string>
 </resources>

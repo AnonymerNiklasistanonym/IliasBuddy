@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -22,9 +23,21 @@ public class BackgroundServiceManager {
         BackgroundServiceManager.pendingIntent = PendingIntent.getService(CONTEXT, 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         // and add this Intent to the alarm manager
         BackgroundServiceManager.am = (AlarmManager) CONTEXT.getSystemService(Activity.ALARM_SERVICE);
-        // call the pending intent every ... minutes
-        final int minutes = 1;
-        BackgroundServiceManager.am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * minutes, BackgroundServiceManager.pendingIntent);
+
+
+        final SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(CONTEXT);
+        final String RINGTONE = prefs.getString("notifications_new_message_ringtone", null);
+        final boolean VIBRATE = prefs.getBoolean("notifications_new_message_vibrate", true);
+        final String FREQUENCY = prefs.getString("sync_frequency", null);
+
+        Log.i("BackgroundServiceMan...", "RINGTONE = " + (RINGTONE != null ? RINGTONE : "null => None"));
+        Log.i("BackgroundServiceMan...", "VIBRATE = " + String.valueOf(VIBRATE));
+        Log.i("BackgroundServiceMan...", "FREQUENCY = " + (FREQUENCY != null ? Integer.valueOf(FREQUENCY) : "null => 5"));
+
+        // call the pending intent every ... minutes with the default value 5
+        final int MINUTES = (FREQUENCY != null ? Integer.valueOf(FREQUENCY) : 5);
+
+        BackgroundServiceManager.am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * MINUTES, BackgroundServiceManager.pendingIntent);
 
         // also make a sticky notification so that the user knows the background service is running
         BackgroundServiceStickyNotification.show(CONTEXT);

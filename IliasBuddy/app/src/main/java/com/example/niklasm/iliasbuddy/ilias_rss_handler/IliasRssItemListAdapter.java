@@ -61,7 +61,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         final String description = CURRENT_ENTRY.getDescription();
 
         // reset holder
-        holder.background.setBackgroundResource(android.R.color.white);
+        holder.background.setBackgroundResource(android.R.color.transparent);
         holder.course.setVisibility(View.VISIBLE);
         holder.course.setText("");
         holder.date.setVisibility(View.VISIBLE);

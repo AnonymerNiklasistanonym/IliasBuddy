@@ -21,6 +21,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
+
 import java.util.List;
 
 /**
@@ -129,6 +131,26 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
                                           final String key) {
 
         Log.i("SettingsActivity", "onSharedPreferenceChanged() >> key: " + key);
+
+
+        switch (key) {
+            case "activate_background_notifications":
+                // Background notifications on/off
+                if (sharedPreferences.getBoolean("activate_background_notifications", true)) {
+                    BackgroundServiceManager.startBackgroundService(this);
+                } else {
+                    BackgroundServiceManager.stopBackgroundService(this);
+                }
+                break;
+            case "sync_frequency":
+                // Sync frequency (check first though if background service is even enabled)
+                if (sharedPreferences.getBoolean("activate_background_notifications", true)) {
+                    BackgroundServiceManager.stopBackgroundService(this);
+                    BackgroundServiceManager.startBackgroundService(this);
+                }
+                break;
+            default:
+        }
         /*if (key.equals(KEY_PREF_SYNC_CONN)) {
             final Preference connectionPref = findPreference(key);
             // Set summary to be the user-description for the selected value
@@ -150,7 +172,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Show the Up [Back] button in the action bar
         setupActionBar();
+        // register preference listener so that settings changes can be registered
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
     }
 
     /**
@@ -158,8 +183,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
      */
     private void setupActionBar() {
         final ActionBar actionBar = getSupportActionBar();
+        // Show the Up [Back] button in the action bar
         if (actionBar != null) {
-            // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }

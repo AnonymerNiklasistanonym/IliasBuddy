@@ -3,6 +3,7 @@ package com.example.niklasm.iliasbuddy;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -33,7 +34,7 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatPreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -42,7 +43,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = (preference, value) -> {
         String stringValue = value.toString();
 
-        Log.i("SettingsActivity", "OnPreferenceChangeListener: " + value.toString());
+        Log.i("SettingsActivity", "OnPreferenceChangeListener:\nnew value: " + value.toString() + "\npreference: " + preference.getKey());
 
         if (preference instanceof ListPreference) {
             Log.i("SettingsActivity", "OnPreferenceChangeListener: preference instanceof ListPreference");
@@ -112,12 +113,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(SettingsActivity.sBindPreferenceSummaryToValueListener);
 
+        Log.i("SettingsActivity", "bindPreferenceSummaryToValue >> preference: " + preference.getKey());
+
+
         // Trigger the listener immediately with the preference's
         // current value.
         SettingsActivity.sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
+                                          final String key) {
+
+        Log.i("SettingsActivity", "onSharedPreferenceChanged() >> key: " + key);
+        /*if (key.equals(KEY_PREF_SYNC_CONN)) {
+            final Preference connectionPref = findPreference(key);
+            // Set summary to be the user-description for the selected value
+            connectionPref.setSummary(sharedPreferences.getString(key, ""));
+        }*/
     }
 
     @Override

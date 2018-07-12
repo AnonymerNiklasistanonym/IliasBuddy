@@ -138,9 +138,9 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
             final String previewString = myDataSet[0].getCourse() + (myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "");
             final String bigString = NEW_ENTRIES[0].toStringNotificationPreview2(VIEW_DATE_FORMAT)
-                    + "\n\n" + Html.fromHtml(myDataSet[0].getDescription());
+                    + (myDataSet[0].getDescription() != null || myDataSet[0].getDescription().equals("") ? "\n\n" + Html.fromHtml(myDataSet[0].getDescription()) : "");
 
-            createNotification("One new Ilias entry!", previewString, bigString, 1, new String[]{bigString}, myDataSet[0].getLink());
+            createNotification("One new Ilias entry!", previewString, bigString.trim(), 1, new String[]{bigString}, myDataSet[0].getLink());
         } else {
             Log.i("BackgroundIntentService", "More than one new entry was found");
 

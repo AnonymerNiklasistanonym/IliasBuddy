@@ -4,7 +4,7 @@
     tools:context="com.example.niklasm.iliasbuddy.SetupActivity">
 
     <item
-        android:icon="@drawable/ic_help"
+        android:icon="@drawable/ic_setup_help_white"
         android:onClick="openHelp"
         android:title="@string/help_instructions"
         app:showAsAction="ifRoom" />

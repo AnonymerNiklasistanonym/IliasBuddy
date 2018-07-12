@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -48,7 +47,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                                                                  final int viewType) {
         // Create new views (invoked by the layout manager)
         final View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.recycler_view_new, parent, false);
+                .inflate(R.layout.recycler_view_element, parent, false);
         return new ViewHolder(v);
     }
 
@@ -69,7 +68,6 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         holder.date.setText("");
         holder.time.setVisibility(View.VISIBLE);
         holder.time.setText("");
-        holder.star.setVisibility(View.VISIBLE);
         holder.title.setVisibility(View.VISIBLE);
         holder.title.setText("");
         holder.extra.setVisibility(View.VISIBLE);
@@ -94,7 +92,6 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         holder.course.setText(CURRENT_ENTRY.getCourse());
         holder.date.setText(viewDateFormat.format(CURRENT_ENTRY.getDate()));
         holder.time.setText(viewTimeFormat.format(CURRENT_ENTRY.getDate()));
-        holder.star.setVisibility(View.GONE);
         holder.title.setText(CURRENT_ENTRY.getTitle());
 
         // if extra is null hide extra card or else set the text
@@ -126,40 +123,6 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     ContextCompat.getColor(CONTEXT, android.R.color.holo_red_dark));
         }
 
-            /* if there is no description make title longer and hide it
-            if (description == null || description.equals("")) {
-                holder.description.setVisibility(View.GONE);
-                holder.title.setLines(2);
-                holder.title.setText(titleExtra);
-                holder.titleExtra.setText(context.getResources().getString(R.string.new_file));
-                holder.titleExtraCard.setCardBackgroundColor(ContextCompat.getColor(context, R.color.holo_red_dark));
-            } else {
-            }
-
-            // if there is no title extra and description hide label
-            if (titleExtra == null && !(description == null || description.equals(""))) {
-                holder.titleExtraCard.setVisibility(View.GONE);
-            } else {
-                holder.titleExtra.setText(titleExtra);
-            }*/
-
-
-            /*final ImageView starView = holder.star;
-            holder.star.setOnClickListener(new View.OnClickListener() {
-                private boolean clicked = false;
-                @Override
-                public void onClick(final View view) {
-                    final IliasRssItem entry = dataSet[position];
-                    Log.i("MainActivity", "Star clicked " + entry.toString());
-                    if (clicked) {
-                        starView.setImageResource(R.drawable.ic_star);
-                    } else {
-                        starView.setImageResource(R.drawable.ic_star_filled);
-                    }
-                    clicked = !clicked;
-                }
-            });*/
-
         setAnimation(holder.itemView, position);
     }
 
@@ -190,7 +153,6 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final public TextView course, title, date, time, description, extra, titleExtra;
         final public LinearLayout background;
-        final public ImageView star;
         final public CardView extraCard, titleExtraCard;
 
         private ViewHolder(final View itemView) {
@@ -204,7 +166,6 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
             description = itemView.findViewById(R.id.description);
             extra = itemView.findViewById(R.id.extra);
             extraCard = itemView.findViewById(R.id.extraCard);
-            star = itemView.findViewById(R.id.star);
             time = itemView.findViewById(R.id.time);
             title = itemView.findViewById(R.id.title);
             titleExtra = itemView.findViewById(R.id.titleExtra);

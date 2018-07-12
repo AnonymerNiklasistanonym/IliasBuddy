@@ -5,14 +5,14 @@
 
     <!-- Icon (if room) - open Ilias -->
     <item
-        android:icon="@drawable/ic_ilias_logo"
+        android:icon="@drawable/ic_ilias_logo_white_48dp"
         android:onClick="openIlias"
         android:title="@string/action_open_ilias"
         app:showAsAction="ifRoom" />
 
     <!-- Icon (if room) - open C@mpus -->
     <item
-        android:icon="@drawable/ic_campus_logo"
+        android:icon="@drawable/ic_campus_logo_48dp"
         android:onClick="openCampus"
         android:title="@string/action_open_campus"
         app:showAsAction="ifRoom" />
@@ -20,21 +20,25 @@
     <!-- Other options behind the three dots -->
 
     <item
+        android:icon="@drawable/ic_main_activity_menu_item_setup_black"
         android:onClick="openSetup"
         android:title="@string/action_setup"
         app:showAsAction="never" />
 
     <item
+        android:icon="@drawable/ic_about_black"
         android:onClick="openAbout"
         android:title="@string/action_about"
         app:showAsAction="never" />
 
     <item
+        android:icon="@drawable/ic_settings_black"
         android:onClick="openSettings"
         android:title="@string/action_settings"
         app:showAsAction="never" />
 
     <item
+        android:icon="@drawable/ic_developer_black"
         android:title="@string/sub_menu_developer_options"
         app:showAsAction="never">
         <menu>

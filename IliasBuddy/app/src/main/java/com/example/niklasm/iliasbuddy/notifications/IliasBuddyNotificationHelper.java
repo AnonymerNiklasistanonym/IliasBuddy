@@ -83,7 +83,7 @@ public class IliasBuddyNotificationHelper {
                 .setContentTitle(CONTENT_TITLE)
                 .setContentText(CONTENT_TEXT)
                 .setContentIntent(openAppPendingIntent)
-                .setSmallIcon(R.drawable.ic_ilias_logo_notification)
+                .setSmallIcon(R.drawable.ic_ilias_logo_white_24dp)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
                 .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary), 3000, 3000)
@@ -145,7 +145,7 @@ public class IliasBuddyNotificationHelper {
                 .setContentText(CONTENT_TEXT)
                 .setContentIntent(openAppPendingIntent)
                 //.addAction(new NotificationCompat.Action.Builder(ACTION_ICON, ACTION_TITLE, actionPendingIntent).build())
-                .setSmallIcon(R.drawable.ic_ilias_logo_notification)
+                .setSmallIcon(R.drawable.ic_ilias_logo_white_24dp)
                 .setPriority(Notification.PRIORITY_MIN)
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
                 .setAutoCancel(false) // on click the notification does not disappear

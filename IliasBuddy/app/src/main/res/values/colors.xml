@@ -14,14 +14,14 @@
 
     <!-- Slide introduction screen colors -->
     <color name="bg_slider_screen1">@color/colorPrimary</color>
-    <color name="bg_slider_screen2">#d50000</color>
-    <color name="bg_slider_screen3">#2e7d32</color>
+    <color name="bg_slider_screen2">@color/colorPrimary</color>
+    <color name="bg_slider_screen3">@color/colorPrimary</color>
     <color name="dot_inactive_screen1">@color/colorPrimaryDark</color>
-    <color name="dot_inactive_screen2">#b71c1c</color>
-    <color name="dot_inactive_screen3">#1b5e20</color>
-    <color name="dot_active_screen1">@color/colorPrimaryLight</color>
-    <color name="dot_active_screen2">#ff3d00</color>
-    <color name="dot_active_screen3">#00c853</color>
+    <color name="dot_inactive_screen2">@color/colorPrimaryDark</color>
+    <color name="dot_inactive_screen3">@color/colorPrimaryDark</color>
+    <color name="dot_active_screen1">@android:color/white</color>
+    <color name="dot_active_screen2">@android:color/white</color>
+    <color name="dot_active_screen3">@android:color/white</color>
     <array name="array_dot_active">
         <item>@color/dot_active_screen1</item>
         <item>@color/dot_active_screen2</item>

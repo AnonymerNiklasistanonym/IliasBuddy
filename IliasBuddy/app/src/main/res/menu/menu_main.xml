@@ -58,6 +58,10 @@
                 android:onClick="exampleNotification"
                 android:title="@string/example_notification"
                 app:showAsAction="never" />
+            <item
+                android:onClick="deleteSetupToken"
+                android:title="@string/deleteSetupToken"
+                app:showAsAction="never" />
         </menu>
     </item>
 

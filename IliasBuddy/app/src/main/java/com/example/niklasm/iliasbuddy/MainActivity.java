@@ -462,4 +462,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         myIntent.putExtra("some_key", "String data");
         startActivity(myIntent);
     }
+
+    public void deleteSetupToken(final MenuItem item) {
+        final PreferenceManager prefManager = new PreferenceManager(this);
+        prefManager.setFirstTimeLaunch(true);
+    }
 }

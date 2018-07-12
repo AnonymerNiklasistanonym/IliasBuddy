@@ -136,4 +136,8 @@
     <string name="sub_menu_developer_options">Developer options</string>
     <string name="example_notification">Make example notification</string>
     <string name="start_background_notifications_on_boot">Start background service on boot</string>
+    <string name="complete_setup">Complete setup</string>
+    <string name="deleteSetupToken">Delete setup token</string>
+    <string name="slide_3_picture_desc">Phone that vibrates and has a speech bubble coming from it\'s center which contains a sound symbol</string>
+    <string name="slide_2_picture_desc">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
 </resources>

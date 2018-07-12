@@ -168,15 +168,25 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bManager.registerReceiver(bReceiver, intentFilter);
         // test - https://stackoverflow.com/a/12997537/7827128
 
-        // check if activate_background_notifications is "on"
-        if (android.preference.PreferenceManager.getDefaultSharedPreferences(this)
-                .getBoolean("activate_background_notifications", true)) {
-            Log.d("MainActivity", "activate_background_notifications = true");
-            startBackgroundService();
-        } else {
-            Log.d("MainActivity", "activate_background_notifications = false");
-        }
 
+        // check if background service is already active
+        if (BackgroundServiceManager.isAlarmManagerCurrentlyActivated()) {
+            Log.d("MainActivity", "Background service is already active");
+        } else {
+            Log.d("MainActivity", "Background service is not active");
+            // activate background service if activate_background_notifications is "on"
+            if (android.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                    .getBoolean("activate_background_notifications", true)) {
+                Log.d("MainActivity", "activate_background_notifications = true");
+                startBackgroundService();
+            } else {
+                Log.d("MainActivity", "activate_background_notifications = false");
+            }
+        }
+    }
+
+    public void exampleNotification(final MenuItem menuItem) {
+        BackgroundServiceNewEntriesNotification.show(this, "titleString", "previewString", "bigString", new String[]{"one", "two", "three"}, new Intent(this, MainActivity.class), 42, "https://ilias3.uni-stuttgart.de");
     }
 
     @Override

@@ -7,12 +7,13 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.example.niklasm.iliasbuddy.R;
 
@@ -32,7 +33,11 @@ public class IliasBuddyNotificationHelper {
                                                           final int MESSAGE_COUNT,
                                                           final String URL) {
 
-        Log.i("NotificationHelper", ONCLICK_INTENT.toString());
+        // get settings
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(CONTEXT);
+        final boolean VIBRATE = sharedPreferences.getBoolean("notifications_new_message_vibrate", true);
+        final String RINGTONE = sharedPreferences.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
+
         // Create the TaskStackBuilder and add the intent, which inflates the back stack
         final TaskStackBuilder stackBuilder = TaskStackBuilder.create(CONTEXT);
         stackBuilder.addNextIntentWithParentStack(ONCLICK_INTENT);
@@ -50,14 +55,10 @@ public class IliasBuddyNotificationHelper {
                             CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
             mChannel.setDescription(CHANNEL_DESCRIPTION);
             mChannel.enableLights(true);
-            mChannel.enableVibration(true);
+            mChannel.enableVibration(VIBRATE);
             mChannel.setShowBadge(true);
             Objects.requireNonNull(notificationManager).createNotificationChannel(mChannel);
         }
-
-        final Notification notification2 = new Notification();
-        notification2.defaults |= Notification.DEFAULT_SOUND;
-        notification2.defaults |= Notification.DEFAULT_VIBRATE;
 
         final NotificationCompat.Style NOTIFICATION_STYLE;
         if (CONTENT_TEXT_ARRAY.length > 1) {
@@ -79,7 +80,6 @@ public class IliasBuddyNotificationHelper {
 
         // build new entries notification
         final NotificationCompat.Builder NOTIFICATION_BUILDER = new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
-                .setDefaults(notification2.defaults)
                 .setContentTitle(CONTENT_TITLE)
                 .setContentText(CONTENT_TEXT)
                 .setContentIntent(openAppPendingIntent)
@@ -87,9 +87,15 @@ public class IliasBuddyNotificationHelper {
                 .setPriority(Notification.PRIORITY_MAX)
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
                 .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary), 3000, 3000)
+                .setVibrate((VIBRATE ? new long[]{1000, 1000, 1000, 1000, 1000} : new long[]{0})) // new long[]{0, 250, 250, 250}
                 .setStyle(NOTIFICATION_STYLE)
+                .setSound(Uri.parse(RINGTONE))
                 .setAutoCancel(true) // on click the notification does not disappear
                 .setNumber(MESSAGE_COUNT);
+
+        if (VIBRATE) {
+            NOTIFICATION_BUILDER.setDefaults(Notification.DEFAULT_VIBRATE);
+        }
 
         // only add additional action if there is an URL
         if (URL != null) {

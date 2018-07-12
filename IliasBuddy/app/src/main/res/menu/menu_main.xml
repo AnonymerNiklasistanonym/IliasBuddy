@@ -55,12 +55,8 @@
                 android:title="@string/send_intent"
                 app:showAsAction="never" />
             <item
-                android:onClick="stopService"
-                android:title="@string/action_stop_service"
-                app:showAsAction="never" />
-            <item
-                android:onClick="restartService"
-                android:title="@string/action_start_service"
+                android:onClick="exampleNotification"
+                android:title="@string/example_notification"
                 app:showAsAction="never" />
         </menu>
     </item>

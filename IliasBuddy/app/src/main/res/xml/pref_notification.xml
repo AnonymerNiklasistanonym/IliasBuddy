@@ -32,6 +32,13 @@
         android:key="sync_frequency"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
+        android:summary="%s"
         android:title="@string/pref_title_frequency" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:dependency="activate_background_notifications"
+        android:key="start_background_notifications_on_boot"
+        android:title="@string/start_background_notifications_on_boot" />
 
 </PreferenceScreen>

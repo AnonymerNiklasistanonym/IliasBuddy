@@ -43,12 +43,17 @@ public class BackgroundServiceManager {
         BackgroundServiceStickyNotification.show(CONTEXT);
     }
 
+    public static boolean isAlarmManagerCurrentlyActivated() {
+        return BackgroundServiceManager.am != null;
+    }
+
     public static void stopBackgroundService(final Context CONTEXT) {
         Log.d("BackgroundServiceMan...", "stopBackgroundService()");
 
         // cancel the alarm if there is one
         if (BackgroundServiceManager.am != null) {
             BackgroundServiceManager.am.cancel(BackgroundServiceManager.pendingIntent);
+            BackgroundServiceManager.am = null;
         }
 
         // also remove the sticky notification so that the user knows the background service is not running

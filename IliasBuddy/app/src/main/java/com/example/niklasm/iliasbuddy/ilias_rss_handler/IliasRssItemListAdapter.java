@@ -7,21 +7,25 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.niklasm.iliasbuddy.R;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemListAdapter.ViewHolder> {
+public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemListAdapter.ViewHolder> implements Filterable {
 
     private final List<IliasRssItem> items;
     private final SimpleDateFormat viewDateFormat;
@@ -30,10 +34,12 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     private final IliasRssItemListAdapterInterface ADAPTER_INTERFACE;
     // Allows to remember the last item shown on screen
     private int lastPosition = -1;
+    private List<IliasRssItem> itemsFiltered;
 
     public IliasRssItemListAdapter(final List<IliasRssItem> dataSet, @NonNull final Context CONTEXT,
                                    @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
         items = dataSet;
+        itemsFiltered = dataSet;
         viewDateFormat = new SimpleDateFormat("dd.MM", CONTEXT.getResources().getConfiguration().locale);
         viewTimeFormat = new SimpleDateFormat("HH:mm", CONTEXT.getResources().getConfiguration().locale);
         this.CONTEXT = CONTEXT;
@@ -80,7 +86,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         // Replace the contents of a view (invoked by the layout manager)
         // - get element from the data set at this position
         // - replace the contents of the view with that element
-        final IliasRssItem CURRENT_ENTRY = items.get(position);
+        final IliasRssItem CURRENT_ENTRY = itemsFiltered.get(position);
         final String description = CURRENT_ENTRY.getDescription();
 
         // reset holder
@@ -165,7 +171,54 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return itemsFiltered.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(final CharSequence charSequence) {
+                final String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    itemsFiltered = items;
+                } else {
+                    final List<IliasRssItem> filteredList = new ArrayList<>();
+                    final String lowerCaseCharString = charString.toLowerCase();
+                    // check which entries should be added to the filtered list
+                    for (final IliasRssItem ENTRY : items) {
+                        Log.i("getFilter", "compare \"" + charString + "\" (" + lowerCaseCharString + ") to \"" + ENTRY.getCourse().toLowerCase() + "\"");
+
+                        if (ENTRY.getCourse().toLowerCase().contains(lowerCaseCharString)) {
+                            Log.i("getFilter", "added to List");
+                            filteredList.add(ENTRY);
+                        }
+                    }
+                    itemsFiltered = filteredList;
+                }
+
+                final FilterResults filterResults = new FilterResults();
+                filterResults.values = itemsFiltered;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(final CharSequence charSequence, final FilterResults filterResults) {
+                if (filterResults != null && filterResults.values != null) {
+                    Log.i("publishResults", filterResults.values.toString());
+                    final List<?> result = (List<?>) filterResults.values;
+                    itemsFiltered = new ArrayList<>();
+                    for (final Object object : result) {
+                        if (object instanceof IliasRssItem) {
+                            itemsFiltered.add((IliasRssItem) object);
+                        }
+                    }
+                }
+
+                // refresh the list with filtered data
+                notifyDataSetChanged();
+            }
+        };
     }
 
     /**

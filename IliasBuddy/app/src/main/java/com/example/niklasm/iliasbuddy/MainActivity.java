@@ -1,5 +1,6 @@
 package com.example.niklasm.iliasbuddy;
 
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,7 +47,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements
     private BroadcastReceiver broadcastReceiver;
     private LocalBroadcastManager broadcastManager;
     private RecyclerView rssEntryRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private IliasRssItemListAdapter mAdapter;
     private Snackbar newEntriesMessage;
     private IliasRssXmlWebRequester iliasRssXmlWebRequester;
     private IliasRssItem latestRssEntry;
@@ -64,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements
     private String lastResponse;
     private int currentDataSetLength;
     private SwipeRefreshLayout rssEntryRecyclerViewSwipeToRefreshLayout;
+    private List<IliasRssItem> items;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -80,6 +85,11 @@ public class MainActivity extends AppCompatActivity implements
         rssEntryRecyclerView.setHasFixedSize(true);
         rssEntryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         rssEntryRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        // set adapter
+        items = new ArrayList<>();
+        mAdapter = new IliasRssItemListAdapter(items, this, this);
+        rssEntryRecyclerView.setAdapter(mAdapter);
 
         // setup the swipe to refresh layout
         rssEntryRecyclerViewSwipeToRefreshLayout = findViewById(R.id.swipe_container);
@@ -164,7 +174,10 @@ public class MainActivity extends AppCompatActivity implements
             latestRssEntryNewIliasRssFeedEntries = myDataSet[0];
             latestRssEntry = myDataSet[0];
             // specify an adapter (see also next example)
-            mAdapter = new IliasRssItemListAdapter(Arrays.asList(myDataSet), this, this);
+            items.clear();
+            items.addAll(Arrays.asList(myDataSet));
+            mAdapter.notifyDataSetChanged();
+
             rssEntryRecyclerView.setAdapter(mAdapter);
             currentDataSetLength = myDataSet.length;
         } else {
@@ -173,8 +186,8 @@ public class MainActivity extends AppCompatActivity implements
             currentDataSetLength = 0;
         }
         if (mAdapter == null) {
-            mAdapter = new IliasRssItemListAdapter(Arrays.asList(new IliasRssItem[0]),
-                    this, this);
+            items.clear();
+            mAdapter.notifyDataSetChanged();
         }
 
         // Start background service if there is not already one running and only if settings say so
@@ -267,7 +280,8 @@ public class MainActivity extends AppCompatActivity implements
 
     public void noNewEntryFound() {
         Log.i("MainActivity", "noNewEntryFound (SnackBar)");
-        Snackbar.make(findViewById(R.id.fab), "No new entry found", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.fab), "No new entry found",
+                Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -276,7 +290,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void errorSnackBar(final String title, final String message) {
-        final Snackbar snackbar = Snackbar.make(findViewById(R.id.fab), title, Snackbar.LENGTH_LONG);
+        final Snackbar snackbar =
+                Snackbar.make(findViewById(R.id.fab), title, Snackbar.LENGTH_LONG);
         snackbar.setActionTextColor(Color.RED); //to change the color of action text
         snackbar.setAction("MORE", view -> {
             final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
@@ -366,9 +381,10 @@ public class MainActivity extends AppCompatActivity implements
             e1.printStackTrace();
         }
         // specify a new adapter with the new data set
-        mAdapter = new IliasRssItemListAdapter(Arrays.asList(NEW_ILIAS_RSS_FEED_ENTRIES),
-                this, this);
-        rssEntryRecyclerView.setAdapter(mAdapter);
+        items.clear();
+        items.addAll(Arrays.asList(NEW_ILIAS_RSS_FEED_ENTRIES));
+        mAdapter.notifyDataSetChanged();
+
         currentDataSetLength = NEW_ILIAS_RSS_FEED_ENTRIES.length;
         latestRssEntryNewIliasRssFeedEntries = currentDataSetLength > 0 ?
                 NEW_ILIAS_RSS_FEED_ENTRIES[0] : null;
@@ -378,12 +394,14 @@ public class MainActivity extends AppCompatActivity implements
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         // check if new elements were found
-        if (intent.getBooleanExtra(IliasBuddyNotificationInterface.NEW_ENTRY_FOUND, false)) {
+        if (intent.getBooleanExtra(
+                IliasBuddyNotificationInterface.NEW_ENTRY_FOUND, false)) {
             Log.i("MainActivity", "onNewIntent: NEW_ENTRY_FOUND");
             // update Ilias RSS feed
             checkForRssUpdates();
             // if there is NEW_ENTRY_DATA extra perform a virtual click on the only new element
-            if (intent.getParcelableExtra(IliasBuddyNotificationInterface.NEW_ENTRY_DATA) != null) {
+            if (intent.getParcelableExtra(
+                    IliasBuddyNotificationInterface.NEW_ENTRY_DATA) != null) {
                 Log.i("MainActivity", "onNewIntent: NEW_ENTRY_DATA");
                 IliasRssItemListAdapter.alertDialogRssFeedEntry(
                         intent.getParcelableExtra(IliasBuddyNotificationInterface.NEW_ENTRY_DATA),
@@ -411,10 +429,39 @@ public class MainActivity extends AppCompatActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         // disable campus icon if the setting says so
-        menu.findItem(R.id.campus_icon).setVisible(PreferenceManager.getDefaultSharedPreferences(this)
+        menu.findItem(R.id.campus_icon).setVisible(PreferenceManager
+                .getDefaultSharedPreferences(this)
                 .getBoolean("enable_campus_shortcut", true));
+        // enable Search view
+        final SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.search)
+                .getActionView();
+        if (searchManager != null) {
+            searchView.setSearchableInfo(searchManager
+                    .getSearchableInfo(getComponentName()));
+            searchView.setMaxWidth(Integer.MAX_VALUE);
+
+            // listening to search query text change
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(final String query) {
+                    // filter recycler view when query submitted
+                    mAdapter.getFilter().filter(query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(final String query) {
+                    // filter recycler view when text is changed
+                    mAdapter.getFilter().filter(query);
+                    return false;
+                }
+            });
+        }
         return true;
     }
+
 
     public void openCampus(final MenuItem item) {
         openUrl("https://campus.uni-stuttgart.de/cusonline/webnav.ini");

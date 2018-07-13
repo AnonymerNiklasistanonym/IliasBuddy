@@ -128,4 +128,6 @@
     <string name="pref_header_summary_notifications">Set background service, notification options, update frequency and more</string>
     <string name="pref_summary_new_message_vibrate">The notification vibrates</string>
     <string name="pref_summary_start_background_notifications_on_boot">Background service will be started on boot/reboot of the device</string>
+    <string name="action_search">Search for entries</string>
+    <string name="search">Search hint</string>
 </resources>

@@ -3,12 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.niklasm.iliasbuddy.MainActivity">
 
+    <!-- Icon (if room) - search recycler view -->
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search_white"
+        android:title="@string/action_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+
     <!-- Icon (if room) - open Ilias -->
     <item
         android:icon="@drawable/ic_ilias_logo_white_48dp"
         android:onClick="openIlias"
         android:title="@string/action_open_ilias"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <!-- Icon (if room) - open C@mpus -->
     <item

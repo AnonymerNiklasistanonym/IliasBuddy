@@ -32,7 +32,6 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/ic_setup_check_white"
-        android:tooltipText="@string/complete_setup"
         app:rippleColor="@color/colorPrimaryLight" />
 
 

@@ -5,7 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
@@ -15,12 +14,7 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
     public static final Creator<IliasRssItem> CREATOR = new Creator<IliasRssItem>() {
         @Override
         public IliasRssItem createFromParcel(final Parcel in) {
-            try {
-                return new IliasRssItem(in);
-            } catch (final ParseException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return new IliasRssItem(in);
         }
 
         @Override
@@ -48,14 +42,14 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         this.DATE = DATE;
     }
 
-    private IliasRssItem(final Parcel in) throws ParseException {
-        COURSE = in.readString();
-        EXTRA = in.readString();
-        TITLE_EXTRA = in.readString();
-        TITLE = in.readString();
-        DESCRIPTION = in.readString();
-        LINK = in.readString();
-        DATE = new Date(in.readLong());
+    private IliasRssItem(@NonNull final Parcel IN) {
+        COURSE = IN.readString();
+        EXTRA = IN.readString();
+        TITLE_EXTRA = IN.readString();
+        TITLE = IN.readString();
+        DESCRIPTION = IN.readString();
+        LINK = IN.readString();
+        DATE = new Date(IN.readLong());
     }
 
     public String getCourse() {
@@ -145,13 +139,13 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
     }
 
     @Override
-    public void writeToParcel(final Parcel parcel, final int i) {
-        parcel.writeString(COURSE);
-        parcel.writeString(EXTRA);
-        parcel.writeString(TITLE_EXTRA);
-        parcel.writeString(TITLE);
-        parcel.writeString(DESCRIPTION);
-        parcel.writeString(LINK);
-        parcel.writeLong(DATE.getTime());
+    public void writeToParcel(final Parcel OUT, final int i) {
+        OUT.writeString(COURSE);
+        OUT.writeString(EXTRA);
+        OUT.writeString(TITLE_EXTRA);
+        OUT.writeString(TITLE);
+        OUT.writeString(DESCRIPTION);
+        OUT.writeString(LINK);
+        OUT.writeLong(DATE.getTime());
     }
 }

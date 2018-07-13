@@ -40,6 +40,29 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         this.ADAPTER_INTERFACE = ADAPTER_INTERFACE;
     }
 
+    public static void alertDialogRssFeedEntry(@NonNull final IliasRssItem ILIAS_RSS_ITEM,
+                                               @NonNull final IliasRssItemAlertDialogInterface ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE,
+                                               @NonNull final Context CONTEXT) {
+        if (ILIAS_RSS_ITEM.getDescription() == null || ILIAS_RSS_ITEM.getDescription().equals("")) {
+            // if there is no description this means it was an upload
+            // therefore instantly link to the Ilias page
+            ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink());
+        } else {
+            // if not this must be a legit message for which a popup dialog will be opened
+            final String message = ">> " + ILIAS_RSS_ITEM.getTitle() + "\n\n" + Html.fromHtml(ILIAS_RSS_ITEM.getDescription());
+            final AlertDialog dialog = new AlertDialog.Builder(CONTEXT)
+                    .setTitle(ILIAS_RSS_ITEM.getCourse() + " (" + new SimpleDateFormat("dd.MM", CONTEXT.getResources().getConfiguration().locale).format(ILIAS_RSS_ITEM.getDate()) + ")")
+                    .setMessage(message)
+                    .setCancelable(true)
+                    .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
+                            (dialog1, id) -> ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink()))
+                    .setNegativeButton(CONTEXT.getString(R.string.go_back),
+                            (dialog12, id) -> dialog12.cancel())
+                    .show();
+            final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
+            textView.setTextIsSelectable(true);
+        }
+    }
 
     @Override
     @NonNull
@@ -175,28 +198,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         @Override
         public void onClick(final View view) {
             final int itemPosition = ADAPTER_INTERFACE.listAdapterGetRecyclerViewChildLayoutPosition(view);
-            //mRecyclerView.getChildLayoutPosition(view);
-            final IliasRssItem entry = items.get(itemPosition);
-
-            if (entry.getDescription() == null || entry.getDescription().equals("")) {
-                // if there is no description this means it was an upload
-                // therefore instantly link to the Ilias page
-                ADAPTER_INTERFACE.listAdapterOpenUrl(entry.getLink());
-            } else {
-                // if not this must be a legit message for which a popup dialog will be opened
-                final String message = ">> " + entry.getTitle() + "\n\n" + Html.fromHtml(entry.getDescription());
-                final AlertDialog dialog = new AlertDialog.Builder(CONTEXT)
-                        .setTitle(entry.getCourse() + " (" + viewDateFormat.format(entry.getDate()) + ")")
-                        .setMessage(message)
-                        .setCancelable(true)
-                        .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
-                                (dialog1, id) -> ADAPTER_INTERFACE.listAdapterOpenUrl(entry.getLink()))
-                        .setNegativeButton(CONTEXT.getString(R.string.go_back),
-                                (dialog12, id) -> dialog12.cancel())
-                        .show();
-                final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
-                textView.setTextIsSelectable(true);
-            }
+            IliasRssItemListAdapter.alertDialogRssFeedEntry(items.get(itemPosition), ADAPTER_INTERFACE, CONTEXT);
         }
     }
 }

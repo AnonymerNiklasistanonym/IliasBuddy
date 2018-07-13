@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
@@ -54,7 +55,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
     public void createNotification(final String titleString, final String previewString,
                                    final String bigString, final int MESSAGE_COUNT,
-                                   final String[] INBOX_MESSAGES, final String URL) {
+                                   final String[] INBOX_MESSAGES, final String URL, final IliasRssItem TEST_ENTRY) {
 
         final SharedPreferences myPrefs =
                 android.preference.PreferenceManager.getDefaultSharedPreferences(this);
@@ -76,7 +77,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
         final Intent ON_CLICK = new Intent(this, MainActivity.class)
                 .putExtra(MainActivity.NEW_ENTRY_FOUND, true)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                .putExtra(MainActivity.NEW_ENTRY_DATA, (Parcelable) TEST_ENTRY)
+                .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         BackgroundServiceNewEntriesNotification.show(this, titleString, previewString, bigString, INBOX_MESSAGES, ON_CLICK, MESSAGE_COUNT, URL);
 
@@ -145,7 +147,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             final String bigString = NEW_ENTRIES[0].toStringNotificationPreview2(VIEW_DATE_FORMAT)
                     + (myDataSet[0].getDescription() != null || myDataSet[0].getDescription().equals("") ? "\n\n" + Html.fromHtml(myDataSet[0].getDescription()) : "");
 
-            createNotification("One new Ilias entry!", previewString, bigString.trim(), 1, new String[]{bigString}, myDataSet[0].getLink());
+            createNotification("One new Ilias entry!", previewString, bigString.trim(), 1, new String[]{bigString}, myDataSet[0].getLink(), myDataSet[0]);
         } else {
             Log.i("BackgroundIntentService", "More than one new entry was found");
 
@@ -158,7 +160,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 bigString.append("- ").append(inboxArray[i]).append((i != NEW_ENTRIES.length - 1 ? "\n" : ""));
             }
 
-            createNotification(NEW_ENTRIES.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length, inboxArray, null);
+            createNotification(NEW_ENTRIES.length + " new Ilias entries!", previewString, bigString.toString(), NEW_ENTRIES.length, inboxArray, null, null);
         }
     }
 

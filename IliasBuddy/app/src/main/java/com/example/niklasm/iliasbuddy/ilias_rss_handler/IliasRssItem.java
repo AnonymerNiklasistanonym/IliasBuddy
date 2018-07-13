@@ -1,13 +1,33 @@
 package com.example.niklasm.iliasbuddy.ilias_rss_handler;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
+public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Parcelable {
+
+    public static final Creator<IliasRssItem> CREATOR = new Creator<IliasRssItem>() {
+        @Override
+        public IliasRssItem createFromParcel(final Parcel in) {
+            try {
+                return new IliasRssItem(in);
+            } catch (final ParseException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public IliasRssItem[] newArray(final int size) {
+            return new IliasRssItem[size];
+        }
+    };
     final private String COURSE;
     final private String EXTRA;
     final private String TITLE_EXTRA;
@@ -26,6 +46,16 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         this.DESCRIPTION = DESCRIPTION;
         this.LINK = LINK;
         this.DATE = DATE;
+    }
+
+    private IliasRssItem(final Parcel in) throws ParseException {
+        COURSE = in.readString();
+        EXTRA = in.readString();
+        TITLE_EXTRA = in.readString();
+        TITLE = in.readString();
+        DESCRIPTION = in.readString();
+        LINK = in.readString();
+        DATE = new Date(in.readLong());
     }
 
     public String getCourse() {
@@ -107,5 +137,21 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable {
         }
         // if description is the same check link
         return OBJECT_1.getLink().compareTo(OBJECT_2.getLink());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel parcel, final int i) {
+        parcel.writeString(COURSE);
+        parcel.writeString(EXTRA);
+        parcel.writeString(TITLE_EXTRA);
+        parcel.writeString(TITLE);
+        parcel.writeString(DESCRIPTION);
+        parcel.writeString(LINK);
+        parcel.writeLong(DATE.getTime());
     }
 }

@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements
     final public static String RECEIVE_JSON = "FOUND_A_NEW_ENTRY";
     final public static String NEW_ENTRY_FOUND = "NEW_ENTRY_FOUND";
     public final static String STOP_BACKGROUND_SERVICE = "STOP_BACKGROUND_SERVICE";
+    public static final String NEW_ENTRY_DATA = "NEW_ENTRY_DATA";
     private LocalBroadcastManager broadcastManager;
     private RecyclerView rssEntryRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -200,7 +201,9 @@ public class MainActivity extends AppCompatActivity implements
         BackgroundServiceNewEntriesNotification.show(this, "titleString",
                 "previewString", "bigString",
                 new String[]{"one", "two", "three"},
-                new Intent(this, MainActivity.class),
+                new Intent(this, MainActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        .putExtra("TestKey", "testValue"),
                 42, "https://ilias3.uni-stuttgart.de");
     }
 
@@ -394,6 +397,16 @@ public class MainActivity extends AppCompatActivity implements
         if (intent.getBooleanExtra(MainActivity.NEW_ENTRY_FOUND, false)) {
             Log.i("MainActivity", "onNewIntent " + getString(R.string.render_new_elements));
             checkForRssUpdates();
+            
+            if (intent.getParcelableExtra(MainActivity.NEW_ENTRY_DATA) != null) {
+                final IliasRssItem myParcelableObject = intent.getParcelableExtra(MainActivity.NEW_ENTRY_DATA);
+                Log.i("MainActivity", "onNewIntent ParcelabelObject: " + myParcelableObject.toString());
+                IliasRssItemListAdapter.alertDialogRssFeedEntry(myParcelableObject, this, this);
+            }
+        }
+
+        if (intent.getStringExtra("TestKey") != null) {
+            Log.i("MainActivity", "onNewIntent TestKey: " + intent.getStringExtra("TestKey"));
         }
 
         if (intent.getBooleanExtra(MainActivity.STOP_BACKGROUND_SERVICE, true)) {
@@ -448,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void listAdapterOpenUrl(final String URL) {
+    public void alertDialogOpenUrl(final String URL) {
         openUrl(URL);
     }
 

@@ -44,24 +44,24 @@
         app:showAsAction="never">
         <menu>
             <item
-                android:onClick="showLastResponse"
-                android:title="@string/action_last_response"
+                android:onClick="menuDevOptionShowLastResponse"
+                android:title="@string/menuDevOptionShowLastResponse"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionCleanList"
-                android:title="@string/action_clean_list"
+                android:title="@string/menuDevOptionCleanList"
                 app:showAsAction="never" />
             <item
-                android:onClick="menuDevOptionSendIntent"
-                android:title="@string/send_intent"
+                android:onClick="menuDevOptionCleanFirstElement"
+                android:title="@string/menuDevOptionCleanFirstElement"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionExampleNotification"
-                android:title="@string/example_notification"
+                android:title="@string/menuDevOptionExampleNotification"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionSetFirstLaunch"
-                android:title="@string/deleteSetupToken"
+                android:title="@string/menuDevOptionSetFirstLaunch"
                 app:showAsAction="never" />
         </menu>
     </item>

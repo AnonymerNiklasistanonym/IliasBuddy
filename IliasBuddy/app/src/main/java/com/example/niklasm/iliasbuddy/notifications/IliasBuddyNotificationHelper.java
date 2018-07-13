@@ -116,19 +116,12 @@ public class IliasBuddyNotificationHelper {
                                                         final String CHANNEL_DESCRIPTION,
                                                         final String CONTENT_TITLE,
                                                         final String CONTENT_TEXT,
-                                                        final Intent ONCLICK_INTENT,
-                                                        final String ACTION_TITLE,
-                                                        final int ACTION_ICON,
-                                                        final Intent ACTION_INTENT) {
+                                                        final Intent ONCLICK_INTENT) {
 
         // create PendingIntent for opening the app on click
         final PendingIntent openAppPendingIntent =
                 PendingIntent.getActivity(CONTEXT, 0, ONCLICK_INTENT,
                         PendingIntent.FLAG_UPDATE_CURRENT);
-        // create PendingIntent for stopping the background service
-        final PendingIntent actionPendingIntent =
-                PendingIntent.getActivity(CONTEXT, 0, ACTION_INTENT,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
 
         // setup oreo notification channel - https://stackoverflow.com/a/47974065
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -151,7 +144,6 @@ public class IliasBuddyNotificationHelper {
                 .setContentTitle(CONTENT_TITLE)
                 .setContentText(CONTENT_TEXT)
                 .setContentIntent(openAppPendingIntent)
-                //.addAction(new NotificationCompat.Action.Builder(ACTION_ICON, ACTION_TITLE, actionPendingIntent).build())
                 .setSmallIcon(R.drawable.ic_ilias_logo_white_24dp)
                 .setPriority(Notification.PRIORITY_MIN)
                 .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))

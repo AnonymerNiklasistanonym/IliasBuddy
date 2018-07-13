@@ -5,14 +5,14 @@
     <string name="action_open_ilias">Open Ilias</string>
     <string name="action_open_campus">Open C@mpus</string>
     <string name="action_setup">Setup</string>
-    <string name="action_last_response">Show last response</string>
+    <string name="menuDevOptionShowLastResponse">Show last server response</string>
     <string name="open_in_ilias">Open in Ilias</string>
     <string name="go_back">Go back</string>
     <string name="action_start_intent_service">Start intent service (beta)</string>
     <string name="action_start_service">(Re-)Start service (beta)</string>
     <string name="action_stop_service">Stop service</string>
     <string name="latestItem">LATEST_ELEMENT</string>
-    <string name="action_clean_list">Clean downloaded list</string>
+    <string name="menuDevOptionCleanList">Remove all list elements</string>
     <string name="render_new_elements">GET_NEW_ELEMENTS</string>
     <string name="lastNotification">LAST_NOTIFICATION_TEXT</string>
 
@@ -35,7 +35,7 @@
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
-    <string name="pref_header_general">General (does not work)</string>
+    <string name="pref_header_general">General</string>
 
     <string name="pref_title_social_recommendations">Enable social recommendations</string>
     <string name="pref_description_social_recommendations">Recommendations for people to contact
@@ -58,16 +58,16 @@
     </string-array>
 
     <string-array name="pref_sync_frequency_titles">
-        <item>1 minute</item>
+        <item>minute</item>
         <item>2 minutes</item>
         <item>5 minutes</item>
         <item>10 minutes</item>
         <item>30 minutes</item>
-        <item>1 hour</item>
+        <item>hour</item>
         <item>2 hours</item>
         <item>6 hours</item>
         <item>12 hours</item>
-        <item>1 day</item>
+        <item>day</item>
     </string-array>
     <string-array name="pref_sync_frequency_values">
         <item>1</item>
@@ -102,7 +102,7 @@
     <string name="pref_title_notification_sound">Notification sound</string>
     <string name="pref_ringtone_silent">Silent</string>
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="pref_title_frequency">Frequency</string>
+    <string name="pref_title_frequency">Frequency background checks</string>
 
     <string name="action_about">About</string>
 
@@ -134,13 +134,18 @@
     <string name="word_refresh">REFRESH</string>
     <string name="send_intent">Send intent</string>
     <string name="sub_menu_developer_options">Developer options</string>
-    <string name="example_notification">Make example notification</string>
-    <string name="start_background_notifications_on_boot">Start background service on boot</string>
+    <string name="menuDevOptionExampleNotification">Make example notification</string>
+    <string name="start_background_notifications_on_boot">Start on boot</string>
     <string name="complete_setup">Complete setup</string>
-    <string name="deleteSetupToken">Delete setup token</string>
+    <string name="menuDevOptionSetFirstLaunch">Reset to first launch</string>
     <string name="slide_3_picture_desc">Phone that vibrates and has a speech bubble coming from it\'s center which contains a sound symbol</string>
     <string name="slide_2_picture_desc">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
-    <string name="pref_title_enable_campus_shortcut">pref_title_enable_campus_shortcut</string>
-    <string name="pref_description_enable_campus_shortcut">Show Campus icon shortcut in the action bar next to the Ilias icon</string>
-    <string name="pref_summary_activate_background_notifications">If on the device will look in the background for feed updates and push notifications</string>
+    <string name="pref_title_enable_campus_shortcut">Show C@mpus shortcut</string>
+    <string name="pref_description_enable_campus_shortcut">Show icon in the action bar next to the Ilias shortcut/icon</string>
+    <string name="pref_summary_activate_background_notifications">A service in the background will look in the specified frequency for private Ilias RSS feed updates which will trigger a notification</string>
+    <string name="menuDevOptionCleanFirstElement">Remove first list element</string>
+    <string name="pref_header_summary_general">General settings</string>
+    <string name="pref_header_summary_notifications">Set background service, notification options, update frequency and more</string>
+    <string name="pref_summary_new_message_vibrate">The notification vibrates</string>
+    <string name="pref_summary_start_background_notifications_on_boot">Background service will be started on boot/reboot of the device</string>
 </resources>

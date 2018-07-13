@@ -17,6 +17,7 @@ import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequester;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequesterInterface;
+import com.example.niklasm.iliasbuddy.notifications.IliasBuddyNotificationInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -76,13 +77,13 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         myPrefs.edit().putString(getString(R.string.lastNotification), bigString).apply();
 
         final Intent ON_CLICK = new Intent(this, MainActivity.class)
-                .putExtra(MainActivity.NEW_ENTRY_FOUND, true)
-                .putExtra(MainActivity.NEW_ENTRY_DATA, (Parcelable) TEST_ENTRY)
+                .putExtra(IliasBuddyNotificationInterface.NEW_ENTRY_FOUND, true)
+                .putExtra(IliasBuddyNotificationInterface.NEW_ENTRY_DATA, (Parcelable) TEST_ENTRY)
                 .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         BackgroundServiceNewEntriesNotification.show(this, titleString, previewString, bigString, INBOX_MESSAGES, ON_CLICK, MESSAGE_COUNT, URL);
 
-        final Intent callMainActivity = new Intent(MainActivity.RECEIVE_JSON)
+        final Intent callMainActivity = new Intent(IliasBuddyNotificationInterface.RECEIVE_JSON)
                 .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING, previewString)
                 .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_MESSAGE_COUNT, MESSAGE_COUNT)
                 .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_BIG_STRING, bigString);

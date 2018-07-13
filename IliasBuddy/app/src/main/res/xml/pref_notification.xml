@@ -1,29 +1,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- A 'parent' preference, which enables/disables child preferences (below)
-         when checked/unchecked. -->
     <SwitchPreference
         android:defaultValue="true"
         android:key="activate_background_notifications"
         android:summary="@string/pref_summary_activate_background_notifications"
         android:title="@string/pref_title_background_notifications" />
-
-    <!-- Allows the user to choose a ringtone in the 'notification' category. -->
-    <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
-    <!-- NOTE: RingtonePreference's summary should be set to its value by the activity code. -->
-    <RingtonePreference
-        android:defaultValue="content://settings/system/notification_sound"
-        android:dependency="activate_background_notifications"
-        android:key="notifications_new_message_ringtone"
-        android:ringtoneType="notification"
-        android:title="@string/pref_title_notification_sound" />
-
-    <!-- NOTE: This preference will be enabled only when the checkbox above is checked. -->
-    <SwitchPreference
-        android:defaultValue="true"
-        android:dependency="activate_background_notifications"
-        android:key="notifications_new_message_vibrate"
-        android:title="@string/pref_title_vibrate" />
 
     <ListPreference
         android:defaultValue="5"
@@ -36,10 +17,25 @@
         android:summary="%s"
         android:title="@string/pref_title_frequency" />
 
+    <RingtonePreference
+        android:defaultValue="content://settings/system/notification_sound"
+        android:dependency="activate_background_notifications"
+        android:key="notifications_new_message_ringtone"
+        android:ringtoneType="notification"
+        android:title="@string/pref_title_notification_sound" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:dependency="activate_background_notifications"
+        android:key="notifications_new_message_vibrate"
+        android:summary="@string/pref_summary_new_message_vibrate"
+        android:title="@string/pref_title_vibrate" />
+
     <SwitchPreference
         android:defaultValue="true"
         android:dependency="activate_background_notifications"
         android:key="start_background_notifications_on_boot"
+        android:summary="@string/pref_summary_start_background_notifications_on_boot"
         android:title="@string/start_background_notifications_on_boot" />
 
 </PreferenceScreen>

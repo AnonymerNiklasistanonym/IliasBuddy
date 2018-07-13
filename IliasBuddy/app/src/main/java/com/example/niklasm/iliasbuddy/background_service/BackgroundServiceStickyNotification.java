@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.example.niklasm.iliasbuddy.MainActivity;
-import com.example.niklasm.iliasbuddy.R;
 import com.example.niklasm.iliasbuddy.notifications.IliasBuddyNotificationHelper;
 
 public class BackgroundServiceStickyNotification {
@@ -17,16 +16,13 @@ public class BackgroundServiceStickyNotification {
     final private static String CHANNEL_DESCRIPTION = "Shows sticky notification when background service is activated";
     final private static String CONTENT_TITLE = "IliasBuddy";
     final private static String CONTENT_TEXT = "Background service is active";
-    final private static String ACTION_TITLE = "Stop background service";
 
     public static void show(final Context CONTEXT) {
         Log.d("BackgroundServiceSti...", "show()");
         final Notification NOTIFICATION = IliasBuddyNotificationHelper.createStickyNotification(CONTEXT,
                 BackgroundServiceStickyNotification.CHANNEL_ID, BackgroundServiceStickyNotification.CHANNEL_NAME,
                 BackgroundServiceStickyNotification.CHANNEL_DESCRIPTION, BackgroundServiceStickyNotification.CONTENT_TITLE,
-                BackgroundServiceStickyNotification.CONTENT_TEXT, new Intent(CONTEXT, MainActivity.class),
-                BackgroundServiceStickyNotification.ACTION_TITLE, R.drawable.ic_close, new Intent(CONTEXT, BootCompletedReceiver.class)
-                        .putExtra(MainActivity.STOP_BACKGROUND_SERVICE, true));
+                BackgroundServiceStickyNotification.CONTENT_TEXT, new Intent(CONTEXT, MainActivity.class));
         IliasBuddyNotificationHelper.showNotification(CONTEXT, BackgroundServiceStickyNotification.NOTIFICATION_ID, NOTIFICATION);
     }
 

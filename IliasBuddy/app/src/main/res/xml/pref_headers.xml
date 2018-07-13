@@ -5,11 +5,13 @@
     <header
         android:fragment="com.example.niklasm.iliasbuddy.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_settings_info"
+        android:summary="@string/pref_header_summary_general"
         android:title="@string/pref_header_general" />
 
     <header
         android:fragment="com.example.niklasm.iliasbuddy.SettingsActivity$NotificationPreferenceFragment"
         android:icon="@drawable/ic_settings_notifications"
+        android:summary="@string/pref_header_summary_notifications"
         android:title="@string/pref_header_notifications" />
 
 </preference-headers>

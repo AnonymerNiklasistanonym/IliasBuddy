@@ -73,4 +73,16 @@
         <item>Alle 12 Stunde</item>
         <item>Jeden Tag</item>
     </string-array>
+    <string-array name="settings_activity_pref_notifications_frequency_values">
+        <item>1</item>
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>360</item>
+        <item>720</item>
+        <item>1440</item>
+    </string-array>
 </resources>

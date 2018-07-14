@@ -25,6 +25,7 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
     /**
      * Name of Ilias course: "Math for Informatics"
      */
+    @NonNull
     final private String COURSE;
     /**
      * CAN BE NULL: "Forum"
@@ -37,23 +38,38 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
     /**
      * Title of entry: "I need help with exercise 6.2"
      */
+    @NonNull
     final private String TITLE;
     /**
      * Description/text of Ilias entry: "Hello all, I have a question because..."
      */
+    @NonNull
     final private String DESCRIPTION;
     /**
      * Link to Ilias entry
      */
+    @NonNull
     final private String LINK;
     /**
      * Date of entry creation
      */
+    @NonNull
     final private Date DATE;
 
+    /**
+     * Constructor that creates a new IliasEntry
+     *
+     * @param COURSE      (String) - Name of the Ilias course of the RSS entry
+     * @param EXTRA       (String) - TODO
+     * @param TITLE_EXTRA (String) - TODO
+     * @param TITLE       (String) - Title of the Ilias course of the RSS entry
+     * @param DESCRIPTION (String) - Content/Description of the Ilias course of the RSS entry
+     * @param LINK        (String) - Link to Ilias post of the RSS entry
+     * @param DATE        (String) - Date of the RSS entry
+     */
     IliasRssItem(@NonNull final String COURSE, final String EXTRA, final String TITLE_EXTRA,
-                 @NonNull final String TITLE, final String DESCRIPTION, @NonNull final String LINK,
-                 @NonNull final Date DATE) {
+                 @NonNull final String TITLE, @NonNull final String DESCRIPTION,
+                 @NonNull final String LINK, @NonNull final Date DATE) {
         this.COURSE = COURSE;
         this.EXTRA = EXTRA;
         this.TITLE_EXTRA = TITLE_EXTRA;
@@ -108,15 +124,21 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
                 ",date=" + DATE.getTime();
     }
 
-    public String toStringNotificationPreview(@NonNull final SimpleDateFormat viewDateFormat) {
-        return getCourse() + (getExtra() != null ? " > " + getExtra() : "") + " >> " +
-                (getTitleExtra() != null ? getTitleExtra() + ": " : "") + getTitle() + " (" +
-                viewDateFormat.format(getDate()) + ")";
+    /**
+     * TODO - Make it external or rename this method
+     */
+    public String toStringNotificationPreview(@NonNull final SimpleDateFormat VIEW_FORMAT_DATE) {
+        return COURSE + (EXTRA != null ? " > " + EXTRA : "") + " >> " +
+                (TITLE_EXTRA != null ? TITLE_EXTRA + ": " : "") + TITLE +
+                " (" + VIEW_FORMAT_DATE.format(DATE) + ")";
     }
 
-    public String toStringNotificationPreview2(@NonNull final SimpleDateFormat viewDateFormat) {
-        return ">> " + (getTitleExtra() != null ? getTitleExtra() + ": " : "") + getTitle() + "\n(" +
-                viewDateFormat.format(getDate()) + ")";
+    /**
+     * TODO - Make it external or rename this method
+     */
+    public String toStringNotificationPreview2(@NonNull final SimpleDateFormat VIEW_FORMAT_DATE) {
+        return ">> " + (TITLE_EXTRA != null ? TITLE_EXTRA + ": " : "") +
+                TITLE + "\n(" + VIEW_FORMAT_DATE.format(DATE) + ")";
     }
 
     @Override
@@ -136,7 +158,8 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
             return EXTRA_IS_THE_SAME;
         }
         // if extra is the same check titleExtra
-        final int TITLE_EXTRA_IS_THE_SAME = OBJECT_1.getTitleExtra().compareTo(OBJECT_2.getTitleExtra());
+        final int TITLE_EXTRA_IS_THE_SAME =
+                OBJECT_1.getTitleExtra().compareTo(OBJECT_2.getTitleExtra());
         if (TITLE_EXTRA_IS_THE_SAME != 0) {
             return TITLE_EXTRA_IS_THE_SAME;
         }
@@ -146,7 +169,8 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
             return TITLE_IS_THE_SAME;
         }
         // if title is the same check description
-        final int DESCRIPTION_IS_THE_SAME = OBJECT_1.getDescription().compareTo(OBJECT_2.getDescription());
+        final int DESCRIPTION_IS_THE_SAME =
+                OBJECT_1.getDescription().compareTo(OBJECT_2.getDescription());
         if (DESCRIPTION_IS_THE_SAME != 0) {
             return DESCRIPTION_IS_THE_SAME;
         }
@@ -170,7 +194,18 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         OUT.writeLong(DATE.getTime());
     }
 
-    public boolean containsIgnoreCase(@NonNull final String QUERY, @NonNull final SimpleDateFormat DATE_FORMAT, @NonNull final SimpleDateFormat TIME_FORMAT) {
+    /**
+     * Check if a search query is contained in any property of this object
+     * without considering lower/upper case on both sides
+     *
+     * @param QUERY       (String) - Search query
+     * @param DATE_FORMAT (SimpleDateFormat) - Time format of recycler view for the date
+     * @param TIME_FORMAT (SimpleDateFormat) - Time format of recycler view for the time
+     * @return (boolean) Query is contained in at least one of the properties
+     */
+    public boolean containsIgnoreCase(@NonNull final String QUERY,
+                                      @NonNull final SimpleDateFormat DATE_FORMAT,
+                                      @NonNull final SimpleDateFormat TIME_FORMAT) {
         // check if search string is safe to work with
         if (QUERY.isEmpty()) {
             return false;

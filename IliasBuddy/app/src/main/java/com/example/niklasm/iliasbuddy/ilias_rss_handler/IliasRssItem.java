@@ -22,12 +22,33 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
             return new IliasRssItem[size];
         }
     };
+    /**
+     * Name of Ilias course: "Math for Informatics"
+     */
     final private String COURSE;
+    /**
+     * CAN BE NULL: "Forum"
+     */
     final private String EXTRA;
+    /**
+     * CAN BE NULL: "New file"
+     */
     final private String TITLE_EXTRA;
+    /**
+     * Title of entry: "I need help with exercise 6.2"
+     */
     final private String TITLE;
+    /**
+     * Description/text of Ilias entry: "Hello all, I have a question because..."
+     */
     final private String DESCRIPTION;
+    /**
+     * Link to Ilias entry
+     */
     final private String LINK;
+    /**
+     * Date of entry creation
+     */
     final private Date DATE;
 
     IliasRssItem(@NonNull final String COURSE, final String EXTRA, final String TITLE_EXTRA,
@@ -87,13 +108,13 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
                 ",date=" + DATE.getTime();
     }
 
-    public String toStringNotificationPreview(final SimpleDateFormat viewDateFormat) {
+    public String toStringNotificationPreview(@NonNull final SimpleDateFormat viewDateFormat) {
         return getCourse() + (getExtra() != null ? " > " + getExtra() : "") + " >> " +
                 (getTitleExtra() != null ? getTitleExtra() + ": " : "") + getTitle() + " (" +
                 viewDateFormat.format(getDate()) + ")";
     }
 
-    public String toStringNotificationPreview2(final SimpleDateFormat viewDateFormat) {
+    public String toStringNotificationPreview2(@NonNull final SimpleDateFormat viewDateFormat) {
         return ">> " + (getTitleExtra() != null ? getTitleExtra() + ": " : "") + getTitle() + "\n(" +
                 viewDateFormat.format(getDate()) + ")";
     }
@@ -149,16 +170,22 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         OUT.writeLong(DATE.getTime());
     }
 
-    public boolean containsIgnoreCase(final String QUERY, final SimpleDateFormat DATE_FORMAT, final SimpleDateFormat TIME_FORMAT) {
-        if (QUERY == null || QUERY.isEmpty()) {
+    public boolean containsIgnoreCase(@NonNull final String QUERY, @NonNull final SimpleDateFormat DATE_FORMAT, @NonNull final SimpleDateFormat TIME_FORMAT) {
+        // check if search string is safe to work with
+        if (QUERY.isEmpty()) {
             return false;
         } else {
+            // convert search string to lowercase
             final String LOWER_CASE_QUERY = QUERY.toLowerCase();
-            return ((COURSE.contains(LOWER_CASE_QUERY) || (EXTRA != null && EXTRA.contains(LOWER_CASE_QUERY)))
-                    || (TITLE_EXTRA != null && TITLE_EXTRA.contains(LOWER_CASE_QUERY)) || TITLE.contains(LOWER_CASE_QUERY))
-                    || ((DESCRIPTION.contains(LOWER_CASE_QUERY) || LINK.contains(LOWER_CASE_QUERY))
-                    || (DATE_FORMAT.format(DATE).contains(LOWER_CASE_QUERY)
-                    || TIME_FORMAT.format(DATE).contains(LOWER_CASE_QUERY)));
+            // check if in any property the search string is contained (ignoring upper-/lowercase)
+            return COURSE.toLowerCase().contains(LOWER_CASE_QUERY)
+                    || (EXTRA != null && EXTRA.toLowerCase().contains(LOWER_CASE_QUERY))
+                    || (TITLE_EXTRA != null && TITLE_EXTRA.toLowerCase().contains(LOWER_CASE_QUERY))
+                    || TITLE.toLowerCase().contains(LOWER_CASE_QUERY)
+                    || DESCRIPTION.toLowerCase().contains(LOWER_CASE_QUERY)
+                    || LINK.toLowerCase().contains(LOWER_CASE_QUERY)
+                    || DATE_FORMAT.format(DATE).contains(LOWER_CASE_QUERY)
+                    || TIME_FORMAT.format(DATE).contains(LOWER_CASE_QUERY);
         }
     }
 }

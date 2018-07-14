@@ -187,7 +187,6 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     // check which entries should be added to the filtered list
                     for (final IliasRssItem ENTRY : items) {
                         if (ENTRY.containsIgnoreCase(charString, viewDateFormat, viewTimeFormat)) {
-                            Log.i("Adapterdebug", "entry added: " + ENTRY.toString());
                             filteredList.add(ENTRY);
                         }
                     }

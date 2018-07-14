@@ -34,6 +34,7 @@ import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManage
 import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceNewEntriesNotification;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssCache;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItemDecoration;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItemListAdapter;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItemListAdapterInterface;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
@@ -80,15 +81,15 @@ public class MainActivity extends AppCompatActivity implements
           SETUP things
          */
 
-        // setup the recycler view
-        rssEntryRecyclerView = findViewById(R.id.my_recycler_view);
-        rssEntryRecyclerView.setHasFixedSize(true);
-        rssEntryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        rssEntryRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        // set adapter
+        // setup adapter
         items = new ArrayList<>();
         mAdapter = new IliasRssItemListAdapter(items, this, this);
+
+        // setup the recycler view
+        rssEntryRecyclerView = findViewById(R.id.my_recycler_view);
+        rssEntryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        rssEntryRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        rssEntryRecyclerView.addItemDecoration(new IliasRssItemDecoration(this));
         rssEntryRecyclerView.setAdapter(mAdapter);
 
         // setup the swipe to refresh layout

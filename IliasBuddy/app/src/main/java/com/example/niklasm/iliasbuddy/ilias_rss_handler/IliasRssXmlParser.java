@@ -1,6 +1,5 @@
 package com.example.niklasm.iliasbuddy.ilias_rss_handler;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 import android.util.Xml;
 
@@ -13,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -128,8 +128,8 @@ public class IliasRssXmlParser {
         parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.DATE_TAG);
         final String DATE_STRING = IliasRssXmlParser.readText(parser);
         parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.DATE_TAG);
-        @SuppressLint("SimpleDateFormat") final SimpleDateFormat sf1 =
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
+        final SimpleDateFormat sf1 =
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ", Locale.US);
         return sf1.parse(DATE_STRING);
     }
 

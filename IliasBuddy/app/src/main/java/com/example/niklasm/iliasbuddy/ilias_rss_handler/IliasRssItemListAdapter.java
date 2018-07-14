@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemListAdapter.ViewHolder> implements Filterable {
+public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemListAdapter.ViewHolder>
+        implements Filterable {
 
     private final List<IliasRssItem> items;
     private final SimpleDateFormat viewDateFormat;
@@ -40,8 +41,10 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                                    @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
         items = dataSet;
         itemsFiltered = dataSet;
-        viewDateFormat = new SimpleDateFormat("dd.MM", CONTEXT.getResources().getConfiguration().locale);
-        viewTimeFormat = new SimpleDateFormat("HH:mm", CONTEXT.getResources().getConfiguration().locale);
+        viewDateFormat = new SimpleDateFormat("dd.MM", CONTEXT.getResources()
+                .getConfiguration().locale);
+        viewTimeFormat = new SimpleDateFormat("HH:mm", CONTEXT.getResources()
+                .getConfiguration().locale);
         this.CONTEXT = CONTEXT;
         this.ADAPTER_INTERFACE = ADAPTER_INTERFACE;
     }
@@ -55,17 +58,23 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
             ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink());
         } else {
             // if not this must be a legit message for which a popup dialog will be opened
-            final String message = ">> " + ILIAS_RSS_ITEM.getTitle() + "\n\n" + Html.fromHtml(ILIAS_RSS_ITEM.getDescription());
+            final String message = ">> " + ILIAS_RSS_ITEM.getTitle() + "\n\n" +
+                    Html.fromHtml(ILIAS_RSS_ITEM.getDescription());
             final AlertDialog dialog = new AlertDialog.Builder(CONTEXT)
-                    .setTitle(ILIAS_RSS_ITEM.getCourse() + " (" + new SimpleDateFormat("dd.MM", CONTEXT.getResources().getConfiguration().locale).format(ILIAS_RSS_ITEM.getDate()) + ")")
+                    .setTitle(ILIAS_RSS_ITEM.getCourse() + " (" +
+                            new SimpleDateFormat("dd.MM",
+                                    CONTEXT.getResources().getConfiguration().locale)
+                                    .format(ILIAS_RSS_ITEM.getDate()) + ")")
                     .setMessage(message)
                     .setCancelable(true)
                     .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
-                            (dialog1, id) -> ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink()))
+                            (dialog1, id) -> ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE
+                                    .alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink()))
                     .setNegativeButton(CONTEXT.getString(R.string.dialog_back),
                             (dialog12, id) -> dialog12.cancel())
                     .show();
-            final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
+            final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView()
+                    .findViewById(android.R.id.message);
             textView.setTextIsSelectable(true);
         }
     }
@@ -105,7 +114,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         holder.description.setText("");
         holder.extraCard.setVisibility(View.VISIBLE);
         holder.titleExtraCard.setVisibility(View.VISIBLE);
-        holder.titleExtraCard.setCardBackgroundColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary));
+        holder.titleExtraCard.setCardBackgroundColor(
+                ContextCompat.getColor(CONTEXT, R.color.colorPrimary));
         holder.titleExtra.setVisibility(View.VISIBLE);
         holder.titleExtra.setText("");
 
@@ -145,7 +155,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     .trim());
         }
 
-        if ((description == null || description.equals("")) && CURRENT_ENTRY.getTitleExtra() != null) {
+        if ((description == null || description.equals(""))
+                && CURRENT_ENTRY.getTitleExtra() != null) {
             holder.titleExtra.setText(CURRENT_ENTRY.getTitle());
             holder.title.setText(CURRENT_ENTRY.getTitleExtra());
             holder.titleExtraCard.setCardBackgroundColor(
@@ -199,7 +210,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
             }
 
             @Override
-            protected void publishResults(final CharSequence charSequence, final FilterResults filterResults) {
+            protected void publishResults(final CharSequence charSequence,
+                                          final FilterResults filterResults) {
                 if (filterResults != null && filterResults.values != null) {
                     Log.i("publishResults", filterResults.values.toString());
                     final List<?> result = (List<?>) filterResults.values;
@@ -246,8 +258,10 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
 
         @Override
         public void onClick(final View view) {
-            final int itemPosition = ADAPTER_INTERFACE.listAdapterGetRecyclerViewChildLayoutPosition(view);
-            IliasRssItemListAdapter.alertDialogRssFeedEntry(itemsFiltered.get(itemPosition), ADAPTER_INTERFACE, CONTEXT);
+            final int itemPosition =
+                    ADAPTER_INTERFACE.listAdapterGetRecyclerViewChildLayoutPosition(view);
+            IliasRssItemListAdapter.alertDialogRssFeedEntry(itemsFiltered.get(itemPosition),
+                    ADAPTER_INTERFACE, CONTEXT);
         }
     }
 }

@@ -20,24 +20,32 @@ public class BackgroundServiceManager {
         // Create a new Intent that calls the BackgroundIntentService class
         final Intent intent = new Intent(CONTEXT, BackgroundIntentService.class);
         // and add it to a pending Intent
-        BackgroundServiceManager.pendingIntent = PendingIntent.getService(CONTEXT, 12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        BackgroundServiceManager.pendingIntent = PendingIntent.getService(CONTEXT,
+                12345, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         // and add this Intent to the alarm manager
-        BackgroundServiceManager.am = (AlarmManager) CONTEXT.getSystemService(Activity.ALARM_SERVICE);
+        BackgroundServiceManager.am =
+                (AlarmManager) CONTEXT.getSystemService(Activity.ALARM_SERVICE);
 
 
-        final SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(CONTEXT);
+        final SharedPreferences prefs =
+                android.preference.PreferenceManager.getDefaultSharedPreferences(CONTEXT);
         final String RINGTONE = prefs.getString("notifications_new_message_ringtone", null);
         final boolean VIBRATE = prefs.getBoolean("notifications_new_message_vibrate", true);
         final String FREQUENCY = prefs.getString("sync_frequency", null);
 
-        Log.i("BackgroundServiceMan...", "RINGTONE = " + (RINGTONE != null ? RINGTONE : "null => None"));
-        Log.i("BackgroundServiceMan...", "VIBRATE = " + String.valueOf(VIBRATE));
-        Log.i("BackgroundServiceMan...", "FREQUENCY = " + (FREQUENCY != null ? Integer.valueOf(FREQUENCY) : "null => 5"));
+        Log.i("BackgroundServiceMan...",
+                "RINGTONE = " + (RINGTONE != null ? RINGTONE : "null => None"));
+        Log.i("BackgroundServiceMan...",
+                "VIBRATE = " + String.valueOf(VIBRATE));
+        Log.i("BackgroundServiceMan...", "FREQUENCY = "
+                + (FREQUENCY != null ? Integer.valueOf(FREQUENCY) : "null => 5"));
 
         // call the pending intent every ... minutes with the default value 5
         final int MINUTES = (FREQUENCY != null ? Integer.valueOf(FREQUENCY) : 5);
 
-        BackgroundServiceManager.am.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), 1000 * 60 * MINUTES, BackgroundServiceManager.pendingIntent);
+        BackgroundServiceManager.am.setRepeating(AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime(), 1000 * 60 * MINUTES,
+                BackgroundServiceManager.pendingIntent);
 
         // also make a sticky notification so that the user knows the background service is running
         BackgroundServiceStickyNotification.show(CONTEXT);
@@ -56,7 +64,7 @@ public class BackgroundServiceManager {
             BackgroundServiceManager.am = null;
         }
 
-        // also remove the sticky notification so that the user knows the background service is not running
+        // also remove the sticky notification so that the user knows the bg service is not running
         BackgroundServiceStickyNotification.hide(CONTEXT);
     }
 }

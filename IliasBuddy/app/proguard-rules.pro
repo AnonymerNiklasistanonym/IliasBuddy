@@ -19,3 +19,10 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+
+# xD - thanks Quan Nguyen > https://stackoverflow.com/users/713903/quan-nguyen,
+# your answer saved me because I still don't know why my release crahes but not my dev build...
+# >> https://stackoverflow.com/a/37054856
+-keep class android.support.v7.widget.SearchView { *; }

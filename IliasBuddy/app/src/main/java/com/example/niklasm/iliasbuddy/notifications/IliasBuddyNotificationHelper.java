@@ -28,7 +28,6 @@ public class IliasBuddyNotificationHelper {
                                                           final String CHANNEL_DESCRIPTION,
                                                           @NonNull final String CONTENT_TITLE,
                                                           final String CONTENT_TEXT,
-                                                          final String CONTENT_TEXT_BIG,
                                                           final String[] CONTENT_TEXT_ARRAY,
                                                           final Intent ONCLICK_INTENT,
                                                           final int MESSAGE_COUNT,

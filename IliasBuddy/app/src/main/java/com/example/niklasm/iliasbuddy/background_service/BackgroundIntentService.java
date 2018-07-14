@@ -82,7 +82,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                 .putExtra(IliasBuddyNotificationInterface.NEW_ENTRY_DATA, (Parcelable) TEST_ENTRY)
                 .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        BackgroundServiceNewEntriesNotification.show(this, titleString, previewString, bigString, INBOX_MESSAGES, ON_CLICK, MESSAGE_COUNT, URL);
+        BackgroundServiceNewEntriesNotification.show(this, titleString, previewString, INBOX_MESSAGES, ON_CLICK, MESSAGE_COUNT, URL);
 
         final Intent callMainActivity = new Intent(IliasBuddyNotificationInterface.RECEIVE_JSON)
                 .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING, previewString)

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -119,10 +118,10 @@ public class MainActivity extends AppCompatActivity implements
                         intent.getAction().equals(IliasBuddyNotificationInterface.RECEIVE_JSON)) {
                     final String PREVIEW_STRING = intent.getStringExtra(BackgroundIntentService
                             .NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
-                    final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService
+                    /*final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService
                             .NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
                     final String BIG_STRING = intent.getStringExtra(BackgroundIntentService
-                            .NOTIFICATION_INTENT_EXTRA_BIG_STRING);
+                            .NOTIFICATION_INTENT_EXTRA_BIG_STRING);*/
 
                     // create snack bar message that refreshes feed on action click
                     newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
@@ -201,8 +200,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionExampleNotification(final MenuItem menuItem) {
         BackgroundServiceNewEntriesNotification.show(this, "titleString",
-                "previewString (single demo)", "bigString",
-                new String[]{"one"},
+                "previewString (single demo)", new String[]{"one"},
                 new Intent(this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 1,
                 "https://ilias3.uni-stuttgart.de");
@@ -210,8 +208,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionExampleNotifications(final MenuItem item) {
         BackgroundServiceNewEntriesNotification.show(this, "titleString",
-                "previewString (multiple demo)", "bigString",
-                new String[]{"one", "two", "three"},
+                "previewString (multiple demo)", new String[]{"one", "two", "three"},
                 new Intent(this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 3,
                 null);
@@ -290,28 +287,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-    }
-
-    public void errorSnackBar(final int resId, final String message) {
-        errorSnackBar(getString(resId), message);
-    }
-
-    public void errorSnackBar(final String title, final String message) {
-        final Snackbar snackbar =
-                Snackbar.make(findViewById(R.id.fab), title, Snackbar.LENGTH_LONG);
-        snackbar.setActionTextColor(Color.RED); //to change the color of action text
-        snackbar.setAction("MORE", view -> {
-            final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
-                    .setTitle(title)
-                    .setMessage(message)
-                    .setNeutralButton("SETTINGS",
-                            (dialog, which) -> openSetupActivity())
-                    .setNeutralButton("OK",
-                            (dialog, which) -> dialog.dismiss())
-                    .create();
-            alertDialog.show();
-        });
-        snackbar.show();
     }
 
     /**

@@ -101,7 +101,8 @@ public class IliasRssXmlParser {
             final String name = PARSER.getName();
             switch (name) {
                 case IliasRssXmlParser.TITLE_TAG:
-                    courseExtraTitleExtraTitle = IliasRssXmlParser.readCourseExtraTitleTitleExtra(PARSER);
+                    courseExtraTitleExtraTitle =
+                            IliasRssXmlParser.readCourseExtraTitleTitleExtra(PARSER);
                     break;
                 case IliasRssXmlParser.LINK_TAG:
                     link = IliasRssXmlParser.readLink(PARSER);
@@ -117,48 +118,62 @@ public class IliasRssXmlParser {
             }
         }
         return new IliasRssItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
-                courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3], description, Objects.requireNonNull(link), Objects.requireNonNull(date));
+                courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3],
+                Objects.requireNonNull(description), Objects.requireNonNull(link),
+                Objects.requireNonNull(date));
     }
 
-    private static Date readDate(@NonNull final XmlPullParser parser) throws IOException, XmlPullParserException, ParseException {
+    private static Date readDate(@NonNull final XmlPullParser parser)
+            throws IOException, XmlPullParserException, ParseException {
         parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.DATE_TAG);
         final String DATE_STRING = IliasRssXmlParser.readText(parser);
         parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.DATE_TAG);
-        @SuppressLint("SimpleDateFormat") final SimpleDateFormat sf1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
+        @SuppressLint("SimpleDateFormat") final SimpleDateFormat sf1 =
+                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss ZZZZZ");
         return sf1.parse(DATE_STRING);
     }
 
-    private static String readDescription(@NonNull final XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readDescription(@NonNull final XmlPullParser parser)
+            throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.DESCRIPTION_TAG);
         final String DESCRIPTION = IliasRssXmlParser.readText(parser);
         parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.DESCRIPTION_TAG);
         return DESCRIPTION;
     }
 
-    private static String readLink(@NonNull final XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readLink(@NonNull final XmlPullParser parser)
+            throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.LINK_TAG);
         final String LINK = IliasRssXmlParser.readText(parser);
         parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.LINK_TAG);
         return LINK;
     }
 
-    private static String[] readCourseExtraTitleTitleExtra(@NonNull final XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String[] readCourseExtraTitleTitleExtra(@NonNull final XmlPullParser parser)
+            throws IOException, XmlPullParserException {
         parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.TITLE_TAG);
         final String courseExtraTitle = IliasRssXmlParser.readText(parser);
-        final String courseExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("[") + 1, courseExtraTitle.indexOf("]")).trim();
+        final String courseExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("[") + 1,
+                courseExtraTitle.indexOf("]")).trim();
         final boolean extraExists = courseExtraTitle.contains(">");
-        final String course = extraExists ? courseExtra.substring(0, courseExtra.indexOf(">")).trim() : courseExtra;
-        final String extra = extraExists ? courseExtra.substring(courseExtra.indexOf(">") + 1).trim() : null;
-        final String titleTitleExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("]") + 1).trim();
+        final String course = extraExists ? courseExtra.substring(0,
+                courseExtra.indexOf(">")).trim() : courseExtra;
+        final String extra =
+                extraExists ? courseExtra.substring(courseExtra.indexOf(">") + 1).trim() : null;
+        final String titleTitleExtra =
+                courseExtraTitle.substring(courseExtraTitle.indexOf("]") + 1).trim();
         final boolean titleExtraExists = titleTitleExtra.contains(":");
-        final String title = titleExtraExists ? titleTitleExtra.substring(titleTitleExtra.indexOf(":") + 1).trim() : titleTitleExtra;
-        final String titleExtra = titleExtraExists ? titleTitleExtra.substring(0, titleTitleExtra.indexOf(":")).trim() : null;
+        final String title = titleExtraExists ? titleTitleExtra
+                .substring(titleTitleExtra.indexOf(":") + 1).trim() : titleTitleExtra;
+        final String titleExtra = titleExtraExists ? titleTitleExtra.substring(0,
+                titleTitleExtra.indexOf(":")).trim() : null;
         parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.TITLE_TAG);
         return new String[]{course, extra, titleExtra, title};
     }
 
     // For the tags title and summary, extracts their text values.
-    private static String readText(@NonNull final XmlPullParser parser) throws IOException, XmlPullParserException {
+    private static String readText(@NonNull final XmlPullParser parser)
+            throws IOException, XmlPullParserException {
         String result = "";
         if (parser.next() == XmlPullParser.TEXT) {
             result = parser.getText();
@@ -167,7 +182,8 @@ public class IliasRssXmlParser {
         return result;
     }
 
-    private static void skip(@NonNull final XmlPullParser PARSER) throws XmlPullParserException, IOException {
+    private static void skip(@NonNull final XmlPullParser PARSER)
+            throws XmlPullParserException, IOException {
         // If initial state is not a defined START_TAG throw exception
         if (PARSER.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();

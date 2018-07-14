@@ -19,13 +19,10 @@ public class IliasRssXmlWebRequester {
     final private IliasRssXmlWebRequesterInterface classThatImplementsInterface;
     final private Context CONTEXT;
 
-    public IliasRssXmlWebRequester(final IliasRssXmlWebRequesterInterface classThatImplementsInterface) {
+    public IliasRssXmlWebRequester(
+            final IliasRssXmlWebRequesterInterface classThatImplementsInterface) {
         this.classThatImplementsInterface = classThatImplementsInterface;
         CONTEXT = (Context) classThatImplementsInterface;
-    }
-
-    private String getSharedPreferenceStringOrNull(final SharedPreferences myPrefs, final int stringId) {
-        return myPrefs.getString(CONTEXT.getResources().getString(stringId), null);
     }
 
     private IliasRssCredentials getCredentialsAndUrl() {
@@ -59,8 +56,10 @@ public class IliasRssXmlWebRequester {
             @Override
             public Map<String, String> getHeaders() {
                 final Map<String, String> headers = new HashMap<>();
-                final String credentials = CREDENTIALS.getUserName() + ":" + CREDENTIALS.getPassword();
-                final String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                final String credentials = CREDENTIALS.getUserName() + ":" +
+                        CREDENTIALS.getPassword();
+                final String auth = "Basic " + Base64.encodeToString(credentials.getBytes(),
+                        Base64.NO_WRAP);
                 headers.put("Content-Type", "application/json; charset=UTF-8");
                 headers.put("Authorization", auth);
                 return headers;

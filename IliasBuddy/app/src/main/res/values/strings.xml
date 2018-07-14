@@ -17,6 +17,8 @@
     <string name="main_activity_toolbar_action_dev_example_notification_single">Example notification (single)</string>
     <string name="main_activity_toolbar_action_dev_example_notification_multiple">Example notification (multiple)</string>
     <string name="main_activity_toolbar_action_dev_reset_to_first_launch">Reset to first launch</string>
+    <string name="main_activity_show_last_response_title">Last response</string>
+    <string name="main_activity_show_last_response_no_response">No recorded response found</string>
     <!-- Main activity: Ilias entries -->
     <string name="open_in_ilias">Open in Ilias</string>
 
@@ -101,6 +103,7 @@
     <!-- Dialog -->
     <string name="dialog_response_error">Web response error</string>
     <string name="dialog_authentication_error">Authentication error</string>
+    <string name="dialog_parse_error">Parse error</string>
     <string name="dialog_back">BACK</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_more">MORE</string>

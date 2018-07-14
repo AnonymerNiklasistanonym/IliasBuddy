@@ -243,7 +243,10 @@ public class MainActivity extends AppCompatActivity implements
                     .replace("</rss>", "")
                     .getBytes(StandardCharsets.UTF_8)));
         } catch (XmlPullParserException | IOException | ParseException e) {
+            SetupActivity.errorSnackBar(this, findViewById(R.id.fab), getString(R.string.dialog_parse_error), e.toString());
             e.printStackTrace();
+            // at last stop refresh animation of swipe to refresh layout
+            rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
             return;
         }
         // get the latest RSS entry from the main activity
@@ -407,8 +410,8 @@ public class MainActivity extends AppCompatActivity implements
     public void menuDevOptionShowLastResponse(final MenuItem menuItem) {
         // show popup with last response
         final AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("Last response")
-                .setMessage((lastResponse != null) ? lastResponse : "NO RESPONSE UNTIL NOW")
+                .setTitle(R.string.main_activity_show_last_response_title)
+                .setMessage((lastResponse != null) ? lastResponse : getString(R.string.main_activity_show_last_response_no_response))
                 .setCancelable(true)
                 .setNeutralButton(getString(R.string.dialog_back), (dialog1, id) -> dialog1.cancel())
                 .show();

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +33,21 @@ public class SetupActivity extends AppCompatActivity {
     final static public String ILIAS_PRIVATE_RSS_FEED_USER = "ilias_user_name";
     final static public String ILIAS_PRIVATE_RSS_FEED_PASSWORD = "ilias_password";
     public static final String ILIAS_PRIVATE_RSS_FEED_CREDENTIALS = "myPrefs";
+
+    public static void errorSnackBar(@NonNull final Context context, @NonNull final View fab,
+                                     @NonNull final String title, @NonNull final String message) {
+        Snackbar.make(fab, title, Snackbar.LENGTH_LONG)
+                .setActionTextColor(Color.RED) //to change the color of action text
+                .setAction(R.string.dialog_more, view ->
+                        new AlertDialog.Builder(context)
+                                .setTitle(title)
+                                .setMessage(message)
+                                .setNeutralButton(R.string.dialog_ok,
+                                        (dialog, which) -> dialog.dismiss())
+                                .create()
+                                .show())
+                .show();
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -108,20 +124,11 @@ public class SetupActivity extends AppCompatActivity {
             final String errorTitle = intent.getStringExtra(MainActivity.ERROR_MESSAGE_WEB_TITLE);
             final String errorMsg = intent.getStringExtra(MainActivity.ERROR_MESSAGE_WEB_MESSAGE);
             if (errorTitle != null && errorMsg != null) {
-                Snackbar.make(fabButton, errorTitle, Snackbar.LENGTH_LONG)
-                        .setActionTextColor(Color.RED) //to change the color of action text
-                        .setAction(R.string.dialog_more, view ->
-                                new AlertDialog.Builder(this)
-                                        .setTitle(errorTitle)
-                                        .setMessage(errorMsg)
-                                        .setNeutralButton(R.string.dialog_ok,
-                                                (dialog, which) -> dialog.dismiss())
-                                        .create()
-                                        .show())
-                        .show();
+                SetupActivity.errorSnackBar(this, fabButton, errorTitle, errorMsg);
             }
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {

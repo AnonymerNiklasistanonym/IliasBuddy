@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final String ERROR_MESSAGE_WEB_TITLE = "ERROR_MESSAGE_WEB_TITLE";
     public static final String ERROR_MESSAGE_WEB_MESSAGE = "ERROR_MESSAGE_WEB_MESSAGE";
+    private static String lastResponse;
     private BroadcastReceiver broadcastReceiver;
     private LocalBroadcastManager broadcastManager;
     private RecyclerView rssEntryRecyclerView;
@@ -66,10 +67,18 @@ public class MainActivity extends AppCompatActivity implements
     private IliasRssItem latestRssEntry;
     private IliasRssItem latestRssEntryNewIliasRssFeedEntries;
     private IliasRssCache iliasRssFeedCacheManager;
-    private String lastResponse;
     private int currentDataSetLength;
     private SwipeRefreshLayout rssEntryRecyclerViewSwipeToRefreshLayout;
     private List<IliasRssItem> items;
+
+    /**
+     * Save latest response of Ilias RSS feed website
+     *
+     * @param RESPONSE (String) - Current website data as a String
+     */
+    public static void devOptionSetLastResponse(final String RESPONSE) {
+        MainActivity.lastResponse = RESPONSE;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -234,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void processIliasXml(final String FEED_XML_DATA) {
         // save latest response in variable
-        devOptionSetLastResponse(FEED_XML_DATA);
+        MainActivity.devOptionSetLastResponse(FEED_XML_DATA);
         // parse String Ilias RSS feed to IliasRssItem[] array
         final IliasRssItem[] myDataSet;
         try {
@@ -308,15 +317,6 @@ public class MainActivity extends AppCompatActivity implements
         iliasRssXmlWebRequester.getWebContent();
     }
 
-    /**
-     * Save latest response of Ilias RSS feed website
-     *
-     * @param RESPONSE (String) - Current website data as a String
-     */
-    public void devOptionSetLastResponse(final String RESPONSE) {
-        lastResponse = RESPONSE;
-    }
-
     public void menuOpenSetupActivity(final MenuItem menuItem) {
         openSetupActivity();
     }
@@ -360,6 +360,8 @@ public class MainActivity extends AppCompatActivity implements
             // render empty list to override the current one
             renderNewList(new IliasRssItem[0]);
             currentDataSetLength = 0;
+            // clear the last server response
+            MainActivity.lastResponse = null;
         } catch (IliasRssCache.IliasRssCacheException | IOException e) {
             e.printStackTrace();
         }
@@ -411,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements
         // show popup with last response
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.main_activity_show_last_response_title)
-                .setMessage((lastResponse != null) ? lastResponse : getString(R.string.main_activity_show_last_response_no_response))
+                .setMessage((MainActivity.lastResponse != null) ? MainActivity.lastResponse : getString(R.string.main_activity_show_last_response_no_response))
                 .setCancelable(true)
                 .setNeutralButton(getString(R.string.dialog_back), (dialog1, id) -> dialog1.cancel())
                 .show();

@@ -122,6 +122,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
     @Override
     public void processIliasXml(final String FEED_XML_DATA) {
         Log.i("BackgroundIntentService", "parseXml");
+        MainActivity.devOptionSetLastResponse(FEED_XML_DATA);
         final InputStream stream = new ByteArrayInputStream(FEED_XML_DATA.replace("<rss version=\"2.0\">", "").replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
         final IliasRssItem[] myDataSet;
         try {

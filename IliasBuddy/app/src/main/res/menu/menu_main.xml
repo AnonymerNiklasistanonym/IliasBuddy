@@ -7,7 +7,7 @@
     <item
         android:id="@+id/search"
         android:icon="@drawable/ic_search_white"
-        android:title="@string/action_search"
+        android:title="@string/search_title"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
 
@@ -15,7 +15,7 @@
     <item
         android:icon="@drawable/ic_ilias_logo_white_48dp"
         android:onClick="openIlias"
-        android:title="@string/action_open_ilias"
+        android:title="@string/main_activity_toolbar_action_open_ilias"
         app:showAsAction="always" />
 
     <!-- Icon (if room) - open C@mpus -->
@@ -23,55 +23,60 @@
         android:id="@+id/campus_icon"
         android:icon="@drawable/ic_campus_logo_48dp"
         android:onClick="openCampus"
-        android:title="@string/action_open_campus"
+        android:title="@string/main_activity_toolbar_action_open_campus"
         app:showAsAction="ifRoom" />
 
     <!-- Other options behind the three dots -->
-
-    <item
-        android:icon="@drawable/ic_main_activity_menu_item_setup_black"
-        android:onClick="menuOpenSetupActivity"
-        android:title="@string/action_setup"
-        app:showAsAction="never" />
-
     <item
         android:icon="@drawable/ic_about_black"
         android:onClick="menuOpenAboutActivity"
-        android:title="@string/action_about"
-        app:showAsAction="never" />
-
-    <item
-        android:icon="@drawable/ic_settings_black"
-        android:onClick="openSettings"
-        android:title="@string/action_settings"
+        android:title="@string/main_activity_toolbar_options_action_about"
         app:showAsAction="never" />
 
     <item
         android:icon="@drawable/ic_developer_black"
-        android:title="@string/sub_menu_developer_options"
+        android:title="@string/main_activity_toolbar_options_action_developer_options"
         app:showAsAction="never">
+
+        <!-- Developer options behind the "Developer options" item -->
         <menu>
             <item
                 android:onClick="menuDevOptionShowLastResponse"
-                android:title="@string/menuDevOptionShowLastResponse"
+                android:title="@string/main_activity_toolbar_action_dev_show_last_response"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionCleanList"
-                android:title="@string/menuDevOptionCleanList"
+                android:title="@string/main_activity_toolbar_action_dev_clear_list"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionCleanFirstElement"
-                android:title="@string/menuDevOptionCleanFirstElement"
+                android:title="@string/main_activity_toolbar_action_dev_clear_first_element"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionExampleNotification"
-                android:title="@string/menuDevOptionExampleNotification"
+                android:title="@string/main_activity_toolbar_action_dev_example_notification_single"
+                app:showAsAction="never" />
+            <item
+                android:onClick="menuDevOptionExampleNotifications"
+                android:title="@string/main_activity_toolbar_action_dev_example_notification_multiple"
                 app:showAsAction="never" />
             <item
                 android:onClick="menuDevOptionSetFirstLaunch"
-                android:title="@string/menuDevOptionSetFirstLaunch"
+                android:title="@string/main_activity_toolbar_action_dev_reset_to_first_launch"
                 app:showAsAction="never" />
         </menu>
     </item>
+
+    <item
+        android:icon="@drawable/ic_settings_black"
+        android:onClick="openSettings"
+        android:title="@string/main_activity_toolbar_options_action_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:icon="@drawable/ic_main_activity_menu_item_setup_black"
+        android:onClick="menuOpenSetupActivity"
+        android:title="@string/main_activity_toolbar_options_action_setup"
+        app:showAsAction="never" />
 
 </menu>

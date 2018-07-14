@@ -23,22 +23,23 @@ public class AboutActivity extends AppCompatActivity {
                 .isRTL(false)
                 .setDescription(getString(R.string.about_app_description))
                 .addItem(new Element().setTitle(getString(R.string.word_version) + " " + BuildConfig.VERSION_NAME))
-                .addItem(new Element().setTitle(getString(R.string.word_license)).setOnClickListener(view -> {
-                    AlertDialog alertDialog = new AlertDialog.Builder(AboutActivity.this)
-                            .setTitle(getString(R.string.word_license))
-                            .setMessage(getString(R.string.about_app_license))
-                            .setNeutralButton(getString(R.string.word_back),
-                                    (dialog, which) -> dialog.dismiss())
-                            .create();
-                    alertDialog.show();
-                }))
-                .addItem(new Element().setTitle(getString(R.string.word_open_source_licenses)).setOnClickListener(view -> {
-                    OssLicensesMenuActivity.setActivityTitle(getString(R.string.word_open_source_licenses));
-                    startActivity(new Intent(AboutActivity.this, OssLicensesMenuActivity.class));
-                }))
-                .addWebsite(getString(R.string.url_ilias_buddy_repository), getString(R.string.url_ilias_buddy_repository_title))
+                .addItem(new Element().setTitle(getString(R.string.word_license)).setOnClickListener(
+                        view -> new AlertDialog.Builder(AboutActivity.this)
+                                .setTitle(getString(R.string.word_license))
+                                .setMessage(getString(R.string.about_app_license))
+                                .setNeutralButton(getString(R.string.dialog_back),
+                                        (dialog, which) -> dialog.dismiss())
+                                .create().show()))
+                .addItem(new Element().setTitle(getString(R.string.word_open_source_licenses)).setOnClickListener(
+                        view -> {
+                            OssLicensesMenuActivity.setActivityTitle(getString(R.string.word_open_source_licenses));
+                            startActivity(new Intent(AboutActivity.this,
+                                    OssLicensesMenuActivity.class));
+                        }))
+                .addWebsite("https://github.com/AnonymerNiklasistanonym/IliasBuddy",
+                        getString(R.string.url_ilias_buddy_repository_title))
                 //.addPlayStore("com.ideashower.readitlater.pro") // later
-                .addGitHub(getString(R.string.author_github_user_name), getString(R.string.author_github_user_name_title))
+                .addGitHub("AnonymerNiklasistanonym", getString(R.string.author_github_user_name_title))
                 .create();
 
         setContentView(aboutPage);

@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/slide_title"
-            android:text="@string/slide_3_title"
+            android:text="@string/welcome_activity_slide_3_title"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="@dimen/slide_title"
@@ -27,7 +27,7 @@
             android:layout_height="@dimen/img_width_height_2"
             android:layout_marginBottom="15dp"
             android:layout_marginTop="15dp"
-            android:contentDescription="@string/slide_3_picture_desc"
+            android:contentDescription="@string/welcome_activity_slide_3_picture_description"
             android:src="@drawable/ic_slide_3" />
 
         <TextView
@@ -36,7 +36,7 @@
             android:layout_marginTop="20dp"
             android:paddingLeft="@dimen/desc_padding"
             android:paddingRight="@dimen/desc_padding"
-            android:text="@string/slide_3_desc"
+            android:text="@string/welcome_activity_slide_3_description"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="@dimen/slide_desc" />

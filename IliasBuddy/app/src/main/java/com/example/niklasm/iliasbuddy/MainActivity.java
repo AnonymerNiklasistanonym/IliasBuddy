@@ -25,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
@@ -57,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface,
         IliasRssItemListAdapterInterface {
 
+    public static final String ERROR_MESSAGE_WEB_TITLE = "ERROR_MESSAGE_WEB_TITLE";
+    public static final String ERROR_MESSAGE_WEB_MESSAGE = "ERROR_MESSAGE_WEB_MESSAGE";
     private BroadcastReceiver broadcastReceiver;
     private LocalBroadcastManager broadcastManager;
     private RecyclerView rssEntryRecyclerView;
@@ -122,15 +123,11 @@ public class MainActivity extends AppCompatActivity implements
                             .NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
                     final String BIG_STRING = intent.getStringExtra(BackgroundIntentService
                             .NOTIFICATION_INTENT_EXTRA_BIG_STRING);
-                    Log.d("MainActivity", "BroadcastReceiver > FOUND_A_NEW_ENTRY\n" +
-                            ">> BIG_STRING: " + BIG_STRING + "\n" +
-                            ">> MESSAGE_COUNT: " + MESSAGE_COUNT + "\n" +
-                            ">> PREVIEW_STRING: " + PREVIEW_STRING);
 
                     // create snack bar message that refreshes feed on action click
                     newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
                             Snackbar.LENGTH_INDEFINITE)
-                            .setAction(R.string.word_refresh, view -> checkForRssUpdates());
+                            .setAction(R.string.main_activity_floating_button_tooltip_refresh, view -> checkForRssUpdates());
                     newEntriesMessage.show();
                 }
             }
@@ -204,12 +201,20 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionExampleNotification(final MenuItem menuItem) {
         BackgroundServiceNewEntriesNotification.show(this, "titleString",
-                "previewString", "bigString",
+                "previewString (single demo)", "bigString",
+                new String[]{"one"},
+                new Intent(this, MainActivity.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 1,
+                "https://ilias3.uni-stuttgart.de");
+    }
+
+    public void menuDevOptionExampleNotifications(final MenuItem item) {
+        BackgroundServiceNewEntriesNotification.show(this, "titleString",
+                "previewString (multiple demo)", "bigString",
                 new String[]{"one", "two", "three"},
                 new Intent(this, MainActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                        .putExtra("TestKey", "testValue"), 42,
-                "https://ilias3.uni-stuttgart.de");
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 3,
+                null);
     }
 
     @Override
@@ -260,15 +265,13 @@ public class MainActivity extends AppCompatActivity implements
     public void webAuthenticationError(final AuthFailureError error) {
         Log.e("MainActivity - AuthErr", error.toString());
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
-        Toast.makeText(this, "Authentication error", Toast.LENGTH_SHORT).show();
-        menuOpenSetupActivity(null);
+        openSetupActivity(R.string.dialog_authentication_error, error.toString());
     }
 
     @Override
     public void webResponseError(final VolleyError error) {
         Log.e("MainActivity - RespErr", error.toString());
-        errorSnackBar("Response Error", error.toString());
-        menuOpenSetupActivity(null);
+        openSetupActivity(R.string.dialog_response_error, error.toString());
     }
 
     public void openSettings(final MenuItem menuItem) {
@@ -280,14 +283,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void noNewEntryFound() {
-        Log.i("MainActivity", "noNewEntryFound (SnackBar)");
-        Snackbar.make(findViewById(R.id.fab), "No new entry found",
+        Snackbar.make(findViewById(R.id.fab), R.string.dialog_no_new_entry_found,
                 Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+    }
+
+    public void errorSnackBar(final int resId, final String message) {
+        errorSnackBar(getString(resId), message);
     }
 
     public void errorSnackBar(final String title, final String message) {
@@ -341,7 +347,19 @@ public class MainActivity extends AppCompatActivity implements
      * Open activity 'Setup' in which the user can enter the RSS feed URL and his credentials
      */
     private void openSetupActivity() {
-        startActivity(new Intent(this, SetupActivity.class));
+        openSetupActivity(-1, null);
+    }
+
+    /**
+     * Open activity 'Setup' in which the user can enter the RSS feed URL and his credentials
+     */
+    private void openSetupActivity(final int errorTitle, final String errorMessage) {
+        final Intent intent = new Intent(this, SetupActivity.class);
+        if (errorTitle != -1 && errorMessage != null) {
+            intent.putExtra(MainActivity.ERROR_MESSAGE_WEB_TITLE, getString(errorTitle))
+                    .putExtra(MainActivity.ERROR_MESSAGE_WEB_MESSAGE, errorMessage);
+        }
+        startActivity(intent);
     }
 
     public void menuDevOptionCleanList(final MenuItem menuItem) {
@@ -357,8 +375,8 @@ public class MainActivity extends AppCompatActivity implements
             iliasRssFeedCacheManager.setCache(new IliasRssItem[0]);
             // clear latest item and latest notification from preferences
             PreferenceManager.getDefaultSharedPreferences(this).edit()
-                    .putString(getString(R.string.latestItem), "")
-                    .putString(getString(R.string.lastNotification), "").apply();
+                    .putString(BackgroundIntentService.LATEST_ELEMENT, "")
+                    .putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, "").apply();
             // set latestRssEntry to null
             latestRssEntry = null;
             // render empty list to override the current one
@@ -372,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements
     public void renderNewList(final IliasRssItem[] NEW_ILIAS_RSS_FEED_ENTRIES) {
         // save latest element of new data set in preferences
         PreferenceManager.getDefaultSharedPreferences(this).edit()
-                .putString(getString(R.string.latestItem),
+                .putString(BackgroundIntentService.LATEST_ELEMENT,
                         NEW_ILIAS_RSS_FEED_ENTRIES.length > 0 ?
                                 NEW_ILIAS_RSS_FEED_ENTRIES[0].toString() : "").apply();
         // set new cache
@@ -417,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements
                 .setTitle("Last response")
                 .setMessage((lastResponse != null) ? lastResponse : "NO RESPONSE UNTIL NOW")
                 .setCancelable(true)
-                .setNeutralButton(getString(R.string.go_back), (dialog1, id) -> dialog1.cancel())
+                .setNeutralButton(getString(R.string.dialog_back), (dialog1, id) -> dialog1.cancel())
                 .show();
         // make alert dialog text (response) selectable
         final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView()
@@ -506,6 +524,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionSetFirstLaunch(final MenuItem item) {
         WelcomeActivity.setFirstTimeLaunch(this, true);
+        startActivity(new Intent(this, WelcomeActivity.class));
     }
 
     public void menuDevOptionCleanFirstElement(final MenuItem item) {
@@ -522,7 +541,7 @@ public class MainActivity extends AppCompatActivity implements
                 latestRssEntry = CURRENT_ILIAS_ENTRIES_2[0];
                 // clear latest item and latest notification from preferences
                 PreferenceManager.getDefaultSharedPreferences(this).edit()
-                        .putString(getString(R.string.latestItem),
+                        .putString(BackgroundIntentService.LATEST_ELEMENT,
                                 CURRENT_ILIAS_ENTRIES_2[0].toString()).apply();
                 // render empty list to override the current one
                 renderNewList(CURRENT_ILIAS_ENTRIES_2);

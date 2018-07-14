@@ -62,7 +62,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
             // using RingtoneManager.
             if (TextUtils.isEmpty(stringValue)) {
                 // Empty values correspond to 'silent' (no ringtone).
-                preference.setSummary(R.string.pref_ringtone_silent);
+                preference.setSummary(R.string.settings_activity_pref_notifications_notification_sound_notification_silent);
 
             } else {
                 Ringtone ringtone = RingtoneManager.getRingtone(

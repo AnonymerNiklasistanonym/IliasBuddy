@@ -62,7 +62,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     .setCancelable(true)
                     .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
                             (dialog1, id) -> ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink()))
-                    .setNegativeButton(CONTEXT.getString(R.string.go_back),
+                    .setNegativeButton(CONTEXT.getString(R.string.dialog_back),
                             (dialog12, id) -> dialog12.cancel())
                     .show();
             final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView().findViewById(android.R.id.message);
@@ -146,7 +146,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         }
 
         if ((description == null || description.equals("")) && CURRENT_ENTRY.getTitleExtra() != null) {
-            holder.titleExtra.setText(CONTEXT.getResources().getString(R.string.new_file));
+            holder.titleExtra.setText(CURRENT_ENTRY.getTitle());
             holder.title.setText(CURRENT_ENTRY.getTitleExtra());
             holder.titleExtraCard.setCardBackgroundColor(
                     ContextCompat.getColor(CONTEXT, android.R.color.holo_red_dark));

@@ -1,55 +1,53 @@
 <resources>
-    <!-- Strings related to main activity -->
-    <string name="app_name">IliasBuddy</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_open_ilias">Open Ilias</string>
-    <string name="action_open_campus">Open C@mpus</string>
-    <string name="action_setup">Setup</string>
-    <string name="menuDevOptionShowLastResponse">Show last server response</string>
+
+    <!-- Main activity -->
+    <string name="app_name" translatable="false">IliasBuddy</string>
+    <!-- Main activity: Toolbar -->
+    <string name="main_activity_toolbar_action_open_ilias">Open Ilias</string>
+    <string name="main_activity_toolbar_action_open_campus">Open C@mpus</string>
+    <string name="main_activity_toolbar_options_action_about">About</string>
+    <string name="main_activity_toolbar_options_action_developer_options">Developer options</string>
+    <string name="main_activity_toolbar_options_action_settings" translatable="false">@string/settings_activity_toolbar_title</string>
+    <string name="main_activity_toolbar_options_action_setup" translatable="false">@string/setup_activity_toolbar_title</string>
+    <string name="main_activity_floating_button_tooltip_refresh">Refresh</string>
+    <!-- Main activity: Toolbar: DevOptions -->
+    <string name="main_activity_toolbar_action_dev_show_last_response">Show last server response</string>
+    <string name="main_activity_toolbar_action_dev_clear_list">Clear list</string>
+    <string name="main_activity_toolbar_action_dev_clear_first_element">Remove first element</string>
+    <string name="main_activity_toolbar_action_dev_example_notification_single">Example notification (single)</string>
+    <string name="main_activity_toolbar_action_dev_example_notification_multiple">Example notification (multiple)</string>
+    <string name="main_activity_toolbar_action_dev_reset_to_first_launch">Reset to first launch</string>
+    <!-- Main activity: Ilias entries -->
     <string name="open_in_ilias">Open in Ilias</string>
-    <string name="go_back">Go back</string>
-    <string name="action_start_intent_service">Start intent service (beta)</string>
-    <string name="action_start_service">(Re-)Start service (beta)</string>
-    <string name="action_stop_service">Stop service</string>
-    <string name="latestItem">LATEST_ELEMENT</string>
-    <string name="menuDevOptionCleanList">Remove all list elements</string>
-    <string name="render_new_elements">GET_NEW_ELEMENTS</string>
-    <string name="lastNotification">LAST_NOTIFICATION_TEXT</string>
 
-    <!-- Strings related to setup activity -->
-    <string name="ilias_connection_setup">Setup Ilias RSS connection</string>
-    <string name="rss_url">Ilias private RSS URL</string>
-    <string name="rss_user_name">Ilias private RSS user name</string>
-    <string name="rss_password">Ilias private RSS password</string>
-    <string name="action_sign_in">Apply</string>
-    <string name="action_help">Instructions on how to setup private RSS feed</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="help_instructions">Help/Instructions</string>
-
-    <!-- Strings used in preferences -->
-    <string name="ilias_url">ilias_url</string>
-    <string name="ilias_user_name">ilias_user_name</string>
-    <string name="ilias_password">ilias_password</string>
-    <string name="title_activity_settings">Settings</string>
-
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string-array name="pref_sync_frequency_titles">
-        <item>every minute</item>
-        <item>every 2 minutes</item>
-        <item>every 5 minutes</item>
-        <item>every 10 minutes</item>
-        <item>every 30 minutes</item>
-        <item>every hour</item>
-        <item>every 2 hours</item>
-        <item>every 6 hours</item>
-        <item>every 12 hours</item>
-        <item>every day</item>
+    <!-- Settings activity -->
+    <string name="settings_activity_toolbar_title">Settings</string>
+    <!-- Settings activity: General settings -->
+    <string name="settings_activity_pref_general_header">General</string>
+    <string name="settings_activity_pref_general_header_summary">General settings</string>
+    <!-- Settings activity: General settings: Entries -->
+    <string name="settings_activity_pref_general_display_campus_shortcut">Display C@mpus shortcut</string>
+    <string name="settings_activity_pref_general_display_campus_shortcut_description">Show icon in the action bar next to the icon of the Ilias shortcut</string>
+    <!-- Settings activity: Notification settings -->
+    <string name="settings_activity_pref_notifications_header">Notifications</string>
+    <string name="settings_activity_pref_notifications_header_summary">Set background service, notification options, update frequency and more</string>
+    <!-- Settings activity: Notification settings: Entries -->
+    <string name="settings_activity_pref_notifications_background_notifications">Background notifications</string>
+    <string name="settings_activity_pref_notifications_background_notifications_summary">A service in the background will look in the specified frequency for private Ilias RSS feed updates which will trigger a notification</string>
+    <string name="settings_activity_pref_notifications_frequency">Frequency of background checks</string>
+    <string-array name="settings_activity_pref_notifications_frequency_titles">
+        <item>Every minute</item>
+        <item>Every 2 minutes</item>
+        <item>Every 5 minutes</item>
+        <item>Every 10 minutes</item>
+        <item>Every 30 minutes</item>
+        <item>Every hour</item>
+        <item>Every 2 hours</item>
+        <item>Every 6 hours</item>
+        <item>Every 12 hours</item>
+        <item>Every day</item>
     </string-array>
-    <string-array name="pref_sync_frequency_values">
+    <string-array name="settings_activity_pref_notifications_frequency_values">
         <item>1</item>
         <item>2</item>
         <item>5</item>
@@ -61,73 +59,56 @@
         <item>720</item>
         <item>1440</item>
     </string-array>
+    <string name="settings_activity_pref_notifications_background_notifications_on_boot">Start background checks on boot</string>
+    <string name="settings_activity_pref_notifications_background_notifications_on_boot_summary">Background service will be started on boot/reboot of the device</string>
+    <string name="settings_activity_pref_notifications_notification_sound">Sound on new notification</string>
+    <string name="settings_activity_pref_notifications_notification_sound_notification_silent">Silent</string>
+    <string name="settings_activity_pref_notifications_notification_vibration">Vibrate on new notification</string>
+    <string name="settings_activity_pref_notifications_notification_vibration_summary">The notification vibrates</string>
 
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
+    <!-- Setup activity -->
+    <string name="setup_activity_toolbar_title">Setup Ilias connection</string>
+    <string name="setup_activity_toolbar_action_help_instructions">Help/Instructions</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_url">Private RSS feed URL</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_user_name">Private RSS feed user name</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_password">Private RSS feed password</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_url_is_invalid_message">Private Ilias RSS URL is not a valid URL</string>
+    <string name="setup_activity_floating_button_tooltip_complete_setup">Complete setup</string>
 
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
+    <!-- Welcome activity -->
+    <string name="welcome_activity_button_right_next">NEXT</string>
+    <string name="welcome_activity_button_left_skip">SKIP</string>
+    <string name="welcome_activity_button_right_got_it">GOT IT</string>
+    <string name="welcome_activity_slide_1_title">Welcome to the IliasBuddy app :)</string>
+    <string name="welcome_activity_slide_1_description">Swipe left or click <i>NEXT</i> to learn more about this app or start instantly by clicking <i>SKIP</i></string>
+    <string name="welcome_activity_slide_2_title">How the app works</string>
+    <string name="welcome_activity_slide_2_description">After you enter your <b><i>private Ilias RSS feed-</i></b> URL, user name and password (<u><b>not your normal Ilias password!!!</b></u>) the app checks this feed regularly for you</string>
+    <string name="welcome_activity_slide_3_title">Features</string>
+    <string name="welcome_activity_slide_3_description">If a new entry was found the app shows you a notification - you can change vibration, sound and other features always in the settings</string>
+    <string name="welcome_activity_slide_1_picture_description">Ilias® logo which (white rectangle with transparent Ilias® text at the bottom left) is used on the IliasBuddy app logo</string>
+    <string name="welcome_activity_slide_3_picture_description">Phone that vibrates and has a speech bubble coming from it\'s center which contains a sound symbol</string>
+    <string name="welcome_activity_slide_2_picture_description">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
 
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-    <string name="pref_title_background_notifications">Background notifications</string>
-    <string name="pref_title_notification_sound">Notification sound</string>
-    <string name="pref_ringtone_silent">Silent</string>
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="pref_title_frequency">Frequency of background checks</string>
-
-    <string name="action_about">About</string>
-
-    <string name="nothing_found">nothing_found</string>
-    <string name="new_file">New file</string>
-
-
-    <string name="next">NEXT</string>
-    <string name="skip">SKIP</string>
-    <string name="start">GOT IT</string>
-    <string name="slide_1_title">Welcome to the IliasBuddy app :)</string>
-    <string name="slide_1_desc">Swipe or click NEXT to learn more or start instantly by clicking SKIP</string>
-    <string name="slide_2_title">How the app works</string>
-    <string name="slide_2_desc">After you enter your private Ilias feed URL, user name and password (not your normal Ilias password!) the app checks this feed and extracts all the information</string>
-    <string name="slide_3_title">Features</string>
-    <string name="slide_3_desc">The app can check the feed frequently in the background, can show you notifications if it finds new entries and many more things - toggle and change the features in the settings</string>
-    <string name="about_app_description">App description</string>
+    <!-- About activity -->
+    <string name="about_app_description">This open source app downloads with your private Ilias RSS feed credentials your private Ilias RSS feed. It displays it for once in a list and can also if enabled check itself if there a new RSS entries and push notifications to notify you too.</string>
     <string name="word_version">Version</string>
     <string name="word_license">License</string>
-    <string name="about_app_license">MIT License\n\nCopyright © 2018 Niklas\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
-    <string name="word_back">BACK</string>
-    <string name="word_ok">OK</string>
+    <string name="about_app_license" translatable="false">MIT License\n\nCopyright © 2018 Niklas\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
     <string name="word_open_source_licenses">Open source licenses</string>
-    <string name="url_ilias_buddy_repository">https://github.com/AnonymerNiklasistanonym/IliasBuddy</string>
     <string name="url_ilias_buddy_repository_title">Website with source code + bug tracker</string>
-    <string name="author_github_user_name">AnonymerNiklasistanonym</string>
     <string name="author_github_user_name_title">AnonymerNiklasistanonym on GitHub</string>
-    <string name="popup_help_html_content"><![CDATA[<p>To use this service you need to visit Ilias and click on the orange <b>RSS</b> button to get to the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias news feed</a>.</p><p>From there you need to copy the private feed url and replace the <b>password</b> with a password you set in the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias settings</a> (you get there by clicking the settings symbol at the top right of the same card you just clicked the orange RSS button.</p><p>Then insert the url in the first text field and your username (The name string in the url without any spaces) and your just set password and click the check button.</p>]]></string>
-    <string name="word_refresh">REFRESH</string>
-    <string name="send_intent">Send intent</string>
-    <string name="sub_menu_developer_options">Developer options</string>
-    <string name="menuDevOptionExampleNotification">Make example notification</string>
-    <string name="start_background_notifications_on_boot">Start on boot</string>
-    <string name="complete_setup">Complete setup</string>
-    <string name="menuDevOptionSetFirstLaunch">Reset to first launch</string>
-    <string name="slide_3_picture_desc">Phone that vibrates and has a speech bubble coming from it\'s center which contains a sound symbol</string>
-    <string name="slide_2_picture_desc">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
-    <string name="pref_title_enable_campus_shortcut">Show C@mpus shortcut</string>
-    <string name="pref_description_enable_campus_shortcut">Show icon in the action bar next to the Ilias shortcut/icon</string>
-    <string name="pref_summary_activate_background_notifications">A service in the background will look in the specified frequency for private Ilias RSS feed updates which will trigger a notification</string>
-    <string name="menuDevOptionCleanFirstElement">Remove first list element</string>
-    <string name="pref_header_summary_general">General settings</string>
-    <string name="pref_header_summary_notifications">Set background service, notification options, update frequency and more</string>
-    <string name="pref_summary_new_message_vibrate">The notification vibrates</string>
-    <string name="pref_summary_start_background_notifications_on_boot">Background service will be started on boot/reboot of the device</string>
-    <string name="action_search">Search for entries</string>
-    <string name="search">Search hint</string>
+
+    <!-- Dialog -->
+    <string name="dialog_response_error">Web response error</string>
+    <string name="dialog_authentication_error">Authentication error</string>
+    <string name="dialog_back">BACK</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_more">MORE</string>
+    <string name="dialog_no_new_entry_found">No new entry found</string>
+
+    <!-- Search -->
+    <string name="search_title">Search for entries</string>
+    <string name="search_hint" translatable="false">@string/search_title</string>
+    <string name="setup_activity_toolbar_action_help_instructions_popup_html_content"><![CDATA[<p>To use this service you need to visit Ilias and click on the orange <b>RSS</b> button to get to the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias news feed</a>.</p><p>From there you need to copy the private feed url and replace the <b>password</b> with a password you set in the <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias settings</a> (you get there by clicking the settings symbol at the top right of the same card you just clicked the orange RSS button.</p><p>Then insert the url in the first text field and your username (The name string in the url without any spaces) and your just set password.</p><p>Now to complete the setup click the check button at the bottom right.</p>]]></string>
+
 </resources>

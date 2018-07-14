@@ -3,7 +3,7 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="enable_campus_shortcut"
-        android:summary="@string/pref_description_enable_campus_shortcut"
-        android:title="@string/pref_title_enable_campus_shortcut" />
-    
+        android:summary="@string/settings_activity_pref_general_display_campus_shortcut_description"
+        android:title="@string/settings_activity_pref_general_display_campus_shortcut" />
+
 </PreferenceScreen>

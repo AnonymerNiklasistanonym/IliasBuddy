@@ -28,7 +28,7 @@
                     android:id="@+id/url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/rss_url"
+                    android:hint="@string/setup_activity_input_ilias_private_rss_feed_url"
                     android:inputType="textWebEditText"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -43,7 +43,7 @@
                     android:id="@+id/userName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/rss_user_name"
+                    android:hint="@string/setup_activity_input_ilias_private_rss_feed_user_name"
                     android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -58,7 +58,7 @@
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/rss_password"
+                    android:hint="@string/setup_activity_input_ilias_private_rss_feed_password"
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:singleLine="true" />

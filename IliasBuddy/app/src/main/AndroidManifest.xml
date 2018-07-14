@@ -46,12 +46,12 @@
         <activity
             android:name=".SetupActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/ilias_connection_setup"
+            android:label="@string/setup_activity_toolbar_title"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
+            android:label="@string/settings_activity_toolbar_title"
             android:parentActivityName=".MainActivity" />
 
         <service

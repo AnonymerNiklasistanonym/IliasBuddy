@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_activity_toolbar_action_open_ilias">Öffne Ilias</string>
+    <string name="main_activity_toolbar_action_open_campus">Öffne C@mpus</string>
+    <string name="main_activity_toolbar_options_action_about">Über</string>
+    <string name="main_activity_toolbar_options_action_developer_options">Entwickleroptionen</string>
+    <string name="main_activity_floating_button_tooltip_refresh">Aktualisieren</string>
+    <string name="main_activity_toolbar_action_dev_show_last_response">Zeige letzte Antwort vom Server</string>
+    <string name="main_activity_toolbar_action_dev_clear_list">Lösche Liste</string>
+    <string name="main_activity_toolbar_action_dev_clear_first_element">Lösches erstes Element von Liste</string>
+    <string name="main_activity_toolbar_action_dev_example_notification_single">Beispielbenachrichtigung (eine)</string>
+    <string name="main_activity_toolbar_action_dev_example_notification_multiple">Beispielbenachrichtigung (mehrere)</string>
+    <string name="main_activity_toolbar_action_dev_reset_to_first_launch">Zurücksetzen auf ersten Start</string>
+    <string name="open_in_ilias">Öffne in Ilias</string>
+    <string name="settings_activity_toolbar_title">Einstellungen</string>
+    <string name="settings_activity_pref_general_header">Allgemeines</string>
+    <string name="settings_activity_pref_general_header_summary">Allgemeine Einstellungen</string>
+    <string name="settings_activity_pref_general_display_campus_shortcut">Zeige C@mpus Verknüpfung</string>
+    <string name="settings_activity_pref_general_display_campus_shortcut_description">Zeige Icon in der Actionbar neben dem Icon der Ilias Verknüpfung</string>
+    <string name="settings_activity_pref_notifications_header">Benachrichtigungen</string>
+    <string name="settings_activity_pref_notifications_header_summary">Hintergrunddienst, Benachrichtigungsoptionen, Aktualisierungshäufigkeit und mehr</string>
+    <string name="settings_activity_pref_notifications_background_notifications">Hintergrundbenachrichtigungsservice</string>
+    <string name="settings_activity_pref_notifications_frequency">Aktualisierungshäufigkeit</string>
+    <string name="settings_activity_pref_notifications_background_notifications_on_boot">Starte bei (Re-)Boot</string>
+    <string name="settings_activity_pref_notifications_background_notifications_summary">Ein Service welcher im Hintergrund mit der eingestellten Aktualisierungshäufigkeit den privaten Ilias RSS Feed nach neuen EInträgen untersucht welche eine Benachrichtigung auslösen</string>
+    <string name="settings_activity_pref_notifications_background_notifications_on_boot_summary">Hintergrunddienst wird bei (Re-)Boot des Geräts automatisch gestartet</string>
+    <string name="settings_activity_pref_notifications_notification_sound">Benachrichtigungston</string>
+    <string name="settings_activity_pref_notifications_notification_sound_notification_silent">Still</string>
+    <string name="settings_activity_pref_notifications_notification_vibration">Vibriere bei neuer Benachrichtigung</string>
+    <string name="settings_activity_pref_notifications_notification_vibration_summary">Das Gerät vibriert wenn eine neue Benachrichtigung erstellt wird</string>
+    <string name="setup_activity_toolbar_title">Einrichtung der Iliasverbindung</string>
+    <string name="setup_activity_toolbar_action_help_instructions">Hilfe/Anleitung</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_url">Private RSS Feed URL</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_user_name">Privater RSS Feed Benutzername</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_password">Privates RSS Feed Passwort</string>
+    <string name="setup_activity_input_ilias_private_rss_feed_url_is_invalid_message">Private Ilias RSS Feed URL ist keine ungültig URL</string>
+    <string name="setup_activity_floating_button_tooltip_complete_setup">Verfollständige die Einrichtung</string>
+    <string name="welcome_activity_button_right_next">WEITER</string>
+    <string name="welcome_activity_button_left_skip">ÜBERSPRINGEN</string>
+    <string name="welcome_activity_button_right_got_it">VERSTANDEN</string>
+    <string name="welcome_activity_slide_1_title">Willkommen zur IliasBuddy app :)</string>
+    <string name="welcome_activity_slide_1_description">Wische links oder klicke <i>WEITER</i> um mehr über diese App zu erfahren oder starte sofort indem du <i>ÜBERSPRINGEN</i> klickst</string>
+    <string name="welcome_activity_slide_2_title">So funktioniert die App</string>
+    <string name="welcome_activity_slide_3_title">Funktionen</string>
+    <string name="welcome_activity_slide_2_description">Nachdem du die URL, den Benutzername und das Passwort deines <b><i>privaten Ilias RSS Feeds</i></b> eingegeben hast (<u><b>Nicht das normale Ilias Passwort!!!</b></u>) überprüft die App regelmäßig den Feed im Hintergrund</string>
+    <string name="welcome_activity_slide_3_description">Wenn ein neuer Eintrag gefunden worden ist bekommst du von der App eine Benachrichtigung - Du kannst Vibration/Ton und Anderes jderzeit in den Einstellungen ändern</string>
+    <string name="welcome_activity_slide_1_picture_description">Das Ilias® Logo (weißes Rechteck mit transparentem Ilias® Schriftzug unten links) welches auf dem IliasBuddy App Logo benutzt wird</string>
+    <string name="welcome_activity_slide_3_picture_description">Smartphone das vibriert und eine Sprechblase aus der Mitte des Displays kommen hat welche ein \"Ton an\" Symbol enthält</string>
+    <string name="welcome_activity_slide_2_picture_description">Smartphone welches auf seinem Display in der oberen Hälfte ein RSS Symbol hat und auf der unteren Hälfte einen Download Pfeil der nach unten zeigt hat</string>
+    <string name="about_app_description">Diese Open Source (Quelloffene) App lädt mit deinen privaten Ilias RSS Feed Anmeldeinformationen deinen privaten Ilias RSS Feed herunter. Sie zeigt einmal die Einträge des Feeds in einer Liste an und kann zudem wenn es aktiviert ist selber im Hintergund nach Aktualisierungen des Feeds schauen und wenn sie welche findet dich durch Benachrichtigungen auch darauf hinweisen.</string>
+    <string name="word_version">Version</string>
+    <string name="word_license">Lizenz</string>
+    <string name="word_open_source_licenses">Open Source Lizenzen</string>
+    <string name="url_ilias_buddy_repository_title">Webseite mit Quellcode und Fehlerverfolgungssystem</string>
+    <string name="author_github_user_name_title">AnonymerNiklasistanonym auf GitHub</string>
+    <string name="dialog_response_error">Internetantwortfehler</string>
+    <string name="dialog_authentication_error">Authentifizierungsfehler</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_more">MEHR</string>
+    <string name="dialog_no_new_entry_found">Kein neuer Eintrag gefunden</string>
+    <string name="search_title">Suche nach Einträgen</string>
+    <string name="setup_activity_toolbar_action_help_instructions_popup_html_content"><![CDATA[<p>Um diesen Service nutzen zu können musst du die Ilias Webseite besuchen und auf den orangenen <b>RSS</b> Knopf drücken um auf die <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=showFeedUrl&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias Neuigkeiten Newsfeed Webseite</a> zu kommen.</p><p>Von dort aus musst du die URL deines privaten Newsfeeds kopieren und das <b>password</b> mit dem Passwort welches du auf der <a href=\'https://ilias3.uni-stuttgart.de/ilias.php?view=0&col_side=right&block_type=pdnews&cmd=editSettings&cmdClass=ilpdnewsblockgui&cmdNode=sh:6b:rv&baseClass=ilPersonalDesktopGUI#il_mhead_t_focus\'>Ilias EINSTELLUNGEN FÜR PRIVATEN NEWSFEED Webseite</a> gesetzt hattest (du kannst dort auch selber hinkommen indem du das Einstellungsrädchen des Neuigkeitenfeeds mit dem orangenen RSS Knopf oben rechts drückst und dann auf Einstellungen drückst).</p><p>Dann füge die URL im ersten Textfeld ein und deinen Benutzername (die Zeichenfolge in der URL am Anfang ohne Leerzeichen) und dein gerade erst gesetztes Passwort in den Folgenden.</p><p>Letztendlich bestätige alles mit einem Klick auf den Haken auf dem Knopf unten rechts.</p>]]></string>
+    <string name="dialog_back">ZURÜCK</string>
+    <string-array name="settings_activity_pref_notifications_frequency_titles">
+        <item>Jede Minute</item>
+        <item>Alle 2 Minuten</item>
+        <item>Alle 5 Minuten</item>
+        <item>Alle 10 Minuten</item>
+        <item>Alle 30 Minuten</item>
+        <item>Jede Stunde</item>
+        <item>Alle 2 Stunden</item>
+        <item>Alle 6 Stunden</item>
+        <item>Alle 12 Stunde</item>
+        <item>Jeden Tag</item>
+    </string-array>
+</resources>

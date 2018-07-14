@@ -35,9 +35,13 @@ public class IliasBuddyNotificationHelper {
                                                           final String URL) {
 
         // get settings
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(CONTEXT);
-        final boolean VIBRATE = sharedPreferences.getBoolean("notifications_new_message_vibrate", true);
-        final String RINGTONE = sharedPreferences.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
+        final SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(CONTEXT);
+        final boolean VIBRATE = sharedPreferences
+                .getBoolean("notifications_new_message_vibrate", true);
+        final String RINGTONE = sharedPreferences
+                .getString("notifications_new_message_ringtone",
+                        "content://settings/system/notification_sound");
 
         // Create the TaskStackBuilder and add the intent, which inflates the back stack
         final TaskStackBuilder stackBuilder = TaskStackBuilder.create(CONTEXT);
@@ -63,7 +67,8 @@ public class IliasBuddyNotificationHelper {
 
         final NotificationCompat.Style NOTIFICATION_STYLE;
         if (CONTENT_TEXT_ARRAY.length > 1) {
-            final NotificationCompat.InboxStyle NOTIFICATION_STYLE_2 = new NotificationCompat.InboxStyle();
+            final NotificationCompat.InboxStyle NOTIFICATION_STYLE_2 =
+                    new NotificationCompat.InboxStyle();
             //.setBigContentTitle("Big content title")
             //.setSummaryText(MESSAGE_COUNT + "entries");
 
@@ -78,19 +83,22 @@ public class IliasBuddyNotificationHelper {
         }
 
         // build new entries notification
-        final NotificationCompat.Builder NOTIFICATION_BUILDER = new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
-                .setContentTitle(CONTENT_TITLE)
-                .setContentText(CONTENT_TEXT)
-                .setContentIntent(openAppPendingIntent)
-                .setSmallIcon(R.drawable.ic_ilias_logo_white_24dp)
-                .setPriority(Notification.PRIORITY_MAX)
-                .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
-                .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary), 3000, 3000)
-                .setVibrate((VIBRATE ? new long[]{1000, 1000, 1000, 1000, 1000} : new long[]{0})) // new long[]{0, 250, 250, 250}
-                .setStyle(NOTIFICATION_STYLE)
-                .setSound(Uri.parse(RINGTONE))
-                .setAutoCancel(true) // on click the notification does not disappear
-                .setNumber(MESSAGE_COUNT);
+        final NotificationCompat.Builder NOTIFICATION_BUILDER =
+                new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
+                        .setContentTitle(CONTENT_TITLE)
+                        .setContentText(CONTENT_TEXT)
+                        .setContentIntent(openAppPendingIntent)
+                        .setSmallIcon(R.drawable.ic_ilias_logo_white_24dp)
+                        .setPriority(Notification.PRIORITY_MAX)
+                        .setColor(ContextCompat.getColor(CONTEXT, R.color.colorPrimary))
+                        .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary),
+                                3000, 3000)
+                        .setVibrate((VIBRATE ? new long[]{1000, 1000, 1000, 1000, 1000}
+                                : new long[]{0})) // new long[]{0, 250, 250, 250}
+                        .setStyle(NOTIFICATION_STYLE)
+                        .setSound(Uri.parse(RINGTONE))
+                        .setAutoCancel(true) // on click the notification does not disappear
+                        .setNumber(MESSAGE_COUNT);
 
         if (VIBRATE) {
             NOTIFICATION_BUILDER.setDefaults(Notification.DEFAULT_VIBRATE);
@@ -153,7 +161,8 @@ public class IliasBuddyNotificationHelper {
                 .build();
     }
 
-    public static void showNotification(final Context CONTEXT, final int NOTIFICATION_ID, final Notification NOTIFICATION) {
+    public static void showNotification(final Context CONTEXT, final int NOTIFICATION_ID,
+                                        final Notification NOTIFICATION) {
         NotificationManagerCompat.from(CONTEXT).notify(NOTIFICATION_ID, NOTIFICATION);
     }
 

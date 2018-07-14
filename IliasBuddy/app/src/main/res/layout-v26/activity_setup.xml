@@ -31,8 +31,8 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
         android:focusable="true"
-        android:tooltipText="@string/complete_setup"
         android:src="@drawable/ic_setup_check_white"
+        android:tooltipText="@string/setup_activity_floating_button_tooltip_complete_setup"
         app:rippleColor="@color/colorPrimaryLight" />
 
 

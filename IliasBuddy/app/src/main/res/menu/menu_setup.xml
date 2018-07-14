@@ -6,7 +6,7 @@
     <item
         android:icon="@drawable/ic_setup_help_white"
         android:onClick="openHelp"
-        android:title="@string/help_instructions"
+        android:title="@string/setup_activity_toolbar_action_help_instructions"
         app:showAsAction="ifRoom" />
 
 </menu>

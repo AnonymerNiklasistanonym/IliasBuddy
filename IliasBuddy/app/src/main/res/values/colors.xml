@@ -9,8 +9,7 @@
     <!-- Custom colors -->
     <color name="date">#999999</color>
     <color name="title">#222222</color>
-    <color name="recyclerViewLineColor">#bdbdbd</color>
-    <color name="colorNewEntry">#88ffd600</color>
+    <color name="colorNewEntry">#64ffd600</color>
 
     <!-- Slide introduction screen colors -->
     <color name="bg_slider_screen1">@color/colorPrimary</color>

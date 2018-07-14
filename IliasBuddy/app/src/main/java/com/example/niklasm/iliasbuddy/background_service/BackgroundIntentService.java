@@ -12,7 +12,6 @@ import android.util.Log;
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.MainActivity;
-import com.example.niklasm.iliasbuddy.R;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItem;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequester;
@@ -34,6 +33,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
     public final static String NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING = "previewString";
     public final static String NOTIFICATION_INTENT_EXTRA_BIG_STRING = "bigString";
     public static final String NOTIFICATION_INTENT_MESSAGE_COUNT = "only_one";
+    final public static String LAST_NOTIFICATION_TEXT = "LAST_NOTIFICATION_TEXT";
+    final public static String LATEST_ELEMENT = "LATEST_ELEMENT";
     private final static String LATEST_ITEM_NOT_FOUND = "nothing_found";
 
     @Override
@@ -61,7 +62,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         final SharedPreferences myPrefs =
                 android.preference.PreferenceManager.getDefaultSharedPreferences(this);
         final String latestItem =
-                myPrefs.getString(getString(R.string.lastNotification),
+                myPrefs.getString(BackgroundIntentService.LAST_NOTIFICATION_TEXT,
                         BackgroundIntentService.LATEST_ITEM_NOT_FOUND);
 
         if (!latestItem.equals(BackgroundIntentService.LATEST_ITEM_NOT_FOUND) && latestItem.equals(bigString)) {
@@ -74,7 +75,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         }
 
         // if new notification save the old String
-        myPrefs.edit().putString(getString(R.string.lastNotification), bigString).apply();
+        myPrefs.edit().putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, bigString).apply();
 
         final Intent ON_CLICK = new Intent(this, MainActivity.class)
                 .putExtra(IliasBuddyNotificationInterface.NEW_ENTRY_FOUND, true)
@@ -133,7 +134,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         // get latest item string form shared preferences
 
         final SharedPreferences myPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        final String latestItem = myPrefs.getString(getString(R.string.latestItem), null);
+        final String latestItem = myPrefs.getString(BackgroundIntentService.LATEST_ELEMENT, null);
 
         final IliasRssItem[] NEW_ENTRIES = getNewElements(myDataSet, latestItem);
 

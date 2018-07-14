@@ -184,13 +184,10 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     itemsFiltered = items;
                 } else {
                     final List<IliasRssItem> filteredList = new ArrayList<>();
-                    final String lowerCaseCharString = charString.toLowerCase();
                     // check which entries should be added to the filtered list
                     for (final IliasRssItem ENTRY : items) {
-                        Log.i("getFilter", "compare \"" + charString + "\" (" + lowerCaseCharString + ") to \"" + ENTRY.getCourse().toLowerCase() + "\"");
-
-                        if (ENTRY.getCourse().toLowerCase().contains(lowerCaseCharString)) {
-                            Log.i("getFilter", "added to List");
+                        if (ENTRY.containsIgnoreCase(charString, viewDateFormat, viewTimeFormat)) {
+                            Log.i("Adapterdebug", "entry added: " + ENTRY.toString());
                             filteredList.add(ENTRY);
                         }
                     }
@@ -251,7 +248,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         @Override
         public void onClick(final View view) {
             final int itemPosition = ADAPTER_INTERFACE.listAdapterGetRecyclerViewChildLayoutPosition(view);
-            IliasRssItemListAdapter.alertDialogRssFeedEntry(items.get(itemPosition), ADAPTER_INTERFACE, CONTEXT);
+            IliasRssItemListAdapter.alertDialogRssFeedEntry(itemsFiltered.get(itemPosition), ADAPTER_INTERFACE, CONTEXT);
         }
     }
 }

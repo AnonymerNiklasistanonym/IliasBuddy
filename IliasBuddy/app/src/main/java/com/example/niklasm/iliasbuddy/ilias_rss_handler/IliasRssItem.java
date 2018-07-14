@@ -148,4 +148,17 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         OUT.writeString(LINK);
         OUT.writeLong(DATE.getTime());
     }
+
+    public boolean containsIgnoreCase(final String QUERY, final SimpleDateFormat DATE_FORMAT, final SimpleDateFormat TIME_FORMAT) {
+        if (QUERY == null || QUERY.isEmpty()) {
+            return false;
+        } else {
+            final String LOWER_CASE_QUERY = QUERY.toLowerCase();
+            return ((COURSE.contains(LOWER_CASE_QUERY) || (EXTRA != null && EXTRA.contains(LOWER_CASE_QUERY)))
+                    || (TITLE_EXTRA != null && TITLE_EXTRA.contains(LOWER_CASE_QUERY)) || TITLE.contains(LOWER_CASE_QUERY))
+                    || ((DESCRIPTION.contains(LOWER_CASE_QUERY) || LINK.contains(LOWER_CASE_QUERY))
+                    || (DATE_FORMAT.format(DATE).contains(LOWER_CASE_QUERY)
+                    || TIME_FORMAT.format(DATE).contains(LOWER_CASE_QUERY)));
+        }
+    }
 }

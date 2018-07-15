@@ -73,19 +73,14 @@
         <item>Alle 12 Stunde</item>
         <item>Jeden Tag</item>
     </string-array>
-    <string-array name="settings_activity_pref_notifications_frequency_values">
-        <item>1</item>
-        <item>2</item>
-        <item>5</item>
-        <item>10</item>
-        <item>30</item>
-        <item>60</item>
-        <item>120</item>
-        <item>360</item>
-        <item>720</item>
-        <item>1440</item>
-    </string-array>
     <string name="main_activity_show_last_response_title">Letzte Antwort des Servers</string>
     <string name="main_activity_show_last_response_no_response">Keine aufgezeichnete Antwort gefunden</string>
     <string name="dialog_parse_error">Parse Error</string>
+    <string name="notification_background_service_is_active">HIntergrunddienst ist aktiv</string>
+    <string name="notification_channel_sticky_description">Zeigt nicht wegwischbare Benachrichtigung wenn der Hintergrunddienst aktiviert ist</string>
+    <string name="notification_channel_sticky_name">Nicht wegwischbare Benachrichtigung ist aktiv</string>
+    <string name="notification_channel_new_entries_new_ilias_entries">neue Ilias Beiträge!</string>
+    <string name="notification_channel_new_entries_one_new_ilias_entry">Ein neuer Ilias Beitrag!</string>
+    <string name="notification_channel_new_entries_name">Neue Ilias Beiträge Benachrichtigung</string>
+    <string name="notification_channel_new_entries_description">Zeigt Benachrichtigung wenn es neue Ilias Beiträge im RSS Feed gibt</string>
 </resources>

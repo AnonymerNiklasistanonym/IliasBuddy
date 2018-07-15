@@ -252,7 +252,8 @@ public class MainActivity extends AppCompatActivity implements
                     .replace("</rss>", "")
                     .getBytes(StandardCharsets.UTF_8)));
         } catch (XmlPullParserException | IOException | ParseException e) {
-            SetupActivity.errorSnackBar(this, findViewById(R.id.fab), getString(R.string.dialog_parse_error), e.toString());
+            SetupActivity.errorSnackBar(this, findViewById(R.id.fab),
+                    getString(R.string.dialog_parse_error), e.toString());
             e.printStackTrace();
             // at last stop refresh animation of swipe to refresh layout
             rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
@@ -413,7 +414,8 @@ public class MainActivity extends AppCompatActivity implements
         // show popup with last response
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.main_activity_show_last_response_title)
-                .setMessage((MainActivity.lastResponse != null) ? MainActivity.lastResponse : getString(R.string.main_activity_show_last_response_no_response))
+                .setMessage((MainActivity.lastResponse != null) ?
+                        MainActivity.lastResponse : getString(R.string.main_activity_show_last_response_no_response))
                 .setCancelable(true)
                 .setNeutralButton(getString(R.string.dialog_back), (dialog1, id) -> dialog1.cancel())
                 .show();

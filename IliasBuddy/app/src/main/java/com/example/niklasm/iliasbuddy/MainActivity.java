@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements
         // disable campus icon if the setting says so
         menu.findItem(R.id.campus_icon).setVisible(PreferenceManager
                 .getDefaultSharedPreferences(this)
-                .getBoolean("enable_campus_shortcut", true));
+                .getBoolean("enable_campus_shortcut", false));
         // enable Search view
         final SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);

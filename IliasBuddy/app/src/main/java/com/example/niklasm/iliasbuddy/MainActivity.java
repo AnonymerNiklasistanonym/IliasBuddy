@@ -19,6 +19,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssItemListAdapterI
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlParser;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequester;
 import com.example.niklasm.iliasbuddy.ilias_rss_handler.IliasRssXmlWebRequesterInterface;
+import com.example.niklasm.iliasbuddy.ilias_rss_handler.RecyclerItemTouchHelper;
 import com.example.niklasm.iliasbuddy.notifications.IliasBuddyNotificationInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -53,7 +55,8 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface,
-        IliasRssItemListAdapterInterface {
+        IliasRssItemListAdapterInterface,
+        RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
     public static final String ERROR_MESSAGE_WEB_TITLE = "ERROR_MESSAGE_WEB_TITLE";
     public static final String ERROR_MESSAGE_WEB_MESSAGE = "ERROR_MESSAGE_WEB_MESSAGE";
@@ -100,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements
         rssEntryRecyclerView.setItemAnimator(new DefaultItemAnimator());
         rssEntryRecyclerView.addItemDecoration(new IliasRssItemDecoration(this));
         rssEntryRecyclerView.setAdapter(mAdapter);
+        final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(rssEntryRecyclerView);
 
         // setup the swipe to refresh layout
         rssEntryRecyclerViewSwipeToRefreshLayout = findViewById(R.id.swipe_container);
@@ -530,6 +535,21 @@ public class MainActivity extends AppCompatActivity implements
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onSwiped(final RecyclerView.ViewHolder viewHolder, final int direction, final int position) {
+        if (viewHolder instanceof IliasRssItemListAdapter.ViewHolder) {
+            // get the removed item name to display it in snack bar
+            final IliasRssItem SELECTED_ITEM =
+                    mAdapter.getFilteredItems().get(viewHolder.getAdapterPosition());
+
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.main_activity_show_last_response_title)
+                    .setMessage(SELECTED_ITEM.toString())
+                    .setCancelable(true)
+                    .show();
         }
     }
 }

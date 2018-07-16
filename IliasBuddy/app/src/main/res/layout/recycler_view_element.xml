@@ -1,187 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/background"
+    <RelativeLayout
+        android:id="@+id/view_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fa315b">
+
+        <ImageView
+            android:id="@+id/delete_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:contentDescription="Save icon"
+            android:src="@drawable/ic_save_white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/delete_icon"
+            android:text="save"
+            android:textColor="#fff"
+            android:textSize="13sp" />
+
+    </RelativeLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/view_foreground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/row_padding_vertical"
-        android:paddingTop="@dimen/row_padding_vertical">
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical">
 
-        <!--
-        android:paddingBottom="@dimen/row_padding_vertical"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/row_padding_vertical"
-        -->
-
-        <!-- Title text view -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/row_padding_vertical"
-            android:paddingRight="@dimen/row_padding_vertical">
+            android:id="@+id/background"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/row_padding_vertical"
+            android:paddingTop="@dimen/row_padding_vertical">
 
-            <!-- Course text view -->
+            <!--
+            android:paddingBottom="@dimen/row_padding_vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/row_padding_vertical"
+            -->
 
-            <TextView
-                android:id="@+id/course"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingEnd="10dp"
-                android:paddingStart="0dp"
-                android:textColor="@color/title"
-                android:textSize="@dimen/recyclerViewFontSizeBig"
-                android:textStyle="bold"
-                tools:text="Math for Informatics" />
-
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:paddingBottom="2dp"
-                android:paddingTop="3dp"
-                android:textSize="@dimen/recyclerViewFontSizeNormal"
-                tools:text="I need help / filename.pdf" />
-
+            <!-- Title text view -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/row_padding_vertical"
+                android:paddingRight="@dimen/row_padding_vertical">
 
-                <android.support.v7.widget.CardView
-                    android:id="@+id/titleExtraCard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@android:color/holo_red_dark"
-                    card_view:cardCornerRadius="2dp"
-                    card_view:cardElevation="0dp"
-                    card_view:cardPreventCornerOverlap="false"
-                    card_view:cardUseCompatPadding="true"
-                    card_view:contentPadding="0dp">
-
-                    <TextView
-                        android:id="@+id/titleExtra"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:textColor="@android:color/white"
-                        tools:text="New file" />
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/extraCard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/colorPrimary"
-                    card_view:cardCornerRadius="2dp"
-                    card_view:cardElevation="0dp"
-                    card_view:cardPreventCornerOverlap="false"
-                    card_view:cardUseCompatPadding="true"
-                    card_view:contentPadding="0dp">
-
-                    <TextView
-                        android:id="@+id/extra"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:textColor="@android:color/white"
-                        tools:text="Forum / Slides" />
-
-
-                </android.support.v7.widget.CardView>
+                <!-- Course text view -->
 
                 <TextView
-                    android:id="@+id/description"
-                    android:layout_width="0dp"
+                    android:id="@+id/course"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:paddingEnd="5dp"
-                    android:paddingStart="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="0dp"
+                    android:textColor="@color/title"
+                    android:textSize="@dimen/recyclerViewFontSizeBig"
+                    android:textStyle="bold"
+                    tools:text="Math for Informatics" />
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:paddingBottom="2dp"
                     android:paddingTop="3dp"
                     android:textSize="@dimen/recyclerViewFontSizeNormal"
-                    android:textStyle="italic"
-                    tools:text="Description - Very long text that gets ellipsized when reaching the end of the parent" />
+                    tools:text="I need help / filename.pdf" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/titleExtraCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@android:color/holo_red_dark"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:cardElevation="0dp"
+                        card_view:cardPreventCornerOverlap="false"
+                        card_view:cardUseCompatPadding="true"
+                        card_view:contentPadding="0dp">
+
+                        <TextView
+                            android:id="@+id/titleExtra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:textColor="@android:color/white"
+                            tools:text="New file" />
+
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/extraCard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="@color/colorPrimary"
+                        card_view:cardCornerRadius="2dp"
+                        card_view:cardElevation="0dp"
+                        card_view:cardPreventCornerOverlap="false"
+                        card_view:cardUseCompatPadding="true"
+                        card_view:contentPadding="0dp">
+
+                        <TextView
+                            android:id="@+id/extra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:textColor="@android:color/white"
+                            tools:text="Forum / Slides" />
+
+
+                    </android.support.v7.widget.CardView>
+
+                    <TextView
+                        android:id="@+id/description"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:paddingEnd="5dp"
+                        android:paddingStart="5dp"
+                        android:paddingTop="3dp"
+                        android:textSize="@dimen/recyclerViewFontSizeNormal"
+                        android:textStyle="italic"
+                        tools:text="Description - Very long text that gets ellipsized when reaching the end of the parent" />
+
+
+                </LinearLayout>
+
+                <!-- Description text view -->
 
 
             </LinearLayout>
 
-            <!-- Description text view -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/row_padding_vertical"
+                android:paddingRight="@dimen/row_padding_vertical">
 
+                <!-- Date text view -->
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/date"
+                    android:textSize="@dimen/recyclerViewFontSizeDate"
+                    tools:text="13.04" />
+
+                <!-- Date text view -->
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textColor="@color/date"
+                    android:textSize="@dimen/recyclerViewFontSizeDate"
+                    tools:text="18:32" />
+
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/row_padding_vertical"
-            android:paddingRight="@dimen/row_padding_vertical">
-
-            <!-- Date text view -->
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textColor="@color/date"
-                android:textSize="@dimen/recyclerViewFontSizeDate"
-                tools:text="13.04" />
-
-            <!-- Date text view -->
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textColor="@color/date"
-                android:textSize="@dimen/recyclerViewFontSizeDate"
-                tools:text="18:32" />
+        <!-- <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#c0c0c0" /> -->
 
 
-        </LinearLayout>
+        <!-- Gray line below the row object
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/recyclerViewLineWidth"
+            android:background="@color/recyclerViewLineColor" />
+        -->
 
     </LinearLayout>
 
-    <!-- <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#c0c0c0" /> -->
-
-
-    <!-- Gray line below the row object
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/recyclerViewLineWidth"
-        android:background="@color/recyclerViewLineColor" />
-    -->
-
-</LinearLayout>
+</FrameLayout>

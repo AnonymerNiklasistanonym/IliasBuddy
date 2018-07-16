@@ -79,6 +79,10 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         }
     }
 
+    public List<IliasRssItem> getFilteredItems() {
+        return itemsFiltered;
+    }
+
     @Override
     @NonNull
     public IliasRssItemListAdapter.ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent,
@@ -238,6 +242,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         final public TextView course, title, date, time, description, extra, titleExtra;
         final public LinearLayout background;
         final public CardView extraCard, titleExtraCard;
+        final public View viewForeground, viewBackground;
 
         private ViewHolder(final View itemView) {
             super(itemView);
@@ -254,6 +259,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
             title = itemView.findViewById(R.id.title);
             titleExtra = itemView.findViewById(R.id.titleExtra);
             titleExtraCard = itemView.findViewById(R.id.titleExtraCard);
+            viewForeground = itemView.findViewById(R.id.view_foreground);
+            viewBackground = itemView.findViewById(R.id.view_background);
         }
 
         @Override

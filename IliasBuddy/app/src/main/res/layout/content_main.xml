@@ -17,6 +17,7 @@
             android:id="@+id/my_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="20dp"
+            android:scrollbars="vertical"
             app:layout_constraintBottom_toTopOf="parent" />
     </android.support.v4.widget.SwipeRefreshLayout>
 

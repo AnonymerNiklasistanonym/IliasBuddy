@@ -38,7 +38,7 @@ There are the following options:
 1. Read the code and understand that none of your credentials ever leave your device
 1. You still think that there is a possibility that the created installation file (`.apk`) has malicious code in it which abuses your credentials - Good on you for thinking about this and here is my solution: Don't trust me and build the `.apk` yourself which would mean you can read the source code and be after the build 100% sure that the app is in no way malicious or abuses your credentials.
 
-## How can I get the needed credentials for this application
+### How can I get the needed credentials for this app to access my private Ilias RSS feed
 You app need three things:
 - Private Ilias feed URL
 - Private Ilias feed user name

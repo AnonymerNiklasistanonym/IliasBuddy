@@ -18,7 +18,7 @@ You can then build it with gradle on an external device via USB-Debugging or run
       2. Enter a password for the key store path
       3. Enter key alias specifically for this app
       4. Enter another key password specifically for this app 
-      5. Enter your a name
+      5. Enter your name
       6. Select `OK`
    2. Otherwise select the `.jks` file vie `Choose existing...`
 3. Then click `Next` and select `release` as Build Type
@@ -34,12 +34,12 @@ This exist to be sure that nobody can take this code add malicious things and up
 
 ### You just want my Ilias credentials, how can I trust you
 There are the following options:
-1. The password and user name would only help me in reading your private RSS feed in which nothing like emails, feedbacks or results are contained and knowing your name - I would still not be able to access anything else than the feed on your Ilias account plus you could always change your feed URL through which I would loose any access
+1. The password and user name would only help me in reading your private RSS feed in which nothing like emails, feedbacks or results are contained and knowing your name - I would still not be able to access anything else than the feed on your Ilias account plus you could always change your feed URL through which I would lose any access
 1. Read the code and understand that none of your credentials ever leave your device
 1. You still think that there is a possibility that the created installation file (`.apk`) has malicious code in it which abuses your credentials - Good on you for thinking about this and here is my solution: Don't trust me and build the `.apk` yourself which would mean you can read the source code and be after the build 100% sure that the app is in no way malicious or abuses your credentials.
 
 ### How can I get the needed credentials for this app to access my private Ilias RSS feed
-You app need three things:
+You need three things:
 - Private Ilias feed URL
 - Private Ilias feed user name
 - Private Ilias feed password

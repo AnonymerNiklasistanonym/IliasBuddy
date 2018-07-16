@@ -95,6 +95,7 @@
     <!-- About activity -->
     <string name="about_app_description">This open source app downloads with your private Ilias RSS feed credentials your private Ilias RSS feed. It displays it for once in a list and can also if enabled check itself if there a new RSS entries and push notifications to notify you too.</string>
     <string name="word_version">Version</string>
+    <string name="word_check_for_new_version">Check for new version</string>
     <string name="word_license">License</string>
     <string name="about_app_license" translatable="false">MIT License\n\nCopyright © 2018 Niklas\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
     <string name="word_open_source_licenses">Open source licenses</string>
@@ -109,6 +110,14 @@
     <string name="dialog_ok">OK</string>
     <string name="dialog_more">MORE</string>
     <string name="dialog_no_new_entry_found">No new entry found</string>
+    <string name="dialog_volley_error">Web request error (VolleyError)</string>
+    <string name="dialog_json_exception">JSON parse error</string>
+    <string name="dialog_new_version_not_found">No new version found</string>
+    <string name="dialog_new_version_found">New Version found!</string>
+    <string name="dialog_current_version">Current version</string>
+    <string name="dialog_latest_version">Latest version</string>
+    <string name="dialog_new_version_already_installed">The newest version is already installed</string>
+    <string name="dialog_new_version_open_release_page">Open release page</string>
 
     <!-- Search -->
     <string name="search_title">Search for entries</string>

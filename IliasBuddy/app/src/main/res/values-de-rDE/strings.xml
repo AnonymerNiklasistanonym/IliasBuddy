@@ -83,4 +83,13 @@
     <string name="notification_channel_new_entries_one_new_ilias_entry">Ein neuer Ilias Beitrag!</string>
     <string name="notification_channel_new_entries_name">Neue Ilias Beiträge Benachrichtigung</string>
     <string name="notification_channel_new_entries_description">Zeigt Benachrichtigung wenn es neue Ilias Beiträge im RSS Feed gibt</string>
+    <string name="word_check_for_new_version">Suche nach neuster Version</string>
+    <string name="dialog_volley_error">Webanfragenfehler (VolleyError)</string>
+    <string name="dialog_json_exception">JSON Parsefehler</string>
+    <string name="dialog_new_version_not_found">Keine neue Version gefunden</string>
+    <string name="dialog_new_version_found">Neuere Version gefunden</string>
+    <string name="dialog_current_version">Aktuelle Version</string>
+    <string name="dialog_latest_version">Neuste Version</string>
+    <string name="dialog_new_version_already_installed">Die neuste Version ist bereits installiert</string>
+    <string name="dialog_new_version_open_release_page">Öffne Veröffentlichungswebseite</string>
 </resources>

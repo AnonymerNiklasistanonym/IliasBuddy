@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -20,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements
     public static final String ERROR_MESSAGE_WEB_TITLE = "ERROR_MESSAGE_WEB_TITLE";
     public static final String ERROR_MESSAGE_WEB_MESSAGE = "ERROR_MESSAGE_WEB_MESSAGE";
     private static String lastResponse;
+    private Layout layout;
     private BroadcastReceiver broadcastReceiver;
     private LocalBroadcastManager broadcastManager;
     private RecyclerView rssEntryRecyclerView;
@@ -73,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements
     private int currentDataSetLength;
     private SwipeRefreshLayout rssEntryRecyclerViewSwipeToRefreshLayout;
     private List<IliasRssItem> items;
+    private BottomNavigationView bottomNavigationView;
 
     /**
      * Save latest response of Ilias RSS feed website
@@ -115,12 +119,6 @@ public class MainActivity extends AppCompatActivity implements
         // refresh on onCreate does not work (Animation, etc.) thus we use the post runnable
         rssEntryRecyclerViewSwipeToRefreshLayout.post(this::checkForRssUpdates);
 
-        // setup floating action button action
-        findViewById(R.id.fab).setOnClickListener(view -> {
-            updateLatestRssEntryToNewestEntry();
-            checkForRssUpdates();
-        });
-
         // setup broadcast receiver
         broadcastReceiver = new BroadcastReceiver() {
             @Override
@@ -138,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements
                             .NOTIFICATION_INTENT_EXTRA_BIG_STRING);*/
 
                     // create snack bar message that refreshes feed on action click
-                    newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
+                    newEntriesMessage = Snackbar.make(rssEntryRecyclerView, PREVIEW_STRING,
                             Snackbar.LENGTH_INDEFINITE)
                             .setAction(R.string.main_activity_floating_button_tooltip_refresh, view -> checkForRssUpdates());
                     newEntriesMessage.show();
@@ -257,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements
                     .replace("</rss>", "")
                     .getBytes(StandardCharsets.UTF_8)));
         } catch (XmlPullParserException | IOException | ParseException e) {
-            SetupActivity.errorSnackBar(this, findViewById(R.id.fab),
+            SetupActivity.errorSnackBar(this, rssEntryRecyclerView,
                     getString(R.string.dialog_parse_error), e.toString());
             e.printStackTrace();
             // at last stop refresh animation of swipe to refresh layout
@@ -298,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void noNewEntryFound() {
-        Snackbar.make(findViewById(R.id.fab), R.string.dialog_no_new_entry_found,
+        Snackbar.make(rssEntryRecyclerView, R.string.dialog_no_new_entry_found,
                 Snackbar.LENGTH_SHORT).show();
     }
 

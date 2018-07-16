@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/i_1"
+        android:icon="@drawable/ic_campus_logo_48dp"
+        android:title="@string/main_activity_toolbar_action_open_campus" />
+
+    <item
+        android:id="@+id/i_2"
+        android:icon="@drawable/ic_ilias_logo_white_48dp"
+        android:title="@string/main_activity_toolbar_action_open_ilias" />
+
+</menu>

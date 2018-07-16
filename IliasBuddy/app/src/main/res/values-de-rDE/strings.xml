@@ -76,7 +76,7 @@
     <string name="main_activity_show_last_response_title">Letzte Antwort des Servers</string>
     <string name="main_activity_show_last_response_no_response">Keine aufgezeichnete Antwort gefunden</string>
     <string name="dialog_parse_error">Parse Error</string>
-    <string name="notification_background_service_is_active">HIntergrunddienst ist aktiv</string>
+    <string name="notification_background_service_is_active">Hintergrunddienst ist aktiv</string>
     <string name="notification_channel_sticky_description">Zeigt nicht wegwischbare Benachrichtigung wenn der Hintergrunddienst aktiviert ist</string>
     <string name="notification_channel_sticky_name">Nicht wegwischbare Benachrichtigung ist aktiv</string>
     <string name="notification_channel_new_entries_new_ilias_entries">neue Ilias Beiträge!</string>

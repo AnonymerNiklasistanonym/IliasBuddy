@@ -123,20 +123,29 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i("MainActivity", "BroadcastReceiver::onReceive > Intent: "
                         + intent.getAction());
 
-                if (intent.getAction() != null &&
-                        intent.getAction().equals(IliasBuddyNotificationInterface.RECEIVE_JSON)) {
-                    final String PREVIEW_STRING = intent.getStringExtra(BackgroundIntentService
-                            .NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
+                if (intent.getAction() != null) {
+                    if (intent.getAction().equals(IliasBuddyNotificationInterface.FOUND_A_NEW_ENTRY)) {
+                        final String PREVIEW_STRING = intent.getStringExtra(BackgroundIntentService
+                                .NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
                     /*final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService
                             .NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
                     final String BIG_STRING = intent.getStringExtra(BackgroundIntentService
                             .NOTIFICATION_INTENT_EXTRA_BIG_STRING);*/
 
-                    // create snack bar message that refreshes feed on action click
-                    newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
-                            Snackbar.LENGTH_INDEFINITE)
-                            .setAction(R.string.main_activity_floating_button_tooltip_refresh, view -> checkForRssUpdates());
-                    newEntriesMessage.show();
+                        // create snack bar message that refreshes feed on action click
+                        newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
+                                Snackbar.LENGTH_INDEFINITE)
+                                .setAction(R.string.main_activity_floating_button_tooltip_refresh, view -> checkForRssUpdates());
+                        newEntriesMessage.show();
+                    } else if (intent.getAction().equals(IliasBuddyNotificationInterface.UPDATE_SILENT)) {
+                        // notification clicked that said update silently
+                        try {
+                            renderNewList(iliasRssFeedCacheManager.getCache());
+                        } catch (IliasRssCache.IliasRssCacheException | IOException | ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
                 }
             }
         };
@@ -144,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
         // setup broadcast manager
         broadcastManager = LocalBroadcastManager.getInstance(this);
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(IliasBuddyNotificationInterface.RECEIVE_JSON);
+        intentFilter.addAction(IliasBuddyNotificationInterface.FOUND_A_NEW_ENTRY);
         broadcastManager.registerReceiver(broadcastReceiver, intentFilter);
 
         // setup cache manager
@@ -212,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements
                 "previewString (single demo)", new String[]{"one"},
                 new Intent(this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 1,
-                "https://ilias3.uni-stuttgart.de");
+                "https://ilias3.uni-stuttgart.de", null);
     }
 
     public void menuDevOptionExampleNotifications(final MenuItem item) {
@@ -220,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements
                 "previewString (multiple demo)", new String[]{"one", "two", "three"},
                 new Intent(this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 3,
-                null);
+                null, null);
     }
 
     @Override
@@ -355,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements
             // clear latest item and latest notification from preferences
             PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString(BackgroundIntentService.LATEST_ELEMENT, "")
-                    .putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, "").apply();
+                    .putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, "____").apply();
             // set latestRssEntry to null
             latestRssEntry = null;
             // render empty list to override the current one
@@ -524,7 +533,9 @@ public class MainActivity extends AppCompatActivity implements
                 // clear latest item and latest notification from preferences
                 PreferenceManager.getDefaultSharedPreferences(this).edit()
                         .putString(BackgroundIntentService.LATEST_ELEMENT,
-                                CURRENT_ILIAS_ENTRIES_2[0].toString()).apply();
+                                CURRENT_ILIAS_ENTRIES_2[0].toString())
+                        .putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, "____").apply();
+
                 // render empty list to override the current one
                 renderNewList(CURRENT_ILIAS_ENTRIES_2);
             }

@@ -131,5 +131,6 @@
     <string name="notification_channel_new_entries_one_new_ilias_entry">One new Ilias entry!</string>
     <string name="notification_channel_new_entries_name">New Ilias entries notification</string>
     <string name="notification_channel_new_entries_description">Shows notification when there are new Ilias entries in the RSS feed</string>
+    <string name="notification_dismiss_notification">Dismiss</string>
 
 </resources>

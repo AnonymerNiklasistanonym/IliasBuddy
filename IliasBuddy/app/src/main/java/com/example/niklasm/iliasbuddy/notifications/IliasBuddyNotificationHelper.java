@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 
 import com.example.niklasm.iliasbuddy.R;
+import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 
 import java.util.Objects;
 
@@ -31,7 +32,8 @@ public class IliasBuddyNotificationHelper {
                                                           final String[] CONTENT_TEXT_ARRAY,
                                                           final Intent ONCLICK_INTENT,
                                                           final int MESSAGE_COUNT,
-                                                          final String URL) {
+                                                          final String URL,
+                                                          final Intent DISMISS_INTENT) {
 
         // get settings
         final SharedPreferences sharedPreferences =
@@ -97,7 +99,16 @@ public class IliasBuddyNotificationHelper {
                         .setStyle(NOTIFICATION_STYLE)
                         .setSound(Uri.parse(RINGTONE))
                         .setAutoCancel(true) // on click the notification does not disappear
-                        .setNumber(MESSAGE_COUNT);
+                        .setNumber(MESSAGE_COUNT)
+                        .addAction(
+                                new NotificationCompat.Action.Builder(
+                                        R.drawable.ic_delete_sweep_black,
+                                        CONTEXT.getString(R.string.notification_dismiss_notification),
+                                        PendingIntent.getService(CONTEXT, 0,
+                                                new Intent(CONTEXT, BackgroundIntentService.class)
+                                                        .putExtra(IliasBuddyNotificationInterface.NOTIFICATION_DISMISSED, true),
+                                                0))
+                                        .build());
 
         if (VIBRATE) {
             NOTIFICATION_BUILDER.setDefaults(Notification.DEFAULT_VIBRATE);

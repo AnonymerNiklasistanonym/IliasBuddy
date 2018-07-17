@@ -15,13 +15,15 @@ public class BackgroundServiceNewEntriesNotification {
 
     public static void show(final Context CONTEXT, final String CONTENT_TITLE,
                             final String CONTENT_TEXT, final String[] CONTENT_TEXT_ARRAY,
-                            final Intent ON_CLICK, final int MESSAGE_COUNT, final String URL) {
+                            final Intent ON_CLICK, final int MESSAGE_COUNT, final String URL,
+                            final Intent ON_DISMISS_CLICK) {
         Log.d("BackgroundServiceNew...", "show()");
         final Notification NOTIFICATION = IliasBuddyNotificationHelper.createNewEntryNotification(
                 CONTEXT, BackgroundServiceNewEntriesNotification.CHANNEL_ID,
                 CONTEXT.getString(R.string.notification_channel_new_entries_name),
                 CONTEXT.getString(R.string.notification_channel_new_entries_description),
-                CONTENT_TITLE, CONTENT_TEXT, CONTENT_TEXT_ARRAY, ON_CLICK, MESSAGE_COUNT, URL);
+                CONTENT_TITLE, CONTENT_TEXT, CONTENT_TEXT_ARRAY, ON_CLICK, MESSAGE_COUNT, URL,
+                ON_DISMISS_CLICK);
         IliasBuddyNotificationHelper.showNotification(CONTEXT,
                 BackgroundServiceNewEntriesNotification.NOTIFICATION_ID, NOTIFICATION);
     }

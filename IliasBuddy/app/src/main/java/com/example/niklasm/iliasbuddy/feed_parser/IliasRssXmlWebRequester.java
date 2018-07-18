@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.feed_parser;
 
 import android.content.Context;
 import android.util.Base64;

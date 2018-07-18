@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.recycler_view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -138,14 +138,18 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         Highlight background if the current entry is new in respect to the latest item of the
          adapter interface - else reset background color to transparent
         */
-        final IliasRssFeedItem ADAPTER_INTERFACE_LATEST_ITEM =
-                ADAPTER_INTERFACE.listAdapterGetLatestEntry();
-        if (ADAPTER_INTERFACE_LATEST_ITEM == null ||
-                ADAPTER_INTERFACE_LATEST_ITEM.getDate().getTime()
-                        < CURRENT_ELEMENT.getDate().getTime()) {
-            holder.background.setBackgroundResource(R.color.colorNewEntry);
-        } else {
+        final long ADAPTER_INTERFACE_LATEST_ITEM_TIME =
+                ADAPTER_INTERFACE.listAdapterGetLatestEntryTime();
+        final long CURRENT_ITEM_TIME =
+                CURRENT_ELEMENT.getDate().getTime();
+
+        // if interface time == -1 or smaller than the current time highlight nothing
+        if (ADAPTER_INTERFACE_LATEST_ITEM_TIME == -1 ||
+                ADAPTER_INTERFACE_LATEST_ITEM_TIME < CURRENT_ITEM_TIME) {
             holder.background.setBackgroundResource(android.R.color.transparent);
+        } else {
+            // otherwise highlight background of item
+            holder.background.setBackgroundResource(R.color.colorNewEntry);
         }
     }
 

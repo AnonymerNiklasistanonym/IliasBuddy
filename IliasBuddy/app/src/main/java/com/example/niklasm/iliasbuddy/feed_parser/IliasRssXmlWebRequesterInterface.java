@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.feed_parser;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;

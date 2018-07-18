@@ -9,6 +9,7 @@
     <string name="main_activity_toolbar_options_action_developer_options">Developer options</string>
     <string name="main_activity_toolbar_options_action_settings" translatable="false">@string/settings_activity_toolbar_title</string>
     <string name="main_activity_toolbar_options_action_setup" translatable="false">@string/setup_activity_toolbar_title</string>
+    <string name="main_activity_toolbar_options_action_share">Share</string>
     <string name="main_activity_floating_button_tooltip_refresh">Refresh</string>
     <!-- Main activity: Toolbar: Filter -->
     <string name="main_activity_toolbar_action_filter">Filter</string>
@@ -136,6 +137,5 @@
     <string name="notification_channel_new_entries_name">New Ilias entries notification</string>
     <string name="notification_channel_new_entries_description">Shows notification when there are new Ilias entries in the RSS feed</string>
     <string name="notification_dismiss_notification">Dismiss</string>
-    <string name="main_activity_toolbar_options_action_share">Share</string>
 
 </resources>

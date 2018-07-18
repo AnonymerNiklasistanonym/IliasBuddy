@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.recycler_view;
 
 import android.content.Context;
 import android.content.res.TypedArray;

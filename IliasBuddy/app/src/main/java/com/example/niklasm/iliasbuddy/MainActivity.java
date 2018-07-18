@@ -28,17 +28,17 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
+import com.example.niklasm.iliasbuddy.feed_parser.IliasRssXmlParser;
+import com.example.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequester;
+import com.example.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequesterInterface;
 import com.example.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
 import com.example.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.example.niklasm.iliasbuddy.handler.IliasBuddyUpdateHandler;
 import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemDecoration;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemListAdapter;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemListAdapterInterface;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlParser;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequester;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequesterInterface;
+import com.example.niklasm.iliasbuddy.recycler_view.IliasRssItemDecoration;
+import com.example.niklasm.iliasbuddy.recycler_view.IliasRssItemListAdapter;
+import com.example.niklasm.iliasbuddy.recycler_view.IliasRssItemListAdapterInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     private IliasRssItemListAdapter mAdapter;
     private Snackbar newEntriesMessage;
     private IliasRssXmlWebRequester iliasRssXmlWebRequester;
+    private long latestRssEntryTime;
     private IliasRssFeedItem latestRssEntry;
     private IliasRssFeedItem latestRssEntryNewIliasRssFeedEntries;
     private int currentDataSetLength;
@@ -108,12 +109,12 @@ public class MainActivity extends AppCompatActivity implements
                 android.R.color.holo_orange_light, android.R.color.holo_green_light,
                 android.R.color.holo_blue_light, android.R.color.holo_red_light);
         // refresh on onCreate does not work (Animation, etc.) thus we use the post runnable
-        rssEntryRecyclerViewSwipeToRefreshLayout.post(this::checkForRssUpdates);
+        rssEntryRecyclerViewSwipeToRefreshLayout.post(() -> checkForRssUpdates(true));
 
         // setup floating action button action
         findViewById(R.id.fab).setOnClickListener(view -> {
             updateLatestRssEntryToNewestEntry();
-            checkForRssUpdates();
+            checkForRssUpdates(true);
         });
 
         // setup broadcast receiver
@@ -129,27 +130,25 @@ public class MainActivity extends AppCompatActivity implements
                                 .NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
 
                         // create snack bar message that refreshes feed on action click
-                        Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING, Snackbar.LENGTH_INDEFINITE)
+                        newEntriesMessage = Snackbar
+                                .make(findViewById(R.id.fab), PREVIEW_STRING,
+                                        Snackbar.LENGTH_INDEFINITE)
                                 .setAction(R.string.main_activity_floating_button_tooltip_refresh,
-                                        view -> checkForRssUpdates())
-                                .show();
+                                        view -> checkForRssUpdates(true));
+                        newEntriesMessage.show();
                     } else if (INTENT.getAction().equals(IliasBuddyNotificationHandler.UPDATE_SILENT)) {
                         // notification clicked that said update silently
-                        try {
-                            renderNewList(IliasBuddyCacheHandler.getCache(CONTEXT));
-                        } catch (IOException | ClassNotFoundException e) {
-                            e.printStackTrace();
-                        }
-
+                        checkForRssUpdates(false);
                     }
                 }
             }
         };
 
-        // setup broadcast manager
+        // setup broadcast manager in registering the intents he can get
         broadcastManager = LocalBroadcastManager.getInstance(this);
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(IliasBuddyNotificationHandler.FOUND_A_NEW_ENTRY);
+        intentFilter.addAction(IliasBuddyNotificationHandler.UPDATE_SILENT);
         broadcastManager.registerReceiver(broadcastReceiver, intentFilter);
 
         // setup web request manager
@@ -174,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements
                 // clean latest RSS entries
                 latestRssEntryNewIliasRssFeedEntries = null;
                 latestRssEntry = null;
+                latestRssEntryTime = 0;
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements
             // if there is data save latest object
             latestRssEntryNewIliasRssFeedEntries = myDataSet[0];
             latestRssEntry = myDataSet[0];
+            latestRssEntryTime = myDataSet[0].getDate().getTime();
             // specify an adapter (see also next example)
             items.clear();
             items.addAll(Arrays.asList(myDataSet));
@@ -190,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements
             currentDataSetLength = myDataSet.length;
         } else {
             latestRssEntry = null;
+            latestRssEntryTime = 0;
             latestRssEntryNewIliasRssFeedEntries = null;
             currentDataSetLength = 0;
         }
@@ -206,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // check on create if there was a RSS feed update
-        checkForRssUpdates();
+        checkForRssUpdates(true);
 
         // check for a new version silently
         IliasBuddyUpdateHandler.checkForUpdate(this, true);
@@ -237,6 +239,11 @@ public class MainActivity extends AppCompatActivity implements
 
     public void updateLatestRssEntryToNewestEntry() {
         latestRssEntry = latestRssEntryNewIliasRssFeedEntries;
+        if (latestRssEntryNewIliasRssFeedEntries != null) {
+            latestRssEntryTime = latestRssEntryNewIliasRssFeedEntries.getDate().getTime();
+        } else {
+            latestRssEntryTime = 0;
+        }
         if (mAdapter != null) {
             mAdapter.notifyItemRangeChanged(0, currentDataSetLength);
         }
@@ -266,7 +273,6 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         // get the latest RSS entry from the main activity
-        final IliasRssFeedItem latestRssEntry = getLatestRssEntry();
         // only continue if the latest object is different
         if (latestRssEntry == null || !latestRssEntry.toString().equals(myDataSet[0].toString())) {
             renderNewList(myDataSet);
@@ -294,10 +300,6 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(new Intent(this, SettingsActivity.class));
     }
 
-    public IliasRssFeedItem getLatestRssEntry() {
-        return latestRssEntry;
-    }
-
     public void noNewEntryFound() {
         Snackbar.make(findViewById(R.id.fab), R.string.dialog_no_new_entry_found,
                 Snackbar.LENGTH_SHORT).show();
@@ -310,14 +312,28 @@ public class MainActivity extends AppCompatActivity implements
 
     /**
      * Check if there are any new RSS entries + start necessary visual animation
+     *
+     * @param HIGHLIGHT_NEW_ENTRIES If true new entries will be highlighted
      */
-    private void checkForRssUpdates() {
+    private void checkForRssUpdates(final boolean HIGHLIGHT_NEW_ENTRIES) {
         // dismiss new entries notification
         IliasBuddyNotificationHandler.hideNotificationNewEntries(this);
         // dismiss new entries snack bar
         if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) {
             newEntriesMessage.dismiss();
         }
+
+        if (HIGHLIGHT_NEW_ENTRIES) {
+            if (latestRssEntry != null) {
+                latestRssEntryTime = latestRssEntry.getDate().getTime();
+            } else {
+                latestRssEntryTime = 0;
+            }
+        } else {
+            // make latest element to HIGHLIGHT nothing
+            latestRssEntryTime = -1;
+        }
+
         // activate refresh animation of SwipeToRefreshLayout
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(true);
         // check Ilias RSS feed
@@ -362,8 +378,9 @@ public class MainActivity extends AppCompatActivity implements
             PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString(BackgroundIntentService.LATEST_ELEMENT, "")
                     .putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, "____").apply();
-            // set latestRssEntry to null
+            // set latestRssEntryTime to null
             latestRssEntry = null;
+            latestRssEntryTime = 0;
             // render empty list to override the current one
             renderNewList(new IliasRssFeedItem[0]);
             currentDataSetLength = 0;
@@ -404,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements
                 IliasBuddyNotificationHandler.NEW_ENTRY_FOUND, false)) {
             Log.i("MainActivity", "onNewIntent: NEW_ENTRY_FOUND");
             // update Ilias RSS feed
-            checkForRssUpdates();
+            checkForRssUpdates(true);
             // if there is NEW_ENTRY_DATA extra perform a virtual click on the only new element
             if (intent.getParcelableExtra(
                     IliasBuddyNotificationHandler.NEW_ENTRY_DATA) != null) {
@@ -485,8 +502,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public IliasRssFeedItem listAdapterGetLatestEntry() {
-        return latestRssEntry;
+    public long listAdapterGetLatestEntryTime() {
+        return latestRssEntryTime;
     }
 
     @Override
@@ -505,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements
         // remove all colors
         updateLatestRssEntryToNewestEntry();
         // check for feed updates
-        checkForRssUpdates();
+        checkForRssUpdates(true);
     }
 
     public void menuDevOptionSetFirstLaunch(final MenuItem item) {
@@ -525,6 +542,7 @@ public class MainActivity extends AppCompatActivity implements
                 // clean things in the future
                 currentDataSetLength--;
                 latestRssEntry = CURRENT_ILIAS_ENTRIES_2[0];
+                latestRssEntryTime = CURRENT_ILIAS_ENTRIES_2[0].getDate().getTime();
                 // clear latest item and latest notification from preferences
                 PreferenceManager.getDefaultSharedPreferences(this).edit()
                         .putString(BackgroundIntentService.LATEST_ELEMENT,

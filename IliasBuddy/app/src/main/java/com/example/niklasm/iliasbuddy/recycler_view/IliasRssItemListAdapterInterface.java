@@ -1,17 +1,15 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.recycler_view;
 
 import android.view.View;
-
-import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
 
 public interface IliasRssItemListAdapterInterface {
 
     /**
      * Get the latest Ilias RSS entry (the one before the last reload)
      *
-     * @return (IliasRssFeedItem) Cached Ilias RSS entry before reload
+     * @return Cached Ilias RSS entry date as time before reload
      */
-    IliasRssFeedItem listAdapterGetLatestEntry();
+    long listAdapterGetLatestEntryTime();
 
     /**
      * Get recycler view position to identify which child of the view was clicked

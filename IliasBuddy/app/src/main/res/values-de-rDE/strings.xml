@@ -96,4 +96,5 @@
     <string name="main_activity_toolbar_action_filter_files">Dateien</string>
     <string name="main_activity_toolbar_action_filter_posts">Beiträge</string>
     <string name="main_activity_toolbar_action_filter">Filter</string>
+    <string name="main_activity_toolbar_options_action_share">Teilen</string>
 </resources>

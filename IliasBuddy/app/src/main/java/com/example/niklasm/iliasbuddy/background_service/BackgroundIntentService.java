@@ -13,13 +13,13 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.MainActivity;
 import com.example.niklasm.iliasbuddy.R;
+import com.example.niklasm.iliasbuddy.feed_parser.IliasRssXmlParser;
+import com.example.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequester;
+import com.example.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequesterInterface;
 import com.example.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
 import com.example.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlParser;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequester;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequesterInterface;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -41,9 +41,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        Log.i("BackgroundIntentService", "onStartCommand (intent: " + intent.getAction() +
-                ")");
-
+        Log.i("BackgroundIntentService", "onStartCommand");
+        
         // check the intent if the current notification was dismissed but read
         if (BackgroundIntentService.current_items != null &&
                 intent.getBooleanExtra(IliasBuddyNotificationHandler.NOTIFICATION_DISMISSED,

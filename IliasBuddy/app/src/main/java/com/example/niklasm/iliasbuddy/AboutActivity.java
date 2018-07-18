@@ -1,99 +1,30 @@
 package com.example.niklasm.iliasbuddy;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyUpdateHandler;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 
 public class AboutActivity extends AppCompatActivity {
 
-    public static void checkForUpdate(final Context CONTEXT, final boolean ONLY_CHECK) {
-        final String URL = "https://api.github.com/repos/AnonymerNiklasistanonym/IliasBuddy/releases";
-        Volley.newRequestQueue(CONTEXT).add(new JsonArrayRequest
-                (Request.Method.GET, URL, null,
-                        response -> {
-                            try {
-                                final JSONObject NEWEST_RELEASE = response.getJSONObject(0);
-                                final String NEWEST_VERSION = NEWEST_RELEASE.getString("tag_name").substring(1);
-                                final String NEWEST_VERSION_URL = NEWEST_RELEASE.getString("html_url");
-                                if (NEWEST_VERSION.equals(BuildConfig.VERSION_NAME)) {
-                                    if (!ONLY_CHECK) {
-                                        new AlertDialog.Builder(CONTEXT)
-                                                .setTitle(R.string.dialog_new_version_not_found)
-                                                .setMessage(R.string.dialog_new_version_already_installed)
-                                                .setNeutralButton(R.string.dialog_back,
-                                                        (dialog, which) -> dialog.dismiss())
-                                                .create().show();
-                                    }
-                                } else {
-                                    new AlertDialog.Builder(CONTEXT)
-                                            .setTitle(R.string.dialog_new_version_found)
-                                            .setMessage(CONTEXT.getString(R.string.dialog_current_version) + ": " + BuildConfig.VERSION_NAME
-                                                    + "\n" + CONTEXT.getString(R.string.dialog_latest_version) + ": " + NEWEST_VERSION)
-                                            .setPositiveButton(R.string.dialog_new_version_open_release_page,
-                                                    (dialog, which) -> {
-                                                        AboutActivity.openUrl(CONTEXT, NEWEST_VERSION_URL);
-                                                        dialog.dismiss();
-                                                    })
-                                            .setNeutralButton(R.string.dialog_back,
-                                                    (dialog, which) -> dialog.dismiss())
-                                            .create().show();
-                                }
-                            } catch (final JSONException e) {
-                                e.printStackTrace();
-                                new AlertDialog.Builder(CONTEXT)
-                                        .setTitle(R.string.dialog_json_exception)
-                                        .setMessage(e.getMessage() + "\n\n" + response.toString())
-                                        .setNeutralButton(R.string.dialog_back,
-                                                (dialog, which) -> dialog.dismiss())
-                                        .create().show();
-                            }
-                        },
-                        error -> new AlertDialog.Builder(CONTEXT)
-                                .setTitle(R.string.dialog_volley_error)
-                                .setMessage("> " + URL + "\n> " + error + "\n"
-                                        + new String(error.networkResponse.data))
-                                .setNeutralButton(R.string.dialog_back,
-                                        (dialog, which) -> dialog.dismiss())
-                                .create().show()
-                ));
-    }
-
-    /**
-     * Open a website in the device browser
-     *
-     * @param URL (String) - Website link/address
-     */
-    private static void openUrl(final Context CONTEXT, final String URL) {
-        CONTEXT.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL)));
-    }
-
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final View aboutPage = new AboutPage(this)
-                .isRTL(false)
+        // set content of activity to about page
+        setContentView(new AboutPage(this)
                 .setDescription(getString(R.string.about_app_description))
                 .addItem(new Element().setTitle(getString(R.string.word_version) + " " + BuildConfig.VERSION_NAME))
                 .addItem(new Element().setTitle(getString(R.string.word_check_for_new_version)).setOnClickListener(
-                        view -> AboutActivity.checkForUpdate(this, false)))
+                        view -> IliasBuddyUpdateHandler.checkForUpdate(this, false)))
                 .addItem(new Element().setTitle(getString(R.string.word_license)).setOnClickListener(
                         view -> new AlertDialog.Builder(AboutActivity.this)
                                 .setTitle(R.string.word_license)
@@ -111,10 +42,9 @@ public class AboutActivity extends AppCompatActivity {
                         getString(R.string.url_ilias_buddy_repository_title))
                 //.addPlayStore("com.ideashower.readitlater.pro") // later
                 .addGitHub("AnonymerNiklasistanonym", getString(R.string.author_github_user_name_title))
-                .create();
+                .create());
 
-        setContentView(aboutPage);
-
+        // enable back button in action bar
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowHomeEnabled(true);

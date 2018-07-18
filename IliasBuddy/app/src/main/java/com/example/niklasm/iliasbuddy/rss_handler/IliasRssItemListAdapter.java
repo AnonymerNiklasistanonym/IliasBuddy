@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.niklasm.iliasbuddy.R;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
 
 import java.text.SimpleDateFormat;
@@ -52,12 +53,11 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     }
 
     public static void alertDialogRssFeedEntry(@NonNull final IliasRssFeedItem ILIAS_RSS_ITEM,
-                                               @NonNull final IliasRssItemAlertDialogInterface ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE,
                                                @NonNull final Context CONTEXT) {
         if (ILIAS_RSS_ITEM.getDescription().equals("")) {
             // if there is no description this means it was an upload
             // therefore instantly link to the Ilias page
-            ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink());
+            IliasBuddyMiscellaneousHandler.openUrl(CONTEXT, ILIAS_RSS_ITEM.getLink());
         } else {
             // if not this must be a legit message for which a popup dialog will be opened
             final String message = ">> " + ILIAS_RSS_ITEM.getTitle() + "\n\n" +
@@ -70,8 +70,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     .setMessage(message)
                     .setCancelable(true)
                     .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
-                            (dialog1, id) -> ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE
-                                    .alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink()))
+                            (dialog1, id) -> IliasBuddyMiscellaneousHandler
+                                    .openUrl(CONTEXT, ILIAS_RSS_ITEM.getLink()))
                     .setNegativeButton(CONTEXT.getString(R.string.dialog_back),
                             (dialog12, id) -> dialog12.cancel())
                     .show();
@@ -292,8 +292,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         public void onClick(final View view) {
             final int itemPosition =
                     ADAPTER_INTERFACE.listAdapterGetRecyclerViewChildLayoutPosition(view);
-            IliasRssItemListAdapter.alertDialogRssFeedEntry(itemsFiltered.get(itemPosition),
-                    ADAPTER_INTERFACE, CONTEXT);
+            IliasRssItemListAdapter
+                    .alertDialogRssFeedEntry(itemsFiltered.get(itemPosition), CONTEXT);
         }
     }
 }

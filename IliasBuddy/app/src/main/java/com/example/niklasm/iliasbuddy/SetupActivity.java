@@ -21,8 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
-import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyPreferenceHandler;
 
 import java.util.Objects;
 
@@ -33,7 +33,7 @@ public class SetupActivity extends AppCompatActivity {
 
     public static void errorSnackBar(@NonNull final Context context, @NonNull final View fab,
                                      @NonNull final String title, @NonNull final String message) {
-        Snackbar.make(fab, title, Snackbar.LENGTH_LONG)
+        Snackbar.make(fab, title, Snackbar.LENGTH_INDEFINITE)
                 .setActionTextColor(Color.RED) //to change the color of action text
                 .setAction(R.string.dialog_more, view ->
                         new AlertDialog.Builder(context)
@@ -86,10 +86,10 @@ public class SetupActivity extends AppCompatActivity {
                 return invalidText;
             }
         });
-        rssUrl.setOnFocusChangeListener((v, focused) -> {
+        rssUrl.setOnFocusChangeListener((view, focused) -> {
             // if view is not focused perform validation
             if (!focused) {
-                ((AutoCompleteTextView) v).performValidation();
+                ((AutoCompleteTextView) view).performValidation();
             }
         });
 
@@ -97,8 +97,8 @@ public class SetupActivity extends AppCompatActivity {
         fabButton.setOnClickListener(view -> {
             if (rssUrl.getValidator().isValid(rssUrl.getText().toString())) {
                 IliasBuddyPreferenceHandler.saveCredentials(this,
-                        rssUrl.getText().toString(), rssUserName.getText().toString(),
-                        rssPassword.getText().toString());
+                        rssUserName.getText().toString(), rssPassword.getText().toString(),
+                        rssUrl.getText().toString());
                 startActivity(new Intent(SetupActivity.this, MainActivity.class));
             } else {
                 Snackbar.make(fabButton,

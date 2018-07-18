@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.handler;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -17,7 +17,7 @@ import java.io.ObjectOutputStream;
 /**
  * Class that can save the IliasRssFeedItem array to a file and read/load it later
  */
-public class IliasRssCache {
+public class IliasBuddyCacheHandler {
 
     /**
      * Name of the cache file
@@ -37,8 +37,8 @@ public class IliasRssCache {
     @NonNull
     private static File getFile(@NonNull final Context CONTEXT) {
         return new File(CONTEXT.getFilesDir().getAbsolutePath() +
-                File.separator + IliasRssCache.NAME_DIR +
-                File.separator + IliasRssCache.NAME_FILE);
+                File.separator + IliasBuddyCacheHandler.NAME_DIR +
+                File.separator + IliasBuddyCacheHandler.NAME_FILE);
     }
 
     /**
@@ -54,7 +54,7 @@ public class IliasRssCache {
             throws IOException, ClassNotFoundException {
 
         // get cache file
-        final File ILIAS_RSS_CACHE_FILE = IliasRssCache.getFile(CONTEXT);
+        final File ILIAS_RSS_CACHE_FILE = IliasBuddyCacheHandler.getFile(CONTEXT);
 
         // convert content of cache file to a IliasRssFeedItem array
         final ObjectInputStream CACHE_FILE_INPUT_STREAM =
@@ -79,16 +79,16 @@ public class IliasRssCache {
             throws IOException {
 
         // get cache file
-        final File ILIAS_RSS_CACHE_FILE = IliasRssCache.getFile(CONTEXT);
+        final File ILIAS_RSS_CACHE_FILE = IliasBuddyCacheHandler.getFile(CONTEXT);
 
         // check if the parent directory of the cache file exists and if not create it
         if (!ILIAS_RSS_CACHE_FILE.getParentFile().mkdirs()) {
-            Log.e("IliasRssCache", "Directory for cache file could not be created");
+            Log.e("IliasBuddyCacheHandler", "Directory for cache file could not be created");
         }
 
         // check if the cache file exists and if not create it
         if (!ILIAS_RSS_CACHE_FILE.createNewFile()) {
-            Log.e("IliasRssCache", "Directory for cache file could not be created");
+            Log.e("IliasBuddyCacheHandler", "Directory for cache file could not be created");
         }
 
         // write given IliasRssFeedItem[] to cache file
@@ -100,7 +100,7 @@ public class IliasRssCache {
 
     public static void clearCache(@NonNull final Context CONTEXT)
             throws IOException {
-        IliasRssCache.setCache(CONTEXT, new IliasRssFeedItem[0]);
+        IliasBuddyCacheHandler.setCache(CONTEXT, new IliasRssFeedItem[0]);
     }
 
 }

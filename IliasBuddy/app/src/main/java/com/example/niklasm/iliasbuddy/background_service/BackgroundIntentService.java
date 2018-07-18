@@ -7,17 +7,16 @@ import android.os.IBinder;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.Html;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.MainActivity;
 import com.example.niklasm.iliasbuddy.R;
-import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotification;
-import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationInterface;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
+import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssCache;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlParser;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequester;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequesterInterface;
@@ -35,31 +34,28 @@ import java.util.ArrayList;
 public class BackgroundIntentService extends Service implements IliasRssXmlWebRequesterInterface {
 
     public final static String NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING = "previewString";
-    public final static String NOTIFICATION_INTENT_EXTRA_BIG_STRING = "bigString";
     public static final String NOTIFICATION_INTENT_MESSAGE_COUNT = "only_one";
-    final public static String LAST_NOTIFICATION_TEXT = "LAST_NOTIFICATION_TEXT";
+    final public static String LAST_NOTIFICATION_TEXT = "FEED_LAST_NOTIFICATION_TEXT";
     final public static String LATEST_ELEMENT = "LATEST_ELEMENT";
-    private final static String LATEST_ITEM_NOT_FOUND = "nothing_found";
     private static IliasRssFeedItem[] current_items;
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        Log.i("BackgroundIntentService", "onStartCommand");
-
-        Log.i("BackgroundIntentService", "startId: " + startId);
+        Log.i("BackgroundIntentService", "onStartCommand (intent: " + intent.getAction() +
+                ")");
 
         // check the intent if the current notification was dismissed but read
         if (BackgroundIntentService.current_items != null &&
-                intent.getBooleanExtra(IliasBuddyNotificationInterface.NOTIFICATION_DISMISSED,
+                intent.getBooleanExtra(IliasBuddyNotificationHandler.NOTIFICATION_DISMISSED,
                         false)) {
             try {
-                IliasRssCache.setCache(this, BackgroundIntentService.current_items);
+                IliasBuddyCacheHandler.setCache(this, BackgroundIntentService.current_items);
                 Log.i("BackgroundIntentService", "updated items on dismiss");
                 // dismiss notification if everything went right
-                IliasBuddyNotification.hideNotificationNewEntries(this);
+                IliasBuddyNotificationHandler.hideNotificationNewEntries(this);
                 // and if the main activity is opened refresh content
                 Log.i("BackgroundIntentService", "sendBroadcast");
-                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(IliasBuddyNotificationInterface.UPDATE_SILENT));
+                LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(IliasBuddyNotificationHandler.UPDATE_SILENT));
             } catch (final IOException e) {
                 Log.e("BackgroundIntentService", "updated items NOT on dismiss");
                 e.printStackTrace();
@@ -82,45 +78,49 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
     public void createNotification(@NonNull final String NOTIFICATION_TITLE,
                                    @NonNull final String NOTIFICATION_PREVIEW_CONTENT,
-                                   final String bigString,
-                                   final String[] INBOX_MESSAGES, final String URL,
-                                   final IliasRssFeedItem TEST_ENTRY, final IliasRssFeedItem[] ALL_NEW_ENTRIES) {
+                                   @NonNull final IliasRssFeedItem[] NEW_ENTRIES) {
 
-        final SharedPreferences myPrefs =
-                android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        final String latestItem =
-                myPrefs.getString(BackgroundIntentService.LAST_NOTIFICATION_TEXT,
-                        BackgroundIntentService.LATEST_ITEM_NOT_FOUND);
+        final String LAST_NOTIFICATION_TEXT = IliasBuddyPreferenceHandler
+                .getLastNotificationText(this, null);
 
-        if (!latestItem.equals(BackgroundIntentService.LATEST_ITEM_NOT_FOUND)
-                && latestItem.equals(bigString)) {
-            Log.i("BackgroundIntentService",
-                    "Do not make a new notification, the text is the same");
-            Log.i("BackgroundIntentService", "latestItem: " + latestItem);
-            Log.i("BackgroundIntentService", "bigString: " + bigString);
+        // check if the last notification is not null and not the current text for no double ones
+        if (LAST_NOTIFICATION_TEXT != null &&
+                LAST_NOTIFICATION_TEXT.equals(NEW_ENTRIES[0].toString())) {
+            Log.i("BackgroundIntentService", "No new notification, text is the same");
             return;
-        } else {
-            Log.i("BackgroundIntentService",
-                    "Make a new notification, the text is NOT the same");
         }
 
-        // if new notification save the old String
-        myPrefs.edit()
-                .putString(BackgroundIntentService.LAST_NOTIFICATION_TEXT, bigString).apply();
+        // if new notification save the first entry
+        IliasBuddyPreferenceHandler
+                .setLastNotificationText(this, NEW_ENTRIES[0].toString());
+
+        final SimpleDateFormat VIEW_DATE_FORMAT = new SimpleDateFormat(
+                "dd.MM HH:mm", getResources().getConfiguration().locale);
+
+        final String[] NOTIFICATION_TEXT_ARRAY = new String[NEW_ENTRIES.length];
+        if (NEW_ENTRIES.length > 1) {
+            for (int i = 0; i < NEW_ENTRIES.length; i++) {
+                NOTIFICATION_TEXT_ARRAY[i] =
+                        NEW_ENTRIES[i].toStringNotificationBigMultiple(this);
+            }
+        } else {
+            NOTIFICATION_TEXT_ARRAY[0] =
+                    NEW_ENTRIES[0].toStringNotificationBigSingle(this);
+        }
 
         final Intent ON_CLICK = new Intent(this, MainActivity.class)
-                .putExtra(IliasBuddyNotificationInterface.NEW_ENTRY_FOUND, true)
-                .putExtra(IliasBuddyNotificationInterface.NEW_ENTRY_DATA, (Parcelable) TEST_ENTRY)
+                .putExtra(IliasBuddyNotificationHandler.NEW_ENTRY_FOUND, true)
+                .putExtra(IliasBuddyNotificationHandler.NEW_ENTRY_DATA, (Parcelable) NEW_ENTRIES[0])
                 .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        IliasBuddyNotification.showNotificationNewEntries(this, NOTIFICATION_TITLE,
-                NOTIFICATION_PREVIEW_CONTENT, INBOX_MESSAGES, ON_CLICK, URL);
+        IliasBuddyNotificationHandler.showNotificationNewEntries(this, NOTIFICATION_TITLE,
+                NOTIFICATION_PREVIEW_CONTENT, NOTIFICATION_TEXT_ARRAY, ON_CLICK,
+                NEW_ENTRIES[0].getLink());
 
-        final Intent callMainActivity = new Intent(IliasBuddyNotificationInterface.FOUND_A_NEW_ENTRY)
+        final Intent callMainActivity = new Intent(IliasBuddyNotificationHandler.FOUND_A_NEW_ENTRY)
                 .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING,
                         NOTIFICATION_PREVIEW_CONTENT)
-                .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_MESSAGE_COUNT, INBOX_MESSAGES.length)
-                .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_EXTRA_BIG_STRING, bigString);
+                .putExtra(BackgroundIntentService.NOTIFICATION_INTENT_MESSAGE_COUNT, NEW_ENTRIES.length);
         LocalBroadcastManager.getInstance(this).sendBroadcast(callMainActivity);
     }
 
@@ -177,46 +177,23 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
         final IliasRssFeedItem[] NEW_ENTRIES = getNewElements(myDataSet, latestItem);
 
-        final SimpleDateFormat VIEW_DATE_FORMAT = new SimpleDateFormat(
-                "dd.MM HH:mm", getResources().getConfiguration().locale);
-
-        if (NEW_ENTRIES != null) {
-            BackgroundIntentService.current_items = NEW_ENTRIES;
+        if (NEW_ENTRIES == null || NEW_ENTRIES.length < 1) {
+            return;
         }
 
-        if (NEW_ENTRIES == null || NEW_ENTRIES.length == 0) {
-            Log.i("BackgroundIntentService", "No new entries where found");
-        } else if (NEW_ENTRIES.length == 1) {
-            Log.i("BackgroundIntentService", "One new entry was found");
+        // TODO why does thi exist
+        BackgroundIntentService.current_items = NEW_ENTRIES;
 
-            final String previewString = myDataSet[0].getCourse() +
-                    (myDataSet[0].getExtra() != null ? " > " + myDataSet[0].getExtra() : "");
-            final String bigString = NEW_ENTRIES[0].toStringNotificationSingle(VIEW_DATE_FORMAT)
-                    + (myDataSet[0].getDescription().equals("") ? "\n\n"
-                    + Html.fromHtml(myDataSet[0].getDescription()) : "---");
-
+        if (NEW_ENTRIES.length == 1) {
             createNotification(
                     getString(R.string.notification_channel_new_entries_one_new_ilias_entry),
-                    previewString, bigString.trim(), new String[]{bigString},
-                    myDataSet[0].getLink(), myDataSet[0], NEW_ENTRIES);
+                    myDataSet[0].toStringNotificationPreview(this),
+                    new IliasRssFeedItem[]{myDataSet[0]});
         } else {
-            Log.i("BackgroundIntentService", "More than one new entry was found");
-
-            final String previewString = "(" + myDataSet[0].getCourse() + ", "
-                    + myDataSet[1].getCourse() + ",... )";
-            final StringBuilder bigString = new StringBuilder("");
-            final String[] inboxArray = new String[NEW_ENTRIES.length];
-            for (int i = 0; i < NEW_ENTRIES.length; i++) {
-                final IliasRssFeedItem entry = NEW_ENTRIES[i];
-                inboxArray[i] = entry.toStringNotificationMultiple(VIEW_DATE_FORMAT);
-                bigString.append("- ").append(inboxArray[i]).append(
-                        (i != NEW_ENTRIES.length - 1 ? "\n" : ""));
-            }
-
             createNotification(NEW_ENTRIES.length + " " +
                             getString(R.string.notification_channel_new_entries_new_ilias_entries),
-                    previewString, bigString.toString(), inboxArray,
-                    null, null, NEW_ENTRIES);
+                    "(" + myDataSet[0].getCourse() + ", "
+                            + myDataSet[1].getCourse() + ",...)", NEW_ENTRIES);
         }
     }
 

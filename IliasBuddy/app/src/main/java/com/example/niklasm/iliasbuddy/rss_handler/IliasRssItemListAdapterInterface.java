@@ -4,7 +4,7 @@ import android.view.View;
 
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
 
-public interface IliasRssItemListAdapterInterface extends IliasRssItemAlertDialogInterface {
+public interface IliasRssItemListAdapterInterface {
 
     /**
      * Get the latest Ilias RSS entry (the one before the last reload)

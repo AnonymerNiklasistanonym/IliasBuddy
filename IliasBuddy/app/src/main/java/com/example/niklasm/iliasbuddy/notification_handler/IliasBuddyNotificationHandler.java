@@ -17,11 +17,17 @@ import android.util.Log;
 import com.example.niklasm.iliasbuddy.MainActivity;
 import com.example.niklasm.iliasbuddy.R;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
-import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyPreferenceHandler;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 
 import java.util.Objects;
 
-public class IliasBuddyNotification {
+public class IliasBuddyNotificationHandler {
+
+    public static final String FOUND_A_NEW_ENTRY = "FOUND_A_NEW_ENTRY";
+    public static final String NEW_ENTRY_FOUND = "NEW_ENTRY_FOUND";
+    public static final String NEW_ENTRY_DATA = "NEW_ENTRY_DATA";
+    public static final String NOTIFICATION_DISMISSED = "NOTIFICATION_DISMISSED";
+    public static final String UPDATE_SILENT = "UPDATE_SILENT";
 
     @NonNull
     private static NotificationCompat.Builder create(@NonNull final Context CONTEXT,
@@ -38,7 +44,7 @@ public class IliasBuddyNotification {
         create notification channel if Android version is O or bigger
         when CONTENT_BIG == null this means this is the sticky notification
          */
-        IliasBuddyNotification.createNotificationChannel(CONTEXT, CHANNEL_ID, CHANNEL_NAME,
+        IliasBuddyNotificationHandler.createNotificationChannel(CONTEXT, CHANNEL_ID, CHANNEL_NAME,
                 CHANNEL_DESCRIPTION, HIGH_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY &&
                         IliasBuddyPreferenceHandler.getNotificationVibrate(CONTEXT, true),
                 HIGH_PRIORITY);
@@ -58,7 +64,7 @@ public class IliasBuddyNotification {
     @NonNull
     private static Notification createSticky(@NonNull final Context CONTEXT) {
 
-        return IliasBuddyNotification.create(CONTEXT,
+        return IliasBuddyNotificationHandler.create(CONTEXT,
                 IliasBuddyNotificationStickyInterface.CHANNEL_ID,
                 CONTEXT.getString(R.string.notification_channel_sticky_name),
                 CONTEXT.getString(R.string.notification_channel_sticky_description),
@@ -96,7 +102,7 @@ public class IliasBuddyNotification {
             NOTIFICATION_STYLE = NOTIFICATION_MULTIPLE_STYLE;
         }
 
-        final NotificationCompat.Builder NOTIFICATION_BUILDER = IliasBuddyNotification.create(
+        final NotificationCompat.Builder NOTIFICATION_BUILDER = IliasBuddyNotificationHandler.create(
                 CONTEXT, CHANNEL_ID, CHANNEL_NAME, CHANNEL_DESCRIPTION, CONTENT_TITLE,
                 CONTENT_PREVIEW, ONCLICK_ACTIVITY_INTENT, true, false)
                 // add notification big content
@@ -112,16 +118,16 @@ public class IliasBuddyNotification {
                 // number in badge/notification
                 .setNumber(CONTENT_BIG.length)
                 // dismiss action button
-                .addAction(IliasBuddyNotification.actionDismiss(CONTEXT));
+                .addAction(IliasBuddyNotificationHandler.actionDismiss(CONTEXT));
 
         // Set vibration if preferences say so
         if (IliasBuddyPreferenceHandler.getNotificationVibrate(CONTEXT, true)) {
             NOTIFICATION_BUILDER.setDefaults(Notification.DEFAULT_VIBRATE);
         }
 
-        // Add URL action if URL is not null
-        if (URL != null) {
-            NOTIFICATION_BUILDER.addAction(IliasBuddyNotification.actionOpenUrl(CONTEXT, URL));
+        // Add URL action if single message
+        if (CONTENT_BIG.length == 1) {
+            NOTIFICATION_BUILDER.addAction(IliasBuddyNotificationHandler.actionOpenUrl(CONTEXT, URL));
         }
 
         return NOTIFICATION_BUILDER.build();
@@ -177,7 +183,7 @@ public class IliasBuddyNotification {
                 CONTEXT.getString(R.string.notification_dismiss_notification),
                 PendingIntent.getService(CONTEXT, 0,
                         new Intent(CONTEXT, BackgroundIntentService.class)
-                                .putExtra(IliasBuddyNotificationInterface.NOTIFICATION_DISMISSED,
+                                .putExtra(IliasBuddyNotificationHandler.NOTIFICATION_DISMISSED,
                                         true),
                         PendingIntent.FLAG_UPDATE_CURRENT)).build();
     }
@@ -199,10 +205,10 @@ public class IliasBuddyNotification {
                                                   @NonNull final Intent ON_CLICK_ACTIVITY_INTENT,
                                                   final String URL) {
 
-        Log.d("IliasBuddyNotification", "showNotificationNewEntries()");
+        Log.d("IliasBuddyNotificationH", "showNotificationNewEntries()");
 
-        IliasBuddyNotification.showNotification(CONTEXT,
-                IliasBuddyNotification.createNewEntries(CONTEXT,
+        IliasBuddyNotificationHandler.showNotification(CONTEXT,
+                IliasBuddyNotificationHandler.createNewEntries(CONTEXT,
                         IliasBuddyNotificationNewEntriesInterface.CHANNEL_ID,
                         CONTEXT.getString(R.string.notification_channel_new_entries_name),
                         CONTEXT.getString(R.string.notification_channel_new_entries_description),
@@ -213,10 +219,10 @@ public class IliasBuddyNotification {
 
     public static void showStickyNotification(@NonNull final Context CONTEXT) {
 
-        Log.d("IliasBuddyNotification", "showStickyNotification()");
+        Log.d("IliasBuddyNotificationH", "showStickyNotification()");
 
-        IliasBuddyNotification.showNotification(CONTEXT,
-                IliasBuddyNotification.createSticky(CONTEXT),
+        IliasBuddyNotificationHandler.showNotification(CONTEXT,
+                IliasBuddyNotificationHandler.createSticky(CONTEXT),
                 IliasBuddyNotificationStickyInterface.NOTIFICATION_ID);
     }
 
@@ -226,7 +232,7 @@ public class IliasBuddyNotification {
      * @param CONTEXT Needed to access the notification bar
      */
     public static void hideNotificationNewEntries(@NonNull final Context CONTEXT) {
-        IliasBuddyNotification.cancelNotification(CONTEXT,
+        IliasBuddyNotificationHandler.cancelNotification(CONTEXT,
                 IliasBuddyNotificationNewEntriesInterface.NOTIFICATION_ID);
     }
 
@@ -236,7 +242,7 @@ public class IliasBuddyNotification {
      * @param CONTEXT Needed to access the notification bar
      */
     public static void hideStickyNotification(@NonNull final Context CONTEXT) {
-        IliasBuddyNotification.cancelNotification(CONTEXT,
+        IliasBuddyNotificationHandler.cancelNotification(CONTEXT,
                 IliasBuddyNotificationStickyInterface.NOTIFICATION_ID);
     }
 

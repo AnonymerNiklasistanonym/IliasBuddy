@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -29,10 +28,11 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
-import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotification;
-import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationInterface;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
+import com.example.niklasm.iliasbuddy.handler.IliasBuddyUpdateHandler;
+import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
 import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssCache;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemDecoration;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemListAdapter;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemListAdapterInterface;
@@ -124,23 +124,19 @@ public class MainActivity extends AppCompatActivity implements
                         + INTENT.getAction());
 
                 if (INTENT.getAction() != null) {
-                    if (INTENT.getAction().equals(IliasBuddyNotificationInterface.FOUND_A_NEW_ENTRY)) {
+                    if (INTENT.getAction().equals(IliasBuddyNotificationHandler.FOUND_A_NEW_ENTRY)) {
                         final String PREVIEW_STRING = INTENT.getStringExtra(BackgroundIntentService
                                 .NOTIFICATION_INTENT_EXTRA_PREVIEW_STRING);
-                    /*final int MESSAGE_COUNT = intent.getIntExtra(BackgroundIntentService
-                            .NOTIFICATION_INTENT_MESSAGE_COUNT, 0);
-                    final String BIG_STRING = intent.getStringExtra(BackgroundIntentService
-                            .NOTIFICATION_INTENT_EXTRA_BIG_STRING);*/
 
                         // create snack bar message that refreshes feed on action click
-                        newEntriesMessage = Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING,
-                                Snackbar.LENGTH_INDEFINITE)
-                                .setAction(R.string.main_activity_floating_button_tooltip_refresh, view -> checkForRssUpdates());
-                        newEntriesMessage.show();
-                    } else if (INTENT.getAction().equals(IliasBuddyNotificationInterface.UPDATE_SILENT)) {
+                        Snackbar.make(findViewById(R.id.fab), PREVIEW_STRING, Snackbar.LENGTH_INDEFINITE)
+                                .setAction(R.string.main_activity_floating_button_tooltip_refresh,
+                                        view -> checkForRssUpdates())
+                                .show();
+                    } else if (INTENT.getAction().equals(IliasBuddyNotificationHandler.UPDATE_SILENT)) {
                         // notification clicked that said update silently
                         try {
-                            renderNewList(IliasRssCache.getCache(CONTEXT));
+                            renderNewList(IliasBuddyCacheHandler.getCache(CONTEXT));
                         } catch (IOException | ClassNotFoundException e) {
                             e.printStackTrace();
                         }
@@ -153,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements
         // setup broadcast manager
         broadcastManager = LocalBroadcastManager.getInstance(this);
         final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(IliasBuddyNotificationInterface.FOUND_A_NEW_ENTRY);
+        intentFilter.addAction(IliasBuddyNotificationHandler.FOUND_A_NEW_ENTRY);
         broadcastManager.registerReceiver(broadcastReceiver, intentFilter);
 
         // setup web request manager
@@ -166,14 +162,14 @@ public class MainActivity extends AppCompatActivity implements
         // try to load saved RSS feed
         IliasRssFeedItem[] myDataSet = null;
         try {
-            myDataSet = IliasRssCache.getCache(this);
+            myDataSet = IliasBuddyCacheHandler.getCache(this);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         if (myDataSet == null) {
             // if data set is still null create clean list
             try {
-                IliasRssCache.clearCache(this);
+                IliasBuddyCacheHandler.clearCache(this);
                 currentDataSetLength = 0;
                 // clean latest RSS entries
                 latestRssEntryNewIliasRssFeedEntries = null;
@@ -213,11 +209,11 @@ public class MainActivity extends AppCompatActivity implements
         checkForRssUpdates();
 
         // check for a new version silently
-        AboutActivity.checkForUpdate(this, true);
+        IliasBuddyUpdateHandler.checkForUpdate(this, true);
     }
 
     public void menuDevOptionExampleNotification(final MenuItem menuItem) {
-        IliasBuddyNotification.showNotificationNewEntries(this, "titleString",
+        IliasBuddyNotificationHandler.showNotificationNewEntries(this, "titleString",
                 "previewString (single demo)", new String[]{"one"},
                 new Intent(this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
@@ -225,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void menuDevOptionExampleNotifications(final MenuItem item) {
-        IliasBuddyNotification.showNotificationNewEntries(this, "titleString",
+        IliasBuddyNotificationHandler.showNotificationNewEntries(this, "titleString",
                 "previewString (multiple demo)",
                 new String[]{"one", "two", "three"},
                 new Intent(this, MainActivity.class)
@@ -317,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void checkForRssUpdates() {
         // dismiss new entries notification
-        IliasBuddyNotification.hideNotificationNewEntries(this);
+        IliasBuddyNotificationHandler.hideNotificationNewEntries(this);
         // dismiss new entries snack bar
         if (newEntriesMessage != null && newEntriesMessage.isShownOrQueued()) {
             newEntriesMessage.dismiss();
@@ -361,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements
     public void devOptionCleanRssEntryList() {
         try {
             // clear cache by saving empty Feed
-            IliasRssCache.clearCache(this);
+            IliasBuddyCacheHandler.clearCache(this);
             // clear latest item and latest notification from preferences
             PreferenceManager.getDefaultSharedPreferences(this).edit()
                     .putString(BackgroundIntentService.LATEST_ELEMENT, "")
@@ -386,7 +382,7 @@ public class MainActivity extends AppCompatActivity implements
                                 NEW_ILIAS_RSS_FEED_ENTRIES[0].toString() : "").apply();
         // set new cache
         try {
-            IliasRssCache.setCache(this, NEW_ILIAS_RSS_FEED_ENTRIES);
+            IliasBuddyCacheHandler.setCache(this, NEW_ILIAS_RSS_FEED_ENTRIES);
         } catch (final IOException e1) {
             e1.printStackTrace();
         }
@@ -405,17 +401,17 @@ public class MainActivity extends AppCompatActivity implements
         super.onNewIntent(intent);
         // check if new elements were found
         if (intent.getBooleanExtra(
-                IliasBuddyNotificationInterface.NEW_ENTRY_FOUND, false)) {
+                IliasBuddyNotificationHandler.NEW_ENTRY_FOUND, false)) {
             Log.i("MainActivity", "onNewIntent: NEW_ENTRY_FOUND");
             // update Ilias RSS feed
             checkForRssUpdates();
             // if there is NEW_ENTRY_DATA extra perform a virtual click on the only new element
             if (intent.getParcelableExtra(
-                    IliasBuddyNotificationInterface.NEW_ENTRY_DATA) != null) {
+                    IliasBuddyNotificationHandler.NEW_ENTRY_DATA) != null) {
                 Log.i("MainActivity", "onNewIntent: NEW_ENTRY_DATA");
                 IliasRssItemListAdapter.alertDialogRssFeedEntry(
-                        intent.getParcelableExtra(IliasBuddyNotificationInterface.NEW_ENTRY_DATA),
-                        this, this);
+                        intent.getParcelableExtra(IliasBuddyNotificationHandler.NEW_ENTRY_DATA),
+                        this);
             }
         }
     }
@@ -479,30 +475,18 @@ public class MainActivity extends AppCompatActivity implements
 
 
     public void openCampus(final MenuItem item) {
-        openUrl("https://campus.uni-stuttgart.de/cusonline/webnav.ini");
+        IliasBuddyMiscellaneousHandler.openUrl(this,
+                "https://campus.uni-stuttgart.de/cusonline/webnav.ini");
     }
 
     public void openIlias(final MenuItem item) {
-        openUrl("https://ilias3.uni-stuttgart.de/login.php?client_id=Uni_Stuttgart&lang=de");
-    }
-
-    /**
-     * Open a website in the device browser
-     *
-     * @param URL (String) - Website link/address
-     */
-    private void openUrl(final String URL) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(URL)));
+        IliasBuddyMiscellaneousHandler.openUrl(this,
+                "https://ilias3.uni-stuttgart.de/login.php?client_id=Uni_Stuttgart&lang=de");
     }
 
     @Override
     public IliasRssFeedItem listAdapterGetLatestEntry() {
         return latestRssEntry;
-    }
-
-    @Override
-    public void alertDialogOpenUrl(final String URL) {
-        openUrl(URL);
     }
 
     @Override
@@ -532,12 +516,12 @@ public class MainActivity extends AppCompatActivity implements
     public void menuDevOptionCleanFirstElement(final MenuItem item) {
         try {
             // load IliasRssFeedItem[] from cache
-            final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES = IliasRssCache.getCache(this);
+            final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES = IliasBuddyCacheHandler.getCache(this);
             // if it's not null and IliasRssFeedItem[] has at least one element remove the first
             if (CURRENT_ILIAS_ENTRIES.length >= 1) {
                 final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES_2 = Arrays.copyOfRange(
                         CURRENT_ILIAS_ENTRIES, 1, CURRENT_ILIAS_ENTRIES.length);
-                IliasRssCache.setCache(this, CURRENT_ILIAS_ENTRIES_2);
+                IliasBuddyCacheHandler.setCache(this, CURRENT_ILIAS_ENTRIES_2);
                 // clean things in the future
                 currentDataSetLength--;
                 latestRssEntry = CURRENT_ILIAS_ENTRIES_2[0];
@@ -561,5 +545,12 @@ public class MainActivity extends AppCompatActivity implements
 
     public void filterPosts(final MenuItem item) {
         mAdapter.filterPosts(!item.isChecked());
+    }
+
+    public void menuShare(final MenuItem item) {
+        IliasBuddyMiscellaneousHandler.shareLink(this,
+                getString(R.string.app_name),
+                "IliasBuddy\nhttps://github.com/AnonymerNiklasistanonym/IliasBuddy/releases",
+                getString(R.string.main_activity_toolbar_options_action_share));
     }
 }

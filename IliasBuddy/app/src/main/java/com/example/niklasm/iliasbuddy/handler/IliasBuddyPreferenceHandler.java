@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.preferences_handler;
+package com.example.niklasm.iliasbuddy.handler;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,12 +9,13 @@ import com.example.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
 
 public class IliasBuddyPreferenceHandler {
 
-    private final static String PRIVATE_FEED_URL = "ilias_url";
-    private final static String PRIVATE_FEED_USER_NAME = "ilias_user_name";
-    private final static String PRIVATE_FEED_USER_PASSWORD = "ilias_password";
-    private final static String PREFERENCE_NAME_PRIVATE_FEED = "myPrefs";
-    private final static String PREFERENCE_NOTIFICATION_VIBRATE = "notifications_new_message_vibrate";
-    private final static String PREFERENCE_NOTIFICATION_RINGTONE = "notifications_new_message_ringtone";
+    private static final String PRIVATE_FEED_URL = "ilias_url";
+    private static final String PRIVATE_FEED_USER_NAME = "ilias_user_name";
+    private static final String PRIVATE_FEED_USER_PASSWORD = "ilias_password";
+    private static final String PREFERENCE_NAME_PRIVATE_FEED = "myPrefs";
+    private static final String PREFERENCE_NOTIFICATION_VIBRATE = "notifications_new_message_vibrate";
+    private static final String PREFERENCE_NOTIFICATION_RINGTONE = "notifications_new_message_ringtone";
+    private static final String FEED_LAST_NOTIFICATION_TEXT = "FEED_LAST_NOTIFICATION_TEXT";
 
     private static boolean getPreferenceBoolean(@NonNull final Context CONTEXT,
                                                 @NonNull final String PREFERENCE,
@@ -28,6 +29,13 @@ public class IliasBuddyPreferenceHandler {
                                               final String DEFAULT_VALUE) {
         return PreferenceManager.getDefaultSharedPreferences(CONTEXT)
                 .getString(PREFERENCE, DEFAULT_VALUE);
+    }
+
+    private static void setPreferenceString(@NonNull final Context CONTEXT,
+                                            @NonNull final String PREFERENCE,
+                                            final String VALUE) {
+        PreferenceManager.getDefaultSharedPreferences(CONTEXT)
+                .edit().putString(PREFERENCE, VALUE).apply();
     }
 
     public static void saveCredentials(@NonNull final Context CONTEXT,
@@ -68,5 +76,15 @@ public class IliasBuddyPreferenceHandler {
     public static String getNotificationRingtone(final Context CONTEXT, final String DEFAULT) {
         return IliasBuddyPreferenceHandler.getPreferenceString(CONTEXT,
                 IliasBuddyPreferenceHandler.PREFERENCE_NOTIFICATION_RINGTONE, DEFAULT);
+    }
+
+    public static String getLastNotificationText(final Context CONTEXT, final String DEFAULT) {
+        return IliasBuddyPreferenceHandler.getPreferenceString(CONTEXT,
+                IliasBuddyPreferenceHandler.FEED_LAST_NOTIFICATION_TEXT, DEFAULT);
+    }
+
+    public static void setLastNotificationText(final Context CONTEXT, final String VALUE) {
+        IliasBuddyPreferenceHandler.setPreferenceString(CONTEXT,
+                IliasBuddyPreferenceHandler.FEED_LAST_NOTIFICATION_TEXT, VALUE);
     }
 }

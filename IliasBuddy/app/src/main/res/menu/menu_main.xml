@@ -104,4 +104,10 @@
         android:title="@string/main_activity_toolbar_options_action_setup"
         app:showAsAction="never" />
 
+    <item
+        android:icon="@drawable/ic_share_black"
+        android:onClick="menuShare"
+        android:title="@string/main_activity_toolbar_options_action_share"
+        app:showAsAction="never" />
+
 </menu>

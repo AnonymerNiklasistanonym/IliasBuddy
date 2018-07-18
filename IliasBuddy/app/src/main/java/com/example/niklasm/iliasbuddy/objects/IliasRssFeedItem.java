@@ -1,8 +1,10 @@
 package com.example.niklasm.iliasbuddy.objects;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.Html;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -23,6 +25,8 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
             return new IliasRssFeedItem[size];
         }
     };
+
+    private static final String SIMPLE_TIME_DATE_FORMAT = "dd.MM HH:mm";
 
     @NonNull
     final private String COURSE;
@@ -135,23 +139,33 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
     }
 
     /**
-     * @param VIEW_FORMAT_DATE Readable time format of notification
+     * @param CONTEXT Get Context for locale
      * @return Notification preview text for single notification
      */
     @NonNull
-    public String toStringNotificationSingle(@NonNull final SimpleDateFormat VIEW_FORMAT_DATE) {
-        return ">> " + (TITLE_EXTRA != null ? TITLE_EXTRA + ": " : "")
-                + TITLE + "\n(" + VIEW_FORMAT_DATE.format(DATE) + ")";
+    public String toStringNotificationPreview(@NonNull final Context CONTEXT) {
+        return ">> " + (TITLE_EXTRA != null ? TITLE_EXTRA + ": " : "") + TITLE + "\n(" +
+                new SimpleDateFormat(IliasRssFeedItem.SIMPLE_TIME_DATE_FORMAT,
+                        CONTEXT.getResources().getConfiguration().locale).format(DATE) + ")";
     }
 
     /**
-     * @param VIEW_FORMAT_DATE Readable time format of notification
-     * @return Notification preview text for multiple notification
+     * @param CONTEXT Get Context for locale
+     * @return Notification text for multiple notification big
      */
     @NonNull
-    public String toStringNotificationMultiple(@NonNull final SimpleDateFormat VIEW_FORMAT_DATE) {
+    public String toStringNotificationBigMultiple(@NonNull final Context CONTEXT) {
         return COURSE + (EXTRA != null ? " > " + EXTRA : "") +
-                toStringNotificationSingle(VIEW_FORMAT_DATE);
+                toStringNotificationPreview(CONTEXT);
+    }
+
+    /**
+     * @param CONTEXT Get Context for locale
+     * @return Notification preview text for one notification big
+     */
+    public String toStringNotificationBigSingle(@NonNull final Context CONTEXT) {
+        return toStringNotificationPreview(CONTEXT) +
+                (!DESCRIPTION.equals("") ? "\n\n" + Html.fromHtml(DESCRIPTION) : "");
     }
 
     @Override

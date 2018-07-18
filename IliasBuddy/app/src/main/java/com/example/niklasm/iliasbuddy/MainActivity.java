@@ -31,8 +31,8 @@ import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService
 import com.example.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
 import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotification;
 import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationInterface;
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssCache;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItem;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemDecoration;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemListAdapter;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItemListAdapterInterface;
@@ -64,11 +64,11 @@ public class MainActivity extends AppCompatActivity implements
     private IliasRssItemListAdapter mAdapter;
     private Snackbar newEntriesMessage;
     private IliasRssXmlWebRequester iliasRssXmlWebRequester;
-    private IliasRssItem latestRssEntry;
-    private IliasRssItem latestRssEntryNewIliasRssFeedEntries;
+    private IliasRssFeedItem latestRssEntry;
+    private IliasRssFeedItem latestRssEntryNewIliasRssFeedEntries;
     private int currentDataSetLength;
     private SwipeRefreshLayout rssEntryRecyclerViewSwipeToRefreshLayout;
-    private List<IliasRssItem> items;
+    private List<IliasRssFeedItem> items;
     private Menu menu;
 
     /**
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements
          */
 
         // try to load saved RSS feed
-        IliasRssItem[] myDataSet = null;
+        IliasRssFeedItem[] myDataSet = null;
         try {
             myDataSet = IliasRssCache.getCache(this);
         } catch (IOException | ClassNotFoundException e) {
@@ -254,8 +254,8 @@ public class MainActivity extends AppCompatActivity implements
     public void processIliasXml(final String FEED_XML_DATA) {
         // save latest response in variable
         MainActivity.devOptionSetLastResponse(FEED_XML_DATA);
-        // parse String Ilias RSS feed to IliasRssItem[] array
-        final IliasRssItem[] myDataSet;
+        // parse String Ilias RSS feed to IliasRssFeedItem[] array
+        final IliasRssFeedItem[] myDataSet;
         try {
             myDataSet = IliasRssXmlParser.parse(new ByteArrayInputStream(FEED_XML_DATA
                     .replace("<rss version=\"2.0\">", "")
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         // get the latest RSS entry from the main activity
-        final IliasRssItem latestRssEntry = getLatestRssEntry();
+        final IliasRssFeedItem latestRssEntry = getLatestRssEntry();
         // only continue if the latest object is different
         if (latestRssEntry == null || !latestRssEntry.toString().equals(myDataSet[0].toString())) {
             renderNewList(myDataSet);
@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(new Intent(this, SettingsActivity.class));
     }
 
-    public IliasRssItem getLatestRssEntry() {
+    public IliasRssFeedItem getLatestRssEntry() {
         return latestRssEntry;
     }
 
@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements
             // set latestRssEntry to null
             latestRssEntry = null;
             // render empty list to override the current one
-            renderNewList(new IliasRssItem[0]);
+            renderNewList(new IliasRssFeedItem[0]);
             currentDataSetLength = 0;
             // clear the last server response
             MainActivity.lastResponse = null;
@@ -378,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void renderNewList(final IliasRssItem[] NEW_ILIAS_RSS_FEED_ENTRIES) {
+    public void renderNewList(final IliasRssFeedItem[] NEW_ILIAS_RSS_FEED_ENTRIES) {
         // save latest element of new data set in preferences
         PreferenceManager.getDefaultSharedPreferences(this).edit()
                 .putString(BackgroundIntentService.LATEST_ELEMENT,
@@ -496,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public IliasRssItem listAdapterGetLatestEntry() {
+    public IliasRssFeedItem listAdapterGetLatestEntry() {
         return latestRssEntry;
     }
 
@@ -531,11 +531,11 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionCleanFirstElement(final MenuItem item) {
         try {
-            // load IliasRssItem[] from cache
-            final IliasRssItem[] CURRENT_ILIAS_ENTRIES = IliasRssCache.getCache(this);
-            // if it's not null and IliasRssItem[] has at least one element remove the first
+            // load IliasRssFeedItem[] from cache
+            final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES = IliasRssCache.getCache(this);
+            // if it's not null and IliasRssFeedItem[] has at least one element remove the first
             if (CURRENT_ILIAS_ENTRIES.length >= 1) {
-                final IliasRssItem[] CURRENT_ILIAS_ENTRIES_2 = Arrays.copyOfRange(
+                final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES_2 = Arrays.copyOfRange(
                         CURRENT_ILIAS_ENTRIES, 1, CURRENT_ILIAS_ENTRIES.length);
                 IliasRssCache.setCache(this, CURRENT_ILIAS_ENTRIES_2);
                 // clean things in the future

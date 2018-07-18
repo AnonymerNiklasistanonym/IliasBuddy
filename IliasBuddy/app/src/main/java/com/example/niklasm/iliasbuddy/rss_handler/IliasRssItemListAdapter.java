@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.niklasm.iliasbuddy.R;
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.Objects;
 public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemListAdapter.ViewHolder>
         implements Filterable {
 
-    private final List<IliasRssItem> items;
+    private final List<IliasRssFeedItem> items;
     private final SimpleDateFormat viewDateFormat;
     private final SimpleDateFormat viewTimeFormat;
     private final Context CONTEXT;
@@ -35,10 +36,10 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     private boolean filterFiles = true, filterPosts = true;
     // Allows to remember the last item shown on screen
     private int lastPosition = -1;
-    private List<IliasRssItem> itemsFiltered;
+    private List<IliasRssFeedItem> itemsFiltered;
     private String currentSearch = "";
 
-    public IliasRssItemListAdapter(final List<IliasRssItem> dataSet, @NonNull final Context CONTEXT,
+    public IliasRssItemListAdapter(final List<IliasRssFeedItem> dataSet, @NonNull final Context CONTEXT,
                                    @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
         items = dataSet;
         itemsFiltered = dataSet;
@@ -50,7 +51,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         this.ADAPTER_INTERFACE = ADAPTER_INTERFACE;
     }
 
-    public static void alertDialogRssFeedEntry(@NonNull final IliasRssItem ILIAS_RSS_ITEM,
+    public static void alertDialogRssFeedEntry(@NonNull final IliasRssFeedItem ILIAS_RSS_ITEM,
                                                @NonNull final IliasRssItemAlertDialogInterface ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE,
                                                @NonNull final Context CONTEXT) {
         if (ILIAS_RSS_ITEM.getDescription().equals("")) {
@@ -96,7 +97,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         // Replace the contents of a view (invoked by the layout manager)
         // - get element from the data set at this position
         // - replace the contents of the view with that element
-        final IliasRssItem CURRENT_ELEMENT = itemsFiltered.get(position);
+        final IliasRssFeedItem CURRENT_ELEMENT = itemsFiltered.get(position);
 
         // These views have always these values and are always visible
         holder.course.setText(CURRENT_ELEMENT.getCourse());
@@ -137,7 +138,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         Highlight background if the current entry is new in respect to the latest item of the
          adapter interface - else reset background color to transparent
         */
-        final IliasRssItem ADAPTER_INTERFACE_LATEST_ITEM =
+        final IliasRssFeedItem ADAPTER_INTERFACE_LATEST_ITEM =
                 ADAPTER_INTERFACE.listAdapterGetLatestEntry();
         if (ADAPTER_INTERFACE_LATEST_ITEM == null ||
                 ADAPTER_INTERFACE_LATEST_ITEM.getDate().getTime()
@@ -177,9 +178,9 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                 if (charString.isEmpty()) {
                     itemsFiltered = new ArrayList<>(items);
                 } else {
-                    final List<IliasRssItem> filteredList = new ArrayList<>();
+                    final List<IliasRssFeedItem> filteredList = new ArrayList<>();
                     // check which entries should be added to the filtered list
-                    for (final IliasRssItem ENTRY : items) {
+                    for (final IliasRssFeedItem ENTRY : items) {
                         if (ENTRY.containsIgnoreCase(charString, viewDateFormat, viewTimeFormat)) {
                             filteredList.add(ENTRY);
                         }
@@ -189,9 +190,9 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                 // if no files should be filtered remove them
                 if (!filterFiles) {
                     Log.i("RemoveDebug", "remove files");
-                    final List<IliasRssItem> filteredList = new ArrayList<>();
+                    final List<IliasRssFeedItem> filteredList = new ArrayList<>();
                     // check which entries should be added to the filtered list
-                    for (final IliasRssItem ENTRY : itemsFiltered) {
+                    for (final IliasRssFeedItem ENTRY : itemsFiltered) {
                         if (!ENTRY.isFileUpdate()) {
                             filteredList.add(ENTRY);
                         }
@@ -200,9 +201,9 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                 }
                 if (!filterPosts) {
                     Log.i("RemoveDebug", "remove posts");
-                    final List<IliasRssItem> filteredList = new ArrayList<>();
+                    final List<IliasRssFeedItem> filteredList = new ArrayList<>();
                     // check which entries should be added to the filtered list
-                    for (final IliasRssItem ENTRY : itemsFiltered) {
+                    for (final IliasRssFeedItem ENTRY : itemsFiltered) {
                         if (ENTRY.isFileUpdate()) {
                             filteredList.add(ENTRY);
                         }
@@ -223,8 +224,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     final List<?> result = (List<?>) filterResults.values;
                     itemsFiltered = new ArrayList<>();
                     for (final Object object : result) {
-                        if (object instanceof IliasRssItem) {
-                            itemsFiltered.add((IliasRssItem) object);
+                        if (object instanceof IliasRssFeedItem) {
+                            itemsFiltered.add((IliasRssFeedItem) object);
                         }
                     }
                 }

@@ -8,7 +8,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyCredentials;
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
 import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyPreferenceHandler;
 
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class IliasRssXmlWebRequester {
 
     public void getWebContent() {
 
-        final IliasBuddyCredentials CREDENTIALS =
+        final IliasRssFeedCredentials CREDENTIALS =
                 IliasBuddyPreferenceHandler.getCredentials(CONTEXT);
 
         final RequestQueue queue = Volley.newRequestQueue(CONTEXT);

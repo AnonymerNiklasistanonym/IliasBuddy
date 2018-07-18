@@ -16,8 +16,8 @@ import com.example.niklasm.iliasbuddy.MainActivity;
 import com.example.niklasm.iliasbuddy.R;
 import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotification;
 import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationInterface;
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssCache;
-import com.example.niklasm.iliasbuddy.rss_handler.IliasRssItem;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlParser;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequester;
 import com.example.niklasm.iliasbuddy.rss_handler.IliasRssXmlWebRequesterInterface;
@@ -40,7 +40,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
     final public static String LAST_NOTIFICATION_TEXT = "LAST_NOTIFICATION_TEXT";
     final public static String LATEST_ELEMENT = "LATEST_ELEMENT";
     private final static String LATEST_ITEM_NOT_FOUND = "nothing_found";
-    private static IliasRssItem[] current_items;
+    private static IliasRssFeedItem[] current_items;
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
@@ -84,7 +84,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
                                    @NonNull final String NOTIFICATION_PREVIEW_CONTENT,
                                    final String bigString,
                                    final String[] INBOX_MESSAGES, final String URL,
-                                   final IliasRssItem TEST_ENTRY, final IliasRssItem[] ALL_NEW_ENTRIES) {
+                                   final IliasRssFeedItem TEST_ENTRY, final IliasRssFeedItem[] ALL_NEW_ENTRIES) {
 
         final SharedPreferences myPrefs =
                 android.preference.PreferenceManager.getDefaultSharedPreferences(this);
@@ -124,8 +124,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         LocalBroadcastManager.getInstance(this).sendBroadcast(callMainActivity);
     }
 
-    private IliasRssItem[] getNewElements(final IliasRssItem[] NEW_DATA_SET,
-                                          final String CURRENT_LATEST_ENTRY) {
+    private IliasRssFeedItem[] getNewElements(final IliasRssFeedItem[] NEW_DATA_SET,
+                                              final String CURRENT_LATEST_ENTRY) {
 
         // if new data is null return null
         if (NEW_DATA_SET == null || NEW_DATA_SET.length == 0) {
@@ -137,13 +137,13 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             return NEW_DATA_SET;
         }
 
-        final ArrayList<IliasRssItem> newIliasRssItems = new ArrayList<>();
+        final ArrayList<IliasRssFeedItem> newIliasRssItems = new ArrayList<>();
 
         // else check which elements of the new data set are new
-        for (final IliasRssItem NEW_ENTRY : NEW_DATA_SET) {
+        for (final IliasRssFeedItem NEW_ENTRY : NEW_DATA_SET) {
             if (NEW_ENTRY.toString().equals(CURRENT_LATEST_ENTRY)) {
                 // if newest entry was found return all found entries
-                return newIliasRssItems.toArray(new IliasRssItem[0]);
+                return newIliasRssItems.toArray(new IliasRssFeedItem[0]);
             } else {
                 newIliasRssItems.add(NEW_ENTRY);
             }
@@ -160,7 +160,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         final InputStream stream = new ByteArrayInputStream(FEED_XML_DATA
                 .replace("<rss version=\"2.0\">", "")
                 .replace("</rss>", "").getBytes(StandardCharsets.UTF_8));
-        final IliasRssItem[] myDataSet;
+        final IliasRssFeedItem[] myDataSet;
         try {
             myDataSet = IliasRssXmlParser.parse(stream);
         } catch (ParseException | XmlPullParserException | IOException e) {
@@ -175,7 +175,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         final String latestItem =
                 myPrefs.getString(BackgroundIntentService.LATEST_ELEMENT, null);
 
-        final IliasRssItem[] NEW_ENTRIES = getNewElements(myDataSet, latestItem);
+        final IliasRssFeedItem[] NEW_ENTRIES = getNewElements(myDataSet, latestItem);
 
         final SimpleDateFormat VIEW_DATE_FORMAT = new SimpleDateFormat(
                 "dd.MM HH:mm", getResources().getConfiguration().locale);
@@ -207,7 +207,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             final StringBuilder bigString = new StringBuilder("");
             final String[] inboxArray = new String[NEW_ENTRIES.length];
             for (int i = 0; i < NEW_ENTRIES.length; i++) {
-                final IliasRssItem entry = NEW_ENTRIES[i];
+                final IliasRssFeedItem entry = NEW_ENTRIES[i];
                 inboxArray[i] = entry.toStringNotificationMultiple(VIEW_DATE_FORMAT);
                 bigString.append("- ").append(inboxArray[i]).append(
                         (i != NEW_ENTRIES.length - 1 ? "\n" : ""));

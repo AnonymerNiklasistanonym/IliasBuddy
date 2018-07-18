@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -18,6 +17,7 @@ import android.util.Log;
 import com.example.niklasm.iliasbuddy.MainActivity;
 import com.example.niklasm.iliasbuddy.R;
 import com.example.niklasm.iliasbuddy.background_service.BackgroundIntentService;
+import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyPreferenceHandler;
 
 import java.util.Objects;
 
@@ -40,8 +40,7 @@ public class IliasBuddyNotification {
          */
         IliasBuddyNotification.createNotificationChannel(CONTEXT, CHANNEL_ID, CHANNEL_NAME,
                 CHANNEL_DESCRIPTION, HIGH_PRIORITY, HIGH_PRIORITY, HIGH_PRIORITY &&
-                        PreferenceManager.getDefaultSharedPreferences(CONTEXT)
-                                .getBoolean("notifications_new_message_vibrate", true),
+                        IliasBuddyPreferenceHandler.getNotificationVibrate(CONTEXT, true),
                 HIGH_PRIORITY);
 
         return new NotificationCompat.Builder(CONTEXT, CHANNEL_ID)
@@ -108,23 +107,21 @@ public class IliasBuddyNotification {
                 .setLights(ContextCompat.getColor(CONTEXT, R.color.colorPrimary),
                         3000, 3000)
                 // set ringtone from preferences
-                .setSound(Uri.parse(PreferenceManager.getDefaultSharedPreferences(CONTEXT)
-                        .getString("notifications_new_message_ringtone",
-                                "content://settings/system/notification_sound")))
+                .setSound(Uri.parse(IliasBuddyPreferenceHandler.getNotificationRingtone(CONTEXT,
+                        "content://settings/system/notification_sound")))
                 // number in badge/notification
                 .setNumber(CONTENT_BIG.length)
                 // dismiss action button
                 .addAction(IliasBuddyNotification.actionDismiss(CONTEXT));
 
         // Set vibration if preferences say so
-        if (PreferenceManager.getDefaultSharedPreferences(CONTEXT)
-                .getBoolean("notifications_new_message_vibrate", true)) {
+        if (IliasBuddyPreferenceHandler.getNotificationVibrate(CONTEXT, true)) {
             NOTIFICATION_BUILDER.setDefaults(Notification.DEFAULT_VIBRATE);
         }
 
         // Add URL action if URL is not null
         if (URL != null) {
-            NOTIFICATION_BUILDER.addAction(IliasBuddyNotification.actionOpenIliasUrl(CONTEXT, URL));
+            NOTIFICATION_BUILDER.addAction(IliasBuddyNotification.actionOpenUrl(CONTEXT, URL));
         }
 
         return NOTIFICATION_BUILDER.build();
@@ -165,8 +162,8 @@ public class IliasBuddyNotification {
     }
 
     @NonNull
-    private static NotificationCompat.Action actionOpenIliasUrl(@NonNull final Context CONTEXT,
-                                                                @NonNull final String URL) {
+    private static NotificationCompat.Action actionOpenUrl(@NonNull final Context CONTEXT,
+                                                           @NonNull final String URL) {
         return new NotificationCompat.Action.Builder(R.drawable.ic_open_in_browser_black,
                 CONTEXT.getString(R.string.open_in_ilias),
                 PendingIntent.getActivity(CONTEXT, 0,
@@ -205,10 +202,12 @@ public class IliasBuddyNotification {
         Log.d("IliasBuddyNotification", "showNotificationNewEntries()");
 
         IliasBuddyNotification.showNotification(CONTEXT,
-                IliasBuddyNotification.createNewEntries(CONTEXT, IliasBuddyNotificationNewEntriesInterface.CHANNEL_ID,
+                IliasBuddyNotification.createNewEntries(CONTEXT,
+                        IliasBuddyNotificationNewEntriesInterface.CHANNEL_ID,
                         CONTEXT.getString(R.string.notification_channel_new_entries_name),
                         CONTEXT.getString(R.string.notification_channel_new_entries_description),
-                        CONTENT_TITLE, CONTENT_PREVIEW, CONTENT_BIG, ON_CLICK_ACTIVITY_INTENT, URL),
+                        CONTENT_TITLE, CONTENT_PREVIEW, CONTENT_BIG, ON_CLICK_ACTIVITY_INTENT,
+                        URL),
                 IliasBuddyNotificationNewEntriesInterface.NOTIFICATION_ID);
     }
 

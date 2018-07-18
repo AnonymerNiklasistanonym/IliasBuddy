@@ -21,7 +21,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyCredentials;
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
 import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyPreferenceHandler;
 
 import java.util.Objects;
@@ -64,7 +64,7 @@ public class SetupActivity extends AppCompatActivity {
         final EditText rssPassword = findViewById(R.id.password);
         final View fabButton = findViewById(R.id.fabSetup);
 
-        final IliasBuddyCredentials CREDENTIALS =
+        final IliasRssFeedCredentials CREDENTIALS =
                 IliasBuddyPreferenceHandler.getCredentials(this);
         rssUrl.setText(CREDENTIALS.getUserUrl());
         rssUserName.setText(CREDENTIALS.getUserName());

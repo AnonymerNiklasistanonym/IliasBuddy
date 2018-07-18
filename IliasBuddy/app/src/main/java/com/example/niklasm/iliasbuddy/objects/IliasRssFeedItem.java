@@ -1,26 +1,26 @@
-package com.example.niklasm.iliasbuddy.rss_handler;
+package com.example.niklasm.iliasbuddy.objects;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Parcelable {
+public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializable, Parcelable {
 
-    public static final Creator<IliasRssItem> CREATOR = new Creator<IliasRssItem>() {
+    public static final Creator<IliasRssFeedItem> CREATOR = new Creator<IliasRssFeedItem>() {
+        @NonNull
         @Override
-        public IliasRssItem createFromParcel(final Parcel in) {
-            return new IliasRssItem(in);
+        public IliasRssFeedItem createFromParcel(final Parcel in) {
+            return new IliasRssFeedItem(in);
         }
 
         @Override
-        public IliasRssItem[] newArray(final int size) {
-            return new IliasRssItem[size];
+        public IliasRssFeedItem[] newArray(final int size) {
+            return new IliasRssFeedItem[size];
         }
     };
 
@@ -41,16 +41,16 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
      * Constructor that creates a new IliasEntry
      *
      * @param COURSE      Name of the Ilias course of the RSS entry ("Math for Informatics")
-     * @param TITLE       Title of the Ilias course of the RSS entry ("Question to exercise 6.2")
-     * @param TITLE_EXTRA Extra information about where the entry is ("Forum")
+     * @param TITLE       Title of the course/file update ("Question to A4"/"File was updated.")
+     * @param TITLE_EXTRA Extra information about where the entry is ("Forum") which can be null
      * @param DESCRIPTION Content/Description of the Ilias course of the RSS entry
      * @param LINK        Link to Ilias post of the RSS entry
      * @param DATE        Date of the RSS entry
-     * @param EXTRA       Extra bit in the title ("File was updated.")
+     * @param EXTRA       Is not null if there was a file update ("FileName.pdf")
      */
-    IliasRssItem(@NonNull final String COURSE, final String TITLE_EXTRA,
-                 @NonNull final String TITLE, @NonNull final String DESCRIPTION,
-                 @NonNull final String LINK, @NonNull final Date DATE, final String EXTRA) {
+    public IliasRssFeedItem(@NonNull final String COURSE, final String TITLE_EXTRA,
+                            @NonNull final String TITLE, @NonNull final String DESCRIPTION,
+                            @NonNull final String LINK, @NonNull final Date DATE, final String EXTRA) {
         this.COURSE = COURSE;
         this.TITLE_EXTRA = TITLE_EXTRA;
         this.TITLE = TITLE;
@@ -58,10 +58,9 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         this.LINK = LINK;
         this.DATE = DATE;
         this.EXTRA = EXTRA;
-        Log.i("DEBUG", toString());
     }
 
-    private IliasRssItem(@NonNull final Parcel IN) {
+    private IliasRssFeedItem(@NonNull final Parcel IN) {
         COURSE = IN.readString();
         TITLE_EXTRA = IN.readString();
         TITLE = IN.readString();
@@ -71,25 +70,41 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         EXTRA = IN.readString();
     }
 
+    /**
+     * @return Ilias course name of the RSS entry ("Math for Informatics")
+     */
     @NonNull
     public String getCourse() {
         return COURSE;
     }
 
+    /**
+     * @return Ilias location of entry ("Forum")
+     */
     public String getTitleExtra() {
         return TITLE_EXTRA;
     }
 
+    /**
+     * @return Title of the Ilias post/file update ("Question exercise 4"/"File was updated.")
+     */
     @NonNull
     public String getTitle() {
         return TITLE;
     }
 
+    /**
+     * @return Description of the Ilias post or in case of a file an empty String
+     * ("My question is...plz help."/"")
+     */
     @NonNull
     public String getDescription() {
         return DESCRIPTION;
     }
 
+    /**
+     * @return HTTPS URL link to Ilias entry  of the RSS entry
+     */
     @NonNull
     public String getLink() {
         return LINK;
@@ -105,7 +120,7 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
     }
 
     /**
-     * @return IliasRssItem entry is a file update
+     * @return IliasRssFeedItem entry is a file update
      */
     public boolean isFileUpdate() {
         return DESCRIPTION.equals("");
@@ -140,7 +155,7 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
     }
 
     @Override
-    public int compare(final IliasRssItem OBJECT_1, final IliasRssItem OBJECT_2) {
+    public int compare(final IliasRssFeedItem OBJECT_1, final IliasRssFeedItem OBJECT_2) {
         final int DATE_IS_THE_SAME = OBJECT_1.getDate().compareTo(OBJECT_2.getDate());
         if (DATE_IS_THE_SAME != 0) {
             return DATE_IS_THE_SAME;
@@ -210,7 +225,7 @@ public class IliasRssItem implements Comparator<IliasRssItem>, Serializable, Par
         // check if in any property the search string is contained (ignoring upper-/lowercase)
         return COURSE.toLowerCase().contains(LOWER_CASE_QUERY)
                 || (EXTRA != null && EXTRA.toLowerCase().contains(LOWER_CASE_QUERY))
-                || TITLE_EXTRA.toLowerCase().contains(LOWER_CASE_QUERY)
+                || (TITLE_EXTRA != null && TITLE_EXTRA.toLowerCase().contains(LOWER_CASE_QUERY))
                 || TITLE.toLowerCase().contains(LOWER_CASE_QUERY)
                 || DESCRIPTION.toLowerCase().contains(LOWER_CASE_QUERY)
                 || LINK.toLowerCase().contains(LOWER_CASE_QUERY)

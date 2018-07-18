@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,7 +15,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
 /**
- * Class that can save the IliasRssItem array to a file and read/load it later
+ * Class that can save the IliasRssFeedItem array to a file and read/load it later
  */
 public class IliasRssCache {
 
@@ -48,20 +50,20 @@ public class IliasRssCache {
      * @throws ClassNotFoundException Object could not be read from serialized data
      */
     @NonNull
-    public static IliasRssItem[] getCache(@NonNull final Context CONTEXT)
+    public static IliasRssFeedItem[] getCache(@NonNull final Context CONTEXT)
             throws IOException, ClassNotFoundException {
 
         // get cache file
         final File ILIAS_RSS_CACHE_FILE = IliasRssCache.getFile(CONTEXT);
 
-        // convert content of cache file to a IliasRssItem array
+        // convert content of cache file to a IliasRssFeedItem array
         final ObjectInputStream CACHE_FILE_INPUT_STREAM =
                 new ObjectInputStream(new FileInputStream(ILIAS_RSS_CACHE_FILE));
-        final IliasRssItem[] CACHED_ILIAS_RSS_ITEMS =
-                (IliasRssItem[]) CACHE_FILE_INPUT_STREAM.readObject();
+        final IliasRssFeedItem[] CACHED_ILIAS_RSS_ITEMS =
+                (IliasRssFeedItem[]) CACHE_FILE_INPUT_STREAM.readObject();
         CACHE_FILE_INPUT_STREAM.close();
 
-        // return the cached IliasRssItem array
+        // return the cached IliasRssFeedItem array
         return CACHED_ILIAS_RSS_ITEMS;
     }
 
@@ -73,7 +75,7 @@ public class IliasRssCache {
      * @throws IOException Cache file could not be found/created/written error
      */
     public static void setCache(@NonNull final Context CONTEXT,
-                                @NonNull final IliasRssItem[] DATA_TO_CACHE)
+                                @NonNull final IliasRssFeedItem[] DATA_TO_CACHE)
             throws IOException {
 
         // get cache file
@@ -89,7 +91,7 @@ public class IliasRssCache {
             Log.e("IliasRssCache", "Directory for cache file could not be created");
         }
 
-        // write given IliasRssItem[] to cache file
+        // write given IliasRssFeedItem[] to cache file
         final ObjectOutput CACHE_FILE_OUTPUT_STREAM =
                 new ObjectOutputStream(new FileOutputStream(ILIAS_RSS_CACHE_FILE));
         CACHE_FILE_OUTPUT_STREAM.writeObject(DATA_TO_CACHE);
@@ -98,7 +100,7 @@ public class IliasRssCache {
 
     public static void clearCache(@NonNull final Context CONTEXT)
             throws IOException {
-        IliasRssCache.setCache(CONTEXT, new IliasRssItem[0]);
+        IliasRssCache.setCache(CONTEXT, new IliasRssFeedItem[0]);
     }
 
 }

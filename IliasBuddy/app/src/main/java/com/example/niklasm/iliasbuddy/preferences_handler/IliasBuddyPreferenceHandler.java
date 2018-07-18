@@ -5,7 +5,16 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
+
 public class IliasBuddyPreferenceHandler {
+
+    private final static String PRIVATE_FEED_URL = "ilias_url";
+    private final static String PRIVATE_FEED_USER_NAME = "ilias_user_name";
+    private final static String PRIVATE_FEED_USER_PASSWORD = "ilias_password";
+    private final static String PREFERENCE_NAME_PRIVATE_FEED = "myPrefs";
+    private final static String PREFERENCE_NOTIFICATION_VIBRATE = "notifications_new_message_vibrate";
+    private final static String PREFERENCE_NOTIFICATION_RINGTONE = "notifications_new_message_ringtone";
 
     private static boolean getPreferenceBoolean(@NonNull final Context CONTEXT,
                                                 @NonNull final String PREFERENCE,
@@ -26,30 +35,38 @@ public class IliasBuddyPreferenceHandler {
                                        @NonNull final String USER_PASSWORD,
                                        @NonNull final String USER_URL) {
         CONTEXT.getSharedPreferences(
-                IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_PREFERENCE_NAME,
+                IliasBuddyPreferenceHandler.PREFERENCE_NAME_PRIVATE_FEED,
                 Context.MODE_PRIVATE).edit()
-                .putString(IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_USER_NAME,
+                .putString(IliasBuddyPreferenceHandler.PRIVATE_FEED_USER_NAME,
                         USER_NAME)
-                .putString(IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_USER_PASSWORD,
+                .putString(IliasBuddyPreferenceHandler.PRIVATE_FEED_USER_PASSWORD,
                         USER_PASSWORD)
-                .putString(IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_URL,
+                .putString(IliasBuddyPreferenceHandler.PRIVATE_FEED_URL,
                         USER_URL)
                 .apply();
     }
 
     @NonNull
-    public static IliasBuddyCredentials getCredentials(@NonNull final Context CONTEXT) {
+    public static IliasRssFeedCredentials getCredentials(@NonNull final Context CONTEXT) {
 
         final SharedPreferences PREF = CONTEXT.getSharedPreferences(
-                IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_PREFERENCE_NAME,
+                IliasBuddyPreferenceHandler.PREFERENCE_NAME_PRIVATE_FEED,
                 Context.MODE_PRIVATE);
 
-        return new IliasBuddyCredentials(
-                PREF.getString(IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_USER_NAME,
-                        ""),
-                PREF.getString(IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_USER_PASSWORD,
-                        ""),
-                PREF.getString(IliasBuddyPreferenceHandlerInterface.ILIAS_PRIV_FEED_URL,
-                        ""));
+        return new IliasRssFeedCredentials(
+                PREF.getString(IliasBuddyPreferenceHandler.PRIVATE_FEED_USER_NAME, ""),
+                PREF.getString(IliasBuddyPreferenceHandler.PRIVATE_FEED_USER_PASSWORD, ""),
+                PREF.getString(IliasBuddyPreferenceHandler.PRIVATE_FEED_URL, ""));
+    }
+
+    public static boolean getNotificationVibrate(final Context CONTEXT, final boolean DEFAULT) {
+        return IliasBuddyPreferenceHandler.getPreferenceBoolean(CONTEXT,
+                IliasBuddyPreferenceHandler.PREFERENCE_NOTIFICATION_VIBRATE, DEFAULT);
+    }
+
+    @NonNull
+    public static String getNotificationRingtone(final Context CONTEXT, final String DEFAULT) {
+        return IliasBuddyPreferenceHandler.getPreferenceString(CONTEXT,
+                IliasBuddyPreferenceHandler.PREFERENCE_NOTIFICATION_RINGTONE, DEFAULT);
     }
 }

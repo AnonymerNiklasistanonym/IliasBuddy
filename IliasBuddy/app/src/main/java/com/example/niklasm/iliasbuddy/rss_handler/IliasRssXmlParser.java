@@ -3,6 +3,8 @@ package com.example.niklasm.iliasbuddy.rss_handler;
 import android.support.annotation.NonNull;
 import android.util.Xml;
 
+import com.example.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -16,7 +18,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Class that parses IliasRssItem's from an IliasRssFeed InputStream
+ * Class that parses IliasRssFeedItem's from an IliasRssFeed InputStream
  * (mostly inspired by this tutorial: https://developer.android.com/training/basics/network-ops/xml.html)
  */
 public class IliasRssXmlParser {
@@ -35,7 +37,7 @@ public class IliasRssXmlParser {
      *                                or anything other XML related
      * @throws IOException            Input stream errors or I don't know
      */
-    public static IliasRssItem[] parse(@NonNull final InputStream inputStream)
+    public static IliasRssFeedItem[] parse(@NonNull final InputStream inputStream)
             throws XmlPullParserException, IOException, ParseException {
         try {
             // create XmlPullParser parser for parsing the XML data in the shape of a InputStream
@@ -59,11 +61,11 @@ public class IliasRssXmlParser {
      *                                or anything other XML related
      * @throws IOException            Input stream errors or I don't know
      */
-    private static IliasRssItem[] readFeed(@NonNull final XmlPullParser PARSER)
+    private static IliasRssFeedItem[] readFeed(@NonNull final XmlPullParser PARSER)
             throws XmlPullParserException, IOException, ParseException {
 
         // create ArrayList for all IliasRssItems in XML file
-        final ArrayList<IliasRssItem> ENTRIES = new ArrayList<>();
+        final ArrayList<IliasRssFeedItem> ENTRIES = new ArrayList<>();
         // require that "channel" is the current Tag
         PARSER.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.FEED_START_TAG);
         // iterate to the next element as long as the start tag that was just required is not found
@@ -82,10 +84,10 @@ public class IliasRssXmlParser {
             }
         }
         // return an array from the ArrayList
-        return ENTRIES.toArray(new IliasRssItem[0]);
+        return ENTRIES.toArray(new IliasRssFeedItem[0]);
     }
 
-    private static IliasRssItem readEntry(@NonNull final XmlPullParser PARSER)
+    private static IliasRssFeedItem readEntry(@NonNull final XmlPullParser PARSER)
             throws XmlPullParserException, IOException, ParseException {
 
         PARSER.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.ENTRY_TAG);
@@ -126,7 +128,7 @@ public class IliasRssXmlParser {
             courseExtraTitleExtraTitle[3] = temp;
         }
 
-        return new IliasRssItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
+        return new IliasRssFeedItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
                 courseExtraTitleExtraTitle[2], Objects.requireNonNull(description),
                 Objects.requireNonNull(link), Objects.requireNonNull(date),
                 courseExtraTitleExtraTitle[3]);

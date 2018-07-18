@@ -1,8 +1,7 @@
-package com.example.niklasm.iliasbuddy.ilias_rss_handler;
+package com.example.niklasm.iliasbuddy.rss_handler;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -33,9 +32,11 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     private final SimpleDateFormat viewTimeFormat;
     private final Context CONTEXT;
     private final IliasRssItemListAdapterInterface ADAPTER_INTERFACE;
+    private boolean filterFiles = true, filterPosts = true;
     // Allows to remember the last item shown on screen
     private int lastPosition = -1;
     private List<IliasRssItem> itemsFiltered;
+    private String currentSearch = "";
 
     public IliasRssItemListAdapter(final List<IliasRssItem> dataSet, @NonNull final Context CONTEXT,
                                    @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
@@ -52,7 +53,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     public static void alertDialogRssFeedEntry(@NonNull final IliasRssItem ILIAS_RSS_ITEM,
                                                @NonNull final IliasRssItemAlertDialogInterface ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE,
                                                @NonNull final Context CONTEXT) {
-        if (ILIAS_RSS_ITEM.getDescription() == null || ILIAS_RSS_ITEM.getDescription().equals("")) {
+        if (ILIAS_RSS_ITEM.getDescription().equals("")) {
             // if there is no description this means it was an upload
             // therefore instantly link to the Ilias page
             ILIAS_RSS_ITEM_ALERT_DIALOG_INTERFACE.alertDialogOpenUrl(ILIAS_RSS_ITEM.getLink());
@@ -95,75 +96,56 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         // Replace the contents of a view (invoked by the layout manager)
         // - get element from the data set at this position
         // - replace the contents of the view with that element
-        final IliasRssItem CURRENT_ENTRY = itemsFiltered.get(position);
-        final String description = CURRENT_ENTRY.getDescription();
+        final IliasRssItem CURRENT_ELEMENT = itemsFiltered.get(position);
 
-        // reset holder
-        holder.background.setBackgroundResource(android.R.color.transparent);
-        holder.course.setVisibility(View.VISIBLE);
-        holder.course.setText("");
-        holder.date.setVisibility(View.VISIBLE);
-        holder.date.setText("");
-        holder.time.setVisibility(View.VISIBLE);
-        holder.time.setText("");
-        holder.title.setVisibility(View.VISIBLE);
-        holder.title.setText("");
-        holder.extra.setVisibility(View.VISIBLE);
-        holder.extra.setText("");
-        holder.description.setVisibility(View.VISIBLE);
-        holder.description.setText("");
-        holder.extraCard.setVisibility(View.VISIBLE);
-        holder.titleExtraCard.setVisibility(View.VISIBLE);
-        holder.titleExtraCard.setCardBackgroundColor(
-                ContextCompat.getColor(CONTEXT, R.color.colorPrimary));
-        holder.titleExtra.setVisibility(View.VISIBLE);
-        holder.titleExtra.setText("");
+        // These views have always these values and are always visible
+        holder.course.setText(CURRENT_ELEMENT.getCourse());
+        holder.date.setText(viewDateFormat.format(CURRENT_ELEMENT.getDate()));
+        holder.time.setText(viewTimeFormat.format(CURRENT_ELEMENT.getDate()));
 
-        // CHECK THIS LATER
-        if (ADAPTER_INTERFACE.listAdapterGetLatestEntry() == null ||
-                ADAPTER_INTERFACE.listAdapterGetLatestEntry().getDate().getTime()
-                        < CURRENT_ENTRY.getDate().getTime()) {
-            holder.background.setBackgroundResource(R.color.colorNewEntry);
-        }
-        // CHECK THIS LATER
-
-        // These views have always these values
-        holder.course.setText(CURRENT_ENTRY.getCourse());
-        holder.date.setText(viewDateFormat.format(CURRENT_ENTRY.getDate()));
-        holder.time.setText(viewTimeFormat.format(CURRENT_ENTRY.getDate()));
-        holder.title.setText(CURRENT_ENTRY.getTitle());
-
-        // if extra is null hide extra card or else set the text
-        if (CURRENT_ENTRY.getExtra() == null) {
-            holder.extraCard.setVisibility(View.GONE);
+        if (CURRENT_ELEMENT.getTitleExtra() != null) {
+            holder.titleExtra.setText(CURRENT_ELEMENT.getTitleExtra());
+            holder.titleExtraCard.setVisibility(View.VISIBLE);
         } else {
-            holder.extra.setText(CURRENT_ENTRY.getExtra());
-        }
-
-        if (CURRENT_ENTRY.getTitleExtra() == null) {
             holder.titleExtraCard.setVisibility(View.GONE);
-        } else {
-            holder.titleExtra.setText(CURRENT_ENTRY.getTitleExtra());
         }
 
-        if (description == null || description.equals("")) {
+        // When there is an file update
+        if (CURRENT_ELEMENT.isFileUpdate()) {
+            // set file name as title
+            holder.title.setText(CURRENT_ELEMENT.getExtra());
+            // and display if file was updated/added in a red label
+            holder.extra.setText(CURRENT_ELEMENT.getTitle());
+            holder.extraCard.setVisibility(View.VISIBLE);
+            // and hide description
             holder.description.setVisibility(View.GONE);
         } else {
-            holder.description.setText(Html.fromHtml(description)
-                    .toString()
-                    .replaceAll("\\s+", " ")
-                    .trim());
+            // else set normal title as title
+            holder.title.setText(CURRENT_ELEMENT.getTitle());
+            // and hide the red label
+            holder.extraCard.setVisibility(View.GONE);
+            // and display a description
+            holder.description.setVisibility(View.VISIBLE);
+            holder.description.setText(Html.fromHtml(CURRENT_ELEMENT.getDescription())
+                    .toString().replaceAll("\\s+", " ").trim());
         }
 
-        if ((description == null || description.equals(""))
-                && CURRENT_ENTRY.getTitleExtra() != null) {
-            holder.titleExtra.setText(CURRENT_ENTRY.getTitle());
-            holder.title.setText(CURRENT_ENTRY.getTitleExtra());
-            holder.titleExtraCard.setCardBackgroundColor(
-                    ContextCompat.getColor(CONTEXT, android.R.color.holo_red_dark));
-        }
-
+        // Add animation
         setAnimation(holder.itemView, position);
+
+        /*
+        Highlight background if the current entry is new in respect to the latest item of the
+         adapter interface - else reset background color to transparent
+        */
+        final IliasRssItem ADAPTER_INTERFACE_LATEST_ITEM =
+                ADAPTER_INTERFACE.listAdapterGetLatestEntry();
+        if (ADAPTER_INTERFACE_LATEST_ITEM == null ||
+                ADAPTER_INTERFACE_LATEST_ITEM.getDate().getTime()
+                        < CURRENT_ELEMENT.getDate().getTime()) {
+            holder.background.setBackgroundResource(R.color.colorNewEntry);
+        } else {
+            holder.background.setBackgroundResource(android.R.color.transparent);
+        }
     }
 
     /**
@@ -191,13 +173,37 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
             @Override
             protected FilterResults performFiltering(final CharSequence charSequence) {
                 final String charString = charSequence.toString();
+                currentSearch = charString;
                 if (charString.isEmpty()) {
-                    itemsFiltered = items;
+                    itemsFiltered = new ArrayList<>(items);
                 } else {
                     final List<IliasRssItem> filteredList = new ArrayList<>();
                     // check which entries should be added to the filtered list
                     for (final IliasRssItem ENTRY : items) {
                         if (ENTRY.containsIgnoreCase(charString, viewDateFormat, viewTimeFormat)) {
+                            filteredList.add(ENTRY);
+                        }
+                    }
+                    itemsFiltered = filteredList;
+                }
+                // if no files should be filtered remove them
+                if (!filterFiles) {
+                    Log.i("RemoveDebug", "remove files");
+                    final List<IliasRssItem> filteredList = new ArrayList<>();
+                    // check which entries should be added to the filtered list
+                    for (final IliasRssItem ENTRY : itemsFiltered) {
+                        if (!ENTRY.isFileUpdate()) {
+                            filteredList.add(ENTRY);
+                        }
+                    }
+                    itemsFiltered = filteredList;
+                }
+                if (!filterPosts) {
+                    Log.i("RemoveDebug", "remove posts");
+                    final List<IliasRssItem> filteredList = new ArrayList<>();
+                    // check which entries should be added to the filtered list
+                    for (final IliasRssItem ENTRY : itemsFiltered) {
+                        if (ENTRY.isFileUpdate()) {
                             filteredList.add(ENTRY);
                         }
                     }
@@ -227,6 +233,31 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                 notifyDataSetChanged();
             }
         };
+    }
+
+    public void filterFiles(final boolean b) {
+        filterFiles = b;
+        // when both are now false make the other one positive
+        if (!filterFiles && !filterPosts) {
+            filterPosts = true;
+        }
+        ADAPTER_INTERFACE.filterChangeCallback(filterPosts, filterFiles);
+        getFilter().filter(currentSearch);
+    }
+
+    public void filterPosts(final boolean b) {
+        filterPosts = b;
+        // when both are now false make the other one positive
+        if (!filterPosts && !filterFiles) {
+            filterFiles = true;
+        }
+        ADAPTER_INTERFACE.filterChangeCallback(filterPosts, filterFiles);
+        getFilter().filter(currentSearch);
+    }
+
+    public void quickFixFilter(final boolean checked, final boolean checked1) {
+        filterFiles(checked);
+        filterPosts(checked1);
     }
 
     /**

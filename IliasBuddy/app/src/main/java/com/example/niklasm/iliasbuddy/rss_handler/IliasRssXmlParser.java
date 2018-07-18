@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.ilias_rss_handler;
+package com.example.niklasm.iliasbuddy.rss_handler;
 
 import android.support.annotation.NonNull;
 import android.util.Xml;
@@ -117,10 +117,19 @@ public class IliasRssXmlParser {
                     IliasRssXmlParser.skip(PARSER);
             }
         }
+
+        // Quickfix: TODO make later better file recognition
+        // if description is empty we have a file
+        if (description == null || description.equals("")) {
+            final String temp = courseExtraTitleExtraTitle[1];
+            courseExtraTitleExtraTitle[1] = courseExtraTitleExtraTitle[3];
+            courseExtraTitleExtraTitle[3] = temp;
+        }
+
         return new IliasRssItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
-                courseExtraTitleExtraTitle[2], courseExtraTitleExtraTitle[3],
-                Objects.requireNonNull(description), Objects.requireNonNull(link),
-                Objects.requireNonNull(date));
+                courseExtraTitleExtraTitle[2], Objects.requireNonNull(description),
+                Objects.requireNonNull(link), Objects.requireNonNull(date),
+                courseExtraTitleExtraTitle[3]);
     }
 
     private static Date readDate(@NonNull final XmlPullParser parser)
@@ -168,7 +177,9 @@ public class IliasRssXmlParser {
         final String titleExtra = titleExtraExists ? titleTitleExtra.substring(0,
                 titleTitleExtra.indexOf(":")).trim() : null;
         parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.TITLE_TAG);
-        return new String[]{course, extra, titleExtra, title};
+
+        return new String[]{course, titleExtra, title, extra};
+
     }
 
     // For the tags title and summary, extracts their text values.

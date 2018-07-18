@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.ilias_rss_handler;
+package com.example.niklasm.iliasbuddy.rss_handler;
 
 import android.view.View;
 
@@ -18,4 +18,12 @@ public interface IliasRssItemListAdapterInterface extends IliasRssItemAlertDialo
      * @return (int) The child view position
      */
     int listAdapterGetRecyclerViewChildLayoutPosition(View view);
+
+    /**
+     * Notify that the filter settings changed
+     *
+     * @param filterPosts Current state of post filter
+     * @param filterFiles Current state of file filter
+     */
+    void filterChangeCallback(boolean filterPosts, boolean filterFiles);
 }

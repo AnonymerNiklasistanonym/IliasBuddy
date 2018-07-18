@@ -10,6 +10,10 @@
     <string name="main_activity_toolbar_options_action_settings" translatable="false">@string/settings_activity_toolbar_title</string>
     <string name="main_activity_toolbar_options_action_setup" translatable="false">@string/setup_activity_toolbar_title</string>
     <string name="main_activity_floating_button_tooltip_refresh">Refresh</string>
+    <!-- Main activity: Toolbar: Filter -->
+    <string name="main_activity_toolbar_action_filter">Filter</string>
+    <string name="main_activity_toolbar_action_filter_files">Files</string>
+    <string name="main_activity_toolbar_action_filter_posts">Posts</string>
     <!-- Main activity: Toolbar: DevOptions -->
     <string name="main_activity_toolbar_action_dev_show_last_response">Show last server response</string>
     <string name="main_activity_toolbar_action_dev_clear_list">Clear list</string>

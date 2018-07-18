@@ -67,34 +67,10 @@
                 android:orientation="horizontal">
 
                 <android.support.v7.widget.CardView
-                    android:id="@+id/titleExtraCard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@android:color/holo_red_dark"
-                    card_view:cardCornerRadius="2dp"
-                    card_view:cardElevation="0dp"
-                    card_view:cardPreventCornerOverlap="false"
-                    card_view:cardUseCompatPadding="true"
-                    card_view:contentPadding="0dp">
-
-                    <TextView
-                        android:id="@+id/titleExtra"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:paddingLeft="5dp"
-                        android:paddingRight="5dp"
-                        android:textColor="@android:color/white"
-                        tools:text="New file" />
-
-                </android.support.v7.widget.CardView>
-
-                <android.support.v7.widget.CardView
                     android:id="@+id/extraCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:cardBackgroundColor="@color/colorPrimary"
+                    app:cardBackgroundColor="@android:color/holo_red_dark"
                     card_view:cardCornerRadius="2dp"
                     card_view:cardElevation="0dp"
                     card_view:cardPreventCornerOverlap="false"
@@ -110,7 +86,36 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:textColor="@android:color/white"
-                        tools:text="Forum / Slides" />
+                        tools:text="New file" />
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/titleExtraCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@color/colorPrimary"
+                    card_view:cardCornerRadius="2dp"
+                    card_view:cardElevation="0dp"
+                    card_view:cardPreventCornerOverlap="false"
+                    card_view:cardUseCompatPadding="true"
+                    card_view:contentPadding="0dp">
+
+                    <HorizontalScrollView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+
+                        <TextView
+                            android:id="@+id/titleExtra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:paddingLeft="5dp"
+                            android:paddingRight="5dp"
+                            android:textColor="@android:color/white"
+                            tools:text="Forum / Slides" />
+                    </HorizontalScrollView>
 
 
                 </android.support.v7.widget.CardView>

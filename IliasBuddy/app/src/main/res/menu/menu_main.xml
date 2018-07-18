@@ -11,12 +11,35 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
 
+    <!-- Icon (if room) - filterChangeCallback -->
+    <item
+        android:id="@+id/filter_icon"
+        android:icon="@drawable/ic_filter_list_white"
+        android:title="@string/main_activity_toolbar_action_filter"
+        app:showAsAction="always">
+        <!-- Developer options behind the "Developer options" item -->
+        <menu>
+            <item
+                android:id="@+id/filter_files"
+                android:checkable="true"
+                android:onClick="filterFileChanges"
+                android:title="@string/main_activity_toolbar_action_filter_files"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/filter_posts"
+                android:checkable="true"
+                android:onClick="filterPosts"
+                android:title="@string/main_activity_toolbar_action_filter_posts"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
     <!-- Icon (if room) - open Ilias -->
     <item
         android:icon="@drawable/ic_ilias_logo_white_48dp"
         android:onClick="openIlias"
         android:title="@string/main_activity_toolbar_action_open_ilias"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <!-- Icon (if room) - open C@mpus -->
     <item
@@ -27,6 +50,8 @@
         app:showAsAction="ifRoom" />
 
     <!-- Other options behind the three dots -->
+
+
     <item
         android:icon="@drawable/ic_about_black"
         android:onClick="menuOpenAboutActivity"

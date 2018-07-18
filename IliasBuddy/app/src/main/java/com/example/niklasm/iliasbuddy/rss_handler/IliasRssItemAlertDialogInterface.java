@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.ilias_rss_handler;
+package com.example.niklasm.iliasbuddy.rss_handler;
 
 public interface IliasRssItemAlertDialogInterface {
 

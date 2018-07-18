@@ -93,4 +93,7 @@
     <string name="dialog_new_version_already_installed">Die neuste Version ist bereits installiert</string>
     <string name="dialog_new_version_open_release_page">Öffne Veröffentlichungswebseite</string>
     <string name="notification_dismiss_notification">Verwerfen</string>
+    <string name="main_activity_toolbar_action_filter_files">Dateien</string>
+    <string name="main_activity_toolbar_action_filter_posts">Beiträge</string>
+    <string name="main_activity_toolbar_action_filter">Filter</string>
 </resources>

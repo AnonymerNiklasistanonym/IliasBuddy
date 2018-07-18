@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
+import com.example.niklasm.iliasbuddy.notification_handler.IliasBuddyNotification;
+
 public class BackgroundServiceManager {
 
     private static AlarmManager am;
@@ -48,7 +50,7 @@ public class BackgroundServiceManager {
                 BackgroundServiceManager.pendingIntent);
 
         // also make a sticky notification so that the user knows the background service is running
-        BackgroundServiceStickyNotification.show(CONTEXT);
+        IliasBuddyNotification.showStickyNotification(CONTEXT);
     }
 
     public static boolean isAlarmManagerCurrentlyActivated() {
@@ -65,6 +67,6 @@ public class BackgroundServiceManager {
         }
 
         // also remove the sticky notification so that the user knows the bg service is not running
-        BackgroundServiceStickyNotification.hide(CONTEXT);
+        IliasBuddyNotification.hideStickyNotification(CONTEXT);
     }
 }

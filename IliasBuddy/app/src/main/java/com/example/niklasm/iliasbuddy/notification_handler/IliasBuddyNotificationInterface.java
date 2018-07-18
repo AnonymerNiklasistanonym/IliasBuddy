@@ -1,4 +1,4 @@
-package com.example.niklasm.iliasbuddy.notifications;
+package com.example.niklasm.iliasbuddy.notification_handler;
 
 public interface IliasBuddyNotificationInterface {
 

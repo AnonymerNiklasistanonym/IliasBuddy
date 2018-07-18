@@ -2,7 +2,6 @@ package com.example.niklasm.iliasbuddy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,17 +21,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyCredentials;
+import com.example.niklasm.iliasbuddy.preferences_handler.IliasBuddyPreferenceHandler;
+
 import java.util.Objects;
 
 /**
  * Check for a better way to save the password: https://stackoverflow.com/questions/9233035/best-option-to-store-username-and-password-in-android-app
  */
 public class SetupActivity extends AppCompatActivity {
-
-    final static public String ILIAS_PRIVATE_RSS_FEED_URL = "ilias_url";
-    final static public String ILIAS_PRIVATE_RSS_FEED_USER = "ilias_user_name";
-    final static public String ILIAS_PRIVATE_RSS_FEED_PASSWORD = "ilias_password";
-    public static final String ILIAS_PRIVATE_RSS_FEED_CREDENTIALS = "myPrefs";
 
     public static void errorSnackBar(@NonNull final Context context, @NonNull final View fab,
                                      @NonNull final String title, @NonNull final String message) {
@@ -67,15 +64,11 @@ public class SetupActivity extends AppCompatActivity {
         final EditText rssPassword = findViewById(R.id.password);
         final View fabButton = findViewById(R.id.fabSetup);
 
-        final SharedPreferences PREFERENCES =
-                getSharedPreferences(SetupActivity.ILIAS_PRIVATE_RSS_FEED_CREDENTIALS,
-                        Context.MODE_PRIVATE);
-        rssUrl.setText(
-                PREFERENCES.getString(SetupActivity.ILIAS_PRIVATE_RSS_FEED_URL, ""));
-        rssUserName.setText(
-                PREFERENCES.getString(SetupActivity.ILIAS_PRIVATE_RSS_FEED_USER, ""));
-        rssPassword.setText(
-                PREFERENCES.getString(SetupActivity.ILIAS_PRIVATE_RSS_FEED_PASSWORD, ""));
+        final IliasBuddyCredentials CREDENTIALS =
+                IliasBuddyPreferenceHandler.getCredentials(this);
+        rssUrl.setText(CREDENTIALS.getUserUrl());
+        rssUserName.setText(CREDENTIALS.getUserName());
+        rssPassword.setText(CREDENTIALS.getUserPassword());
 
         rssUrl.setValidator(new AutoCompleteTextView.Validator() {
             @Override
@@ -103,14 +96,9 @@ public class SetupActivity extends AppCompatActivity {
         // set fab on click listener
         fabButton.setOnClickListener(view -> {
             if (rssUrl.getValidator().isValid(rssUrl.getText().toString())) {
-                PREFERENCES.edit()
-                        .putString(SetupActivity.ILIAS_PRIVATE_RSS_FEED_URL,
-                                rssUrl.getText().toString())
-                        .putString(SetupActivity.ILIAS_PRIVATE_RSS_FEED_USER,
-                                rssUserName.getText().toString())
-                        .putString(SetupActivity.ILIAS_PRIVATE_RSS_FEED_PASSWORD,
-                                rssPassword.getText().toString())
-                        .apply();
+                IliasBuddyPreferenceHandler.saveCredentials(this,
+                        rssUrl.getText().toString(), rssUserName.getText().toString(),
+                        rssPassword.getText().toString());
                 startActivity(new Intent(SetupActivity.this, MainActivity.class));
             } else {
                 Snackbar.make(fabButton,

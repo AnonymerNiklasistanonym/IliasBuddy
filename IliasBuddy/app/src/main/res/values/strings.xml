@@ -146,5 +146,6 @@
     <string name="notification_channel_new_entries_name">New Ilias entries notification</string>
     <string name="notification_channel_new_entries_description">Shows notification when there are new Ilias entries in the RSS feed</string>
     <string name="notification_dismiss_notification">Dismiss</string>
+    <string name="notification_background_service_tap_to_change">Tap to disable/configure background service</string>
 
 </resources>

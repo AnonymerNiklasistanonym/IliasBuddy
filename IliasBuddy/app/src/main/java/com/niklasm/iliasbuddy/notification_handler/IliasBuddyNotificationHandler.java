@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -15,7 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.example.niklasm.iliasbuddy.R;
-import com.niklasm.iliasbuddy.MainActivity;
+import com.niklasm.iliasbuddy.SettingsActivity;
 import com.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
@@ -24,7 +25,6 @@ import java.util.Objects;
 
 public class IliasBuddyNotificationHandler {
 
-    public static final String FOUND_A_NEW_ENTRY = "FOUND_A_NEW_ENTRY";
     public static final String NEW_ENTRY_FOUND = "NEW_ENTRY_FOUND";
     public static final String NEW_ENTRY_DATA = "NEW_ENTRY_DATA";
     public static final String NOTIFICATION_DISMISSED = "NOTIFICATION_DISMISSED";
@@ -59,7 +59,7 @@ public class IliasBuddyNotificationHandler {
                 .setSmallIcon(R.drawable.ic_ilias_logo_white_24dp)
                 .setPriority(HIGH_PRIORITY ? Notification.PRIORITY_MAX : Notification.PRIORITY_MIN)
                 .setOngoing(STICKY)
-                .setAutoCancel(STICKY);
+                .setAutoCancel(!STICKY);
     }
 
     @NonNull
@@ -69,9 +69,17 @@ public class IliasBuddyNotificationHandler {
                 IliasBuddyNotificationStickyInterface.CHANNEL_ID,
                 CONTEXT.getString(R.string.notification_channel_sticky_name),
                 CONTEXT.getString(R.string.notification_channel_sticky_description),
-                CONTEXT.getString(R.string.app_name),
-                CONTEXT.getString(R.string.notification_background_service_is_active),
-                new Intent(CONTEXT, MainActivity.class), false, true)
+                CONTEXT.getString(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
+                        R.string.notification_background_service_is_active : R.string.app_name),
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
+                        CONTEXT.getString(R.string.notification_background_service_tap_to_change) :
+                        CONTEXT.getString(R.string.notification_background_service_is_active),
+                // open notification preference without the settings header
+                new Intent(CONTEXT, SettingsActivity.class)
+                        .putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                                SettingsActivity.NotificationPreferenceFragment.class.getName())
+                        .putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true),
+                false, true)
                 // do not display timestamp
                 .setShowWhen(false)
                 .build();
@@ -83,6 +91,7 @@ public class IliasBuddyNotificationHandler {
                                                  @NonNull final CharSequence CHANNEL_NAME,
                                                  @NonNull final String CHANNEL_DESCRIPTION,
                                                  @NonNull final String CONTENT_TITLE,
+                                                 @NonNull final String CONTENT_BIG_TITLE,
                                                  @NonNull final String CONTENT_PREVIEW,
                                                  @NonNull final String[] CONTENT_BIG,
                                                  @NonNull final Intent ONCLICK_ACTIVITY_INTENT,
@@ -93,8 +102,8 @@ public class IliasBuddyNotificationHandler {
         final NotificationCompat.Style NOTIFICATION_STYLE;
         if (CONTENT_BIG.length == 1) {
             NOTIFICATION_STYLE = new NotificationCompat.BigTextStyle()
-                    .bigText(CONTENT_BIG[0])
-                    .setBigContentTitle(CONTENT_PREVIEW);
+                    .bigText(CONTENT_BIG_TITLE + " " + CONTENT_BIG[0])
+                    .setBigContentTitle(CONTENT_TITLE);
         } else {
             final NotificationCompat.InboxStyle NOTIFICATION_MULTIPLE_STYLE =
                     new NotificationCompat.InboxStyle();
@@ -204,6 +213,7 @@ public class IliasBuddyNotificationHandler {
      */
     public static void showNotificationNewEntries(@NonNull final Context CONTEXT,
                                                   @NonNull final String CONTENT_TITLE,
+                                                  @NonNull final String CONTENT_TITLE_BIG,
                                                   @NonNull final String CONTENT_PREVIEW,
                                                   @NonNull final String[] CONTENT_BIG,
                                                   @NonNull final Intent ON_CLICK_ACTIVITY_INTENT,
@@ -217,8 +227,8 @@ public class IliasBuddyNotificationHandler {
                         IliasBuddyNotificationNewEntriesInterface.CHANNEL_ID,
                         CONTEXT.getString(R.string.notification_channel_new_entries_name),
                         CONTEXT.getString(R.string.notification_channel_new_entries_description),
-                        CONTENT_TITLE, CONTENT_PREVIEW, CONTENT_BIG, ON_CLICK_ACTIVITY_INTENT,
-                        NEW_ENTRIES_ARRAY, URL),
+                        CONTENT_TITLE, CONTENT_TITLE_BIG, CONTENT_PREVIEW, CONTENT_BIG,
+                        ON_CLICK_ACTIVITY_INTENT, NEW_ENTRIES_ARRAY, URL),
                 IliasBuddyNotificationNewEntriesInterface.NOTIFICATION_ID);
     }
 

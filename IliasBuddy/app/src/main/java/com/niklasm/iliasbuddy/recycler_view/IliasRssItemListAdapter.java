@@ -71,7 +71,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     Html.fromHtml(ILIAS_RSS_ITEM.getDescription());
             final AlertDialog dialog = new AlertDialog.Builder(CONTEXT)
                     .setTitle(ILIAS_RSS_ITEM.getCourse() + " (" +
-                            new SimpleDateFormat("dd.MM",
+                            new SimpleDateFormat("dd.MM HH:mm",
                                     CONTEXT.getResources().getConfiguration().locale)
                                     .format(ILIAS_RSS_ITEM.getDate()) + ")")
                     .setMessage(message)

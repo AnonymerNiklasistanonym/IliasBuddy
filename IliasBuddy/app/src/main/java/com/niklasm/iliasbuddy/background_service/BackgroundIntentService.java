@@ -16,6 +16,7 @@ import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequester;
 import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequesterInterface;
 import com.niklasm.iliasbuddy.handler.IliasBuddyBroadcastHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
+import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
 import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
@@ -97,20 +98,24 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         final String NOTIFICATION_TITLE;
         final String NOTIFICATION_PREVIEW_CONTENT;
         final String[] NOTIFICATION_TEXT_ARRAY = new String[NEW_ENTRIES.length];
+        final String NOTIFICATION_TITLE_BIG;
         if (NEW_ENTRIES.length == 1) {
             // Only one new item
-            NOTIFICATION_TITLE =
-                    getString(R.string.notification_channel_new_entries_one_new_ilias_entry);
-            NOTIFICATION_PREVIEW_CONTENT =
-                    NEW_ENTRIES[0].toStringNotificationPreview(this);
-            NOTIFICATION_TEXT_ARRAY[0] =
-                    NEW_ENTRIES[0].toStringNotificationBigSingle(this);
+            NOTIFICATION_TITLE = IliasBuddyMiscellaneousHandler
+                    .notificationTitleSingle(NEW_ENTRIES[0], this);
+            NOTIFICATION_PREVIEW_CONTENT = IliasBuddyMiscellaneousHandler
+                    .notificationPreviewSingle(NEW_ENTRIES[0], this);
+            NOTIFICATION_TEXT_ARRAY[0] = IliasBuddyMiscellaneousHandler
+                    .notificationBigContentSingle(NEW_ENTRIES[0], this);
+            NOTIFICATION_TITLE_BIG = IliasBuddyMiscellaneousHandler
+                    .notificationBigTitleSingle(NEW_ENTRIES[0]);
         } else {
             // More than one new item
             NOTIFICATION_TITLE = NEW_ENTRIES.length + " " +
                     getString(R.string.notification_channel_new_entries_new_ilias_entries);
-            NOTIFICATION_PREVIEW_CONTENT = "(" + NEW_ENTRIES[0].getCourse() + ", "
-                    + NEW_ENTRIES[1].getCourse() + ",...)";
+            NOTIFICATION_TITLE_BIG = "";
+            NOTIFICATION_PREVIEW_CONTENT =
+                    IliasBuddyMiscellaneousHandler.notificationPreviewMultiple(NEW_ENTRIES);
             for (int i = 0; i < NEW_ENTRIES.length; i++) {
                 NOTIFICATION_TEXT_ARRAY[i] =
                         NEW_ENTRIES[i].toStringNotificationBigMultiple(this);
@@ -125,8 +130,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
 
         // Show notification with all the values
         IliasBuddyNotificationHandler.showNotificationNewEntries(this, NOTIFICATION_TITLE,
-                NOTIFICATION_PREVIEW_CONTENT, NOTIFICATION_TEXT_ARRAY, ON_CLICK, NEW_ENTRIES,
-                NEW_ENTRIES[0].getLink());
+                NOTIFICATION_TITLE_BIG, NOTIFICATION_PREVIEW_CONTENT, NOTIFICATION_TEXT_ARRAY,
+                ON_CLICK, NEW_ENTRIES, NEW_ENTRIES[0].getLink());
 
         // Additionally send a broadcast to the main activity if it currently is running
         IliasBuddyBroadcastHandler.sendBroadcastNewEntriesFound(this,

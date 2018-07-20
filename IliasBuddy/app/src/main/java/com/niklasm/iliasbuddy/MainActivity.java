@@ -122,8 +122,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 // check if action is not null
                 if (INTENT.getAction() == null) {
-                    Log.d("MainActivity",
-                            "BroadcastReceiver::onReceive > Intent.getAction() was null!");
+                    Log.e("MainActivity",
+                            "BroadcastReceiver::onReceive > Intent.getAction() == null!");
                     return;
                 }
 
@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionExampleNotification(final MenuItem menuItem) {
         IliasBuddyNotificationHandler.showNotificationNewEntries(this, "titleString",
+                "titleStringBig (single demo)",
                 "previewString (single demo)", new String[]{"one"},
                 new Intent(this, MainActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), new IliasRssFeedItem[0],
@@ -223,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionExampleNotifications(final MenuItem item) {
         IliasBuddyNotificationHandler.showNotificationNewEntries(this, "titleString",
+                "not important",
                 "previewString (multiple demo)",
                 new String[]{"one", "two", "three"},
                 new Intent(this, MainActivity.class)
@@ -430,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // check if a new entry was found
         if (intent.getBooleanExtra(IliasBuddyNotificationHandler.NEW_ENTRY_FOUND, false)) {
-            Log.i("MainActivity", "onNewIntent: NEW_ENTRY_FOUND");
+            Log.d("MainActivity", "onNewIntent: NEW_ENTRY_FOUND");
             // update Ilias RSS feed
             checkForRssUpdates(true);
             // if there is NEW_ENTRY_DATA extra perform a virtual click on the only new element
@@ -445,7 +447,6 @@ public class MainActivity extends AppCompatActivity implements
                     IliasRssFeedItem.readParcelableArray(NEW_ENTRIES_EXTRA_Parcelable);
             // if the new entries have only a length of one show alert dialog to this element
             if (NEW_ENTRIES_EXTRA != null && NEW_ENTRIES_EXTRA.length == 1) {
-                Log.i("MainActivity", "onNewIntent: NEW_ENTRY_DATA");
                 IliasRssItemListAdapter.alertDialogRssFeedEntry(NEW_ENTRIES_EXTRA[0], this);
             }
         }

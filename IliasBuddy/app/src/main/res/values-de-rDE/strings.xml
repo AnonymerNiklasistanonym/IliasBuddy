@@ -103,4 +103,5 @@
     <string name="settings_activity_pref_general_display_dev_shortcut">Zeige Entwickleroptionen Verknüpfung</string>
     <string name="settings_activity_pref_general_auto_update_check">Automatischer Updatecheck</string>
     <string name="settings_activity_pref_general_auto_update_check_description">Jedes mal wenn die App gestartet wird nach Aktualisierungen gesucht damit die App immer auf dem neusten Stand ist</string>
+    <string name="notification_background_service_tap_to_change">Berühre um Hintergrunddienst zu konfigurieren/auszuschalten</string>
 </resources>

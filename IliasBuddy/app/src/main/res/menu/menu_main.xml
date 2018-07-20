@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:CONTEXT="com.example.niklasm.iliasbuddy.MainActivity">
+    tools:CONTEXT="com.niklasm.iliasbuddy.MainActivity">
 
     <!-- Icon (if room) - search recycler view -->
     <item
@@ -49,7 +49,21 @@
         android:title="@string/main_activity_toolbar_action_open_campus"
         app:showAsAction="ifRoom" />
 
+
     <!-- Other options behind the three dots -->
+
+    <item
+        android:icon="@drawable/ic_settings_black"
+        android:onClick="openSettings"
+        android:title="@string/main_activity_toolbar_options_action_settings"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/setup"
+        android:icon="@drawable/ic_main_activity_menu_item_setup_black"
+        android:onClick="menuOpenSetupActivity"
+        android:title="@string/main_activity_toolbar_options_action_setup"
+        app:showAsAction="never" />
 
 
     <item
@@ -59,6 +73,14 @@
         app:showAsAction="never" />
 
     <item
+        android:icon="@drawable/ic_share_black"
+        android:onClick="menuShare"
+        android:title="@string/main_activity_toolbar_options_action_share"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/developer_options"
         android:icon="@drawable/ic_developer_black"
         android:title="@string/main_activity_toolbar_options_action_developer_options"
         app:showAsAction="never">
@@ -89,25 +111,11 @@
                 android:onClick="menuDevOptionSetFirstLaunch"
                 android:title="@string/main_activity_toolbar_action_dev_reset_to_first_launch"
                 app:showAsAction="never" />
+            <item
+                android:onClick="menuDevOptionForceStartBackgroundService"
+                android:title="@string/main_activity_toolbar_action_dev_force_background_service"
+                app:showAsAction="never" />
         </menu>
     </item>
-
-    <item
-        android:icon="@drawable/ic_settings_black"
-        android:onClick="openSettings"
-        android:title="@string/main_activity_toolbar_options_action_settings"
-        app:showAsAction="never" />
-
-    <item
-        android:icon="@drawable/ic_main_activity_menu_item_setup_black"
-        android:onClick="menuOpenSetupActivity"
-        android:title="@string/main_activity_toolbar_options_action_setup"
-        app:showAsAction="never" />
-
-    <item
-        android:icon="@drawable/ic_share_black"
-        android:onClick="menuShare"
-        android:title="@string/main_activity_toolbar_options_action_share"
-        app:showAsAction="never" />
 
 </menu>

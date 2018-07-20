@@ -24,6 +24,7 @@
     <string name="main_activity_toolbar_action_dev_reset_to_first_launch">Reset to first launch</string>
     <string name="main_activity_show_last_response_title">Last response</string>
     <string name="main_activity_show_last_response_no_response">No recorded response found</string>
+    <string name="main_activity_toolbar_action_dev_force_background_service">Force start background service</string>
     <!-- Main activity: Ilias entries -->
     <string name="open_in_ilias">Open in Ilias</string>
 
@@ -34,7 +35,12 @@
     <string name="settings_activity_pref_general_header_summary">General settings</string>
     <!-- Settings activity: General settings: Entries -->
     <string name="settings_activity_pref_general_display_campus_shortcut">Display C@mpus shortcut</string>
-    <string name="settings_activity_pref_general_display_campus_shortcut_description">Show icon in the action bar next to the icon of the Ilias shortcut</string>
+    <string name="settings_activity_pref_general_display_shortcut_description">Show entry in the action bar menu of the home screen of this app</string>
+    <string name="settings_activity_pref_general_display_campus_shortcut_description" translatable="false">@string/settings_activity_pref_general_display_shortcut_description</string>
+    <string name="settings_activity_pref_general_display_setup_shortcut_description" translatable="false">@string/settings_activity_pref_general_display_shortcut_description</string>
+    <string name="settings_activity_pref_general_display_setup_shortcut">Display account shortcut</string>
+    <string name="settings_activity_pref_general_display_dev_shortcut_description" translatable="false">@string/settings_activity_pref_general_display_shortcut_description</string>
+    <string name="settings_activity_pref_general_display_dev_shortcut">Display developer options shortcut</string>
     <!-- Settings activity: Notification settings -->
     <string name="settings_activity_pref_notifications_header">Notifications</string>
     <string name="settings_activity_pref_notifications_header_summary">Set background service, notification options, update frequency and more</string>
@@ -72,9 +78,11 @@
     <string name="settings_activity_pref_notifications_notification_sound_notification_silent">Silent</string>
     <string name="settings_activity_pref_notifications_notification_vibration">Vibrate on new notification</string>
     <string name="settings_activity_pref_notifications_notification_vibration_summary">The notification vibrates</string>
+    <string name="settings_activity_pref_general_auto_update_check">Automatically check for updates</string>
+    <string name="settings_activity_pref_general_auto_update_check_description">Every time the app gets started a check for new updates is silently done so that when there is an update so you are always up to date</string>
 
     <!-- Setup activity -->
-    <string name="setup_activity_toolbar_title">Setup Ilias connection</string>
+    <string name="setup_activity_toolbar_title">Account</string>
     <string name="setup_activity_toolbar_action_help_instructions">Help/Instructions</string>
     <string name="setup_activity_input_ilias_private_rss_feed_url">Private RSS feed URL</string>
     <string name="setup_activity_input_ilias_private_rss_feed_user_name">Private RSS feed user name</string>
@@ -111,11 +119,12 @@
     <string name="dialog_response_error">Web response error</string>
     <string name="dialog_authentication_error">Authentication error</string>
     <string name="dialog_parse_error">Parse error</string>
+    <string name="dialog_cache_error">Cache error</string>
+    <string name="dialog_volley_error">Web request error (VolleyError)</string>
     <string name="dialog_back">BACK</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_more">MORE</string>
     <string name="dialog_no_new_entry_found">No new entry found</string>
-    <string name="dialog_volley_error">Web request error (VolleyError)</string>
     <string name="dialog_json_exception">JSON parse error</string>
     <string name="dialog_new_version_not_found">No new version found</string>
     <string name="dialog_new_version_found">New Version found!</string>

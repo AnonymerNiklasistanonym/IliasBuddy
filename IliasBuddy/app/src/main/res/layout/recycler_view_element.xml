@@ -3,21 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
+    android:background="@drawable/ripple_highlight"
     android:clickable="true"
     android:focusable="true"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/row_padding_vertical"
+    android:paddingEnd="@dimen/row_padding_vertical"
+    android:paddingStart="@dimen/row_padding_vertical"
+    android:paddingTop="@dimen/row_padding_vertical">
+    <!-- android:background="?android:attr/selectableItemBackground" -->
+
 
     <LinearLayout
-        android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/row_padding_vertical"
-        android:paddingTop="@dimen/row_padding_vertical">
+        android:orientation="horizontal">
 
         <!--
         android:paddingBottom="@dimen/row_padding_vertical"
@@ -32,7 +36,6 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:paddingLeft="@dimen/row_padding_vertical"
             android:paddingRight="@dimen/row_padding_vertical">
 
             <!-- Course text view -->
@@ -61,10 +64,60 @@
                 android:textSize="@dimen/recyclerViewFontSizeNormal"
                 tools:text="I need help / filename.pdf" />
 
+
+            <!-- Description text view -->
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/row_padding_vertical"
+            android:paddingRight="@dimen/row_padding_vertical">
+
+            <!-- Date text view -->
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/date"
+                android:textSize="@dimen/recyclerViewFontSizeDate"
+                tools:text="13.04" />
+
+            <!-- Date text view -->
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/date"
+                android:textSize="@dimen/recyclerViewFontSizeDate"
+                tools:text="18:32" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
 
                 <android.support.v7.widget.CardView
                     android:id="@+id/extraCard"
@@ -101,30 +154,22 @@
                     card_view:cardUseCompatPadding="true"
                     card_view:contentPadding="0dp">
 
-                    <HorizontalScrollView
+                    <TextView
+                        android:id="@+id/titleExtra"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:scrollbars="none">
-
-                        <TextView
-                            android:id="@+id/titleExtra"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:maxLines="1"
-                            android:paddingLeft="5dp"
-                            android:paddingRight="5dp"
-                            android:textColor="@android:color/white"
-                            tools:text="Forum / Slides" />
-                    </HorizontalScrollView>
-
+                        android:maxLines="1"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@android:color/white"
+                        tools:text="Forum / Slides" />
 
                 </android.support.v7.widget.CardView>
 
                 <TextView
                     android:id="@+id/description"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:paddingEnd="5dp"
@@ -134,45 +179,9 @@
                     android:textStyle="italic"
                     tools:text="Description - Very long text that gets ellipsized when reaching the end of the parent" />
 
-
             </LinearLayout>
 
-            <!-- Description text view -->
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/row_padding_vertical"
-            android:paddingRight="@dimen/row_padding_vertical">
-
-            <!-- Date text view -->
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textColor="@color/date"
-                android:textSize="@dimen/recyclerViewFontSizeDate"
-                tools:text="13.04" />
-
-            <!-- Date text view -->
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textColor="@color/date"
-                android:textSize="@dimen/recyclerViewFontSizeDate"
-                tools:text="18:32" />
-
-
-        </LinearLayout>
+        </HorizontalScrollView>
 
     </LinearLayout>
 

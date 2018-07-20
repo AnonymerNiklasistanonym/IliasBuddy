@@ -1,9 +1,24 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
+        android:defaultValue="true"
+        android:key="enable_auto_update_check"
+        android:summary="@string/settings_activity_pref_general_auto_update_check_description"
+        android:title="@string/settings_activity_pref_general_auto_update_check" />
+    <SwitchPreference
         android:defaultValue="false"
         android:key="enable_campus_shortcut"
         android:summary="@string/settings_activity_pref_general_display_campus_shortcut_description"
         android:title="@string/settings_activity_pref_general_display_campus_shortcut" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="enable_setup_shortcut"
+        android:summary="@string/settings_activity_pref_general_display_setup_shortcut_description"
+        android:title="@string/settings_activity_pref_general_display_setup_shortcut" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="enable_dev_shortcut"
+        android:summary="@string/settings_activity_pref_general_display_dev_shortcut_description"
+        android:title="@string/settings_activity_pref_general_display_dev_shortcut" />
 
 </PreferenceScreen>

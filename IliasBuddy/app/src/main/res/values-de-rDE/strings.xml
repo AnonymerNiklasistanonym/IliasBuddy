@@ -16,7 +16,6 @@
     <string name="settings_activity_pref_general_header">Allgemeines</string>
     <string name="settings_activity_pref_general_header_summary">Allgemeine Einstellungen</string>
     <string name="settings_activity_pref_general_display_campus_shortcut">Zeige C@mpus Verknüpfung</string>
-    <string name="settings_activity_pref_general_display_campus_shortcut_description">Zeige Icon in der Actionbar neben dem Icon der Ilias Verknüpfung</string>
     <string name="settings_activity_pref_notifications_header">Benachrichtigungen</string>
     <string name="settings_activity_pref_notifications_header_summary">Hintergrunddienst, Benachrichtigungsoptionen, Aktualisierungshäufigkeit und mehr</string>
     <string name="settings_activity_pref_notifications_background_notifications">Hintergrundbenachrichtigungsservice</string>
@@ -28,7 +27,7 @@
     <string name="settings_activity_pref_notifications_notification_sound_notification_silent">Still</string>
     <string name="settings_activity_pref_notifications_notification_vibration">Vibriere bei neuer Benachrichtigung</string>
     <string name="settings_activity_pref_notifications_notification_vibration_summary">Das Gerät vibriert wenn eine neue Benachrichtigung erstellt wird</string>
-    <string name="setup_activity_toolbar_title">Einrichtung der Iliasverbindung</string>
+    <string name="setup_activity_toolbar_title">Benutzerkonto</string>
     <string name="setup_activity_toolbar_action_help_instructions">Hilfe/Anleitung</string>
     <string name="setup_activity_input_ilias_private_rss_feed_url">Private RSS Feed URL</string>
     <string name="setup_activity_input_ilias_private_rss_feed_user_name">Privater RSS Feed Benutzername</string>
@@ -97,4 +96,11 @@
     <string name="main_activity_toolbar_action_filter_posts">Beiträge</string>
     <string name="main_activity_toolbar_action_filter">Filter</string>
     <string name="main_activity_toolbar_options_action_share">Teilen</string>
+    <string name="dialog_cache_error">Cache Error</string>
+    <string name="main_activity_toolbar_action_dev_force_background_service">Erzwinge Start von Hintergrunddienst</string>
+    <string name="settings_activity_pref_general_display_shortcut_description">Zeige Verknüpfung im Menü auf dem Startbildschirm dieser App</string>
+    <string name="settings_activity_pref_general_display_setup_shortcut">Zeige Benutzerkonto Verknüpfung</string>
+    <string name="settings_activity_pref_general_display_dev_shortcut">Zeige Entwickleroptionen Verknüpfung</string>
+    <string name="settings_activity_pref_general_auto_update_check">Automatischer Updatecheck</string>
+    <string name="settings_activity_pref_general_auto_update_check_description">Jedes mal wenn die App gestartet wird nach Aktualisierungen gesucht damit die App immer auf dem neusten Stand ist</string>
 </resources>

@@ -35,7 +35,7 @@ This exist to be sure that nobody can take this code add malicious things and up
 ### You just want my Ilias credentials, how can I trust you
 There are the following options:
 1. The password and user name would only help me in reading your private RSS feed in which nothing like emails, feedbacks or results are contained and knowing your name - I would still not be able to access anything else than the feed on your Ilias account plus you could always change your feed password through which I would lose any access
-2. Read the code and understand that none of your credentials ever leave your device (besides when a web request to https://ilias.com is made)
+2. Read the code and understand that none of your credentials ever leave your device (besides when a web request to https://...ilias.youruniversity... is made)
 3. You still think that there is a possibility that the created installation file (`.apk`) has malicious code in it which abuses your credentials - Good on you for thinking about this and here is my solution: Don't trust me and build the `.apk` yourself which would mean you could read the source code and be after the build 100% sure that the app is in no way malicious or abuses your credentials.
 
 ### How can I get the needed credentials for this app to access my private Ilias RSS feed

@@ -70,10 +70,10 @@ public class IliasBuddyNotificationHandler {
                 CONTEXT.getString(R.string.notification_channel_sticky_name),
                 CONTEXT.getString(R.string.notification_channel_sticky_description),
                 CONTEXT.getString(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
-                        R.string.notification_background_service_is_active : R.string.app_name),
+                        R.string.notification_title_background_service_is_active : R.string.app_name),
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
-                        CONTEXT.getString(R.string.notification_background_service_tap_to_change) :
-                        CONTEXT.getString(R.string.notification_background_service_is_active),
+                        CONTEXT.getString(R.string.notification_description_background_service_tap_to_change) :
+                        CONTEXT.getString(R.string.notification_title_background_service_is_active),
                 // open notification preference without the settings header
                 new Intent(CONTEXT, SettingsActivity.class)
                         .putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
@@ -182,7 +182,7 @@ public class IliasBuddyNotificationHandler {
     private static NotificationCompat.Action actionOpenUrl(@NonNull final Context CONTEXT,
                                                            @NonNull final String URL) {
         return new NotificationCompat.Action.Builder(R.drawable.ic_open_in_browser_black,
-                CONTEXT.getString(R.string.open_in_ilias),
+                CONTEXT.getString(R.string.notification_action_open_in_ilias),
                 PendingIntent.getActivity(CONTEXT, 0,
                         new Intent(Intent.ACTION_VIEW, Uri.parse(URL)),
                         PendingIntent.FLAG_UPDATE_CURRENT)).build();
@@ -192,7 +192,7 @@ public class IliasBuddyNotificationHandler {
     private static NotificationCompat.Action actionDismiss(@NonNull final Context CONTEXT,
                                                            final IliasRssFeedItem[] NEW_ENTRIES_ARRAY) {
         return new NotificationCompat.Action.Builder(R.drawable.ic_delete_sweep_black,
-                CONTEXT.getString(R.string.notification_dismiss_notification),
+                CONTEXT.getString(R.string.notification_action_dismiss),
                 PendingIntent.getService(CONTEXT, 0,
                         new Intent(CONTEXT, BackgroundIntentService.class)
                                 .putExtra(IliasBuddyNotificationHandler.NOTIFICATION_DISMISSED,

@@ -112,7 +112,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         } else {
             // More than one new item
             NOTIFICATION_TITLE = NEW_ENTRIES.length + " " +
-                    getString(R.string.notification_channel_new_entries_new_ilias_entries);
+                    getString(R.string.notification_title_new_ilias_entries);
             NOTIFICATION_TITLE_BIG = "";
             NOTIFICATION_PREVIEW_CONTENT =
                     IliasBuddyMiscellaneousHandler.notificationPreviewMultiple(NEW_ENTRIES);

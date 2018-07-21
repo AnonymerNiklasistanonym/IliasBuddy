@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.example.niklasm.iliasbuddy.BuildConfig;
 import com.example.niklasm.iliasbuddy.R;
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity;
+import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyUpdateHandler;
 
 import mehdi.sakout.aboutpage.AboutPage;
@@ -23,27 +24,29 @@ public class AboutActivity extends AppCompatActivity {
 
         // set content of activity to about page
         setContentView(new AboutPage(this)
-                .setDescription(getString(R.string.about_app_description))
-                .addItem(new Element().setTitle(getString(R.string.word_version) + " " + BuildConfig.VERSION_NAME))
-                .addItem(new Element().setTitle(getString(R.string.word_check_for_new_version)).setOnClickListener(
+                .setDescription(getString(R.string.about_activity_description))
+                .addItem(new Element().setTitle(getString(R.string.about_activity_version) + " " + BuildConfig.VERSION_NAME))
+                .addItem(new Element().setTitle(getString(R.string.about_activity_check_for_new_version)).setOnClickListener(
                         view -> IliasBuddyUpdateHandler.checkForUpdate(this, false)))
-                .addItem(new Element().setTitle(getString(R.string.word_license)).setOnClickListener(
+                .addItem(new Element().setTitle(getString(R.string.about_activity_license)).setOnClickListener(
                         view -> new AlertDialog.Builder(AboutActivity.this)
-                                .setTitle(R.string.word_license)
-                                .setMessage(R.string.about_app_license)
+                                .setTitle(R.string.about_activity_license)
+                                .setMessage(R.string.about_activity_license_text)
                                 .setNeutralButton(R.string.dialog_back,
                                         (dialog, which) -> dialog.dismiss())
                                 .create().show()))
-                .addItem(new Element().setTitle(getString(R.string.word_open_source_licenses)).setOnClickListener(
+                .addItem(new Element().setTitle(getString(R.string.about_activity_open_source_licenses)).setOnClickListener(
                         view -> {
-                            OssLicensesMenuActivity.setActivityTitle(getString(R.string.word_open_source_licenses));
+                            OssLicensesMenuActivity.setActivityTitle(getString(R.string.about_activity_open_source_licenses));
                             startActivity(new Intent(AboutActivity.this,
                                     OssLicensesMenuActivity.class));
                         }))
-                .addWebsite("https://github.com/AnonymerNiklasistanonym/IliasBuddy",
-                        getString(R.string.url_ilias_buddy_repository_title))
+                .addWebsite(IliasBuddyMiscellaneousHandler.GITHUB_REPOSITORY_URL,
+                        getString(R.string.about_activity_ilias_buddy_repository_website))
                 //.addPlayStore("com.ideashower.readitlater.pro") // later
-                .addGitHub("AnonymerNiklasistanonym", getString(R.string.author_github_user_name_title))
+                .addGitHub(IliasBuddyMiscellaneousHandler.GITHUB_USERNAME_AUTHOR,
+                        IliasBuddyMiscellaneousHandler.GITHUB_USERNAME_AUTHOR + " " +
+                                getString(R.string.about_activity_author_on_github))
                 .create());
 
         // enable back button in action bar

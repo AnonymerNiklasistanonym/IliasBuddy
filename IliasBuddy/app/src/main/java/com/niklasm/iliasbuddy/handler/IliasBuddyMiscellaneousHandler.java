@@ -23,6 +23,11 @@ import java.util.Objects;
 
 public class IliasBuddyMiscellaneousHandler {
 
+    public static final String GITHUB_USERNAME_AUTHOR = "AnonymerNiklasistanonym";
+    public static final String GITHUB_REPOSITORY_URL = "https://github.com/AnonymerNiklasistanonym/IliasBuddy";
+    public static final String GITHUB_REPOSITORY_RELEASES_URL = "https://github.com/AnonymerNiklasistanonym/IliasBuddy";
+    public static final String GITHUB_REPOSITORY_RELEASES_API_URL = "https://api.github.com/repos/AnonymerNiklasistanonym/IliasBuddy/releases";
+
     /**
      * Open a website in the device browser
      *
@@ -41,9 +46,9 @@ public class IliasBuddyMiscellaneousHandler {
      * @param TEXT_LINK         Link to text that should be shared
      * @param DESCRIPTION_TITLE Description of share (shown on select of the app to share)
      */
-    public static void shareLink(@NonNull final Activity ACTIVITY, @NonNull final String TEXT,
-                                 @NonNull final String TEXT_LINK,
-                                 @NonNull final String DESCRIPTION_TITLE) {
+    private static void shareLink(@NonNull final Activity ACTIVITY, @NonNull final String TEXT,
+                                  @NonNull final String TEXT_LINK,
+                                  @NonNull final String DESCRIPTION_TITLE) {
         ShareCompat.IntentBuilder.from(ACTIVITY)
                 .setType("text/plain")
                 .setSubject(TEXT)
@@ -96,10 +101,10 @@ public class IliasBuddyMiscellaneousHandler {
     public static String notificationTitleSingle(@NonNull final IliasRssFeedItem ENTRY,
                                                  @NonNull final Context CONTEXT) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return CONTEXT.getString(R.string.notification_channel_new_entries_one_new_ilias_entry) +
+            return CONTEXT.getString(R.string.notification_title_one_new_ilias_entry) +
                     " [" + ENTRY.getCourse() + "]";
         } else {
-            return CONTEXT.getString(R.string.notification_channel_new_entries_one_new_ilias_entry);
+            return CONTEXT.getString(R.string.notification_title_one_new_ilias_entry);
         }
     }
 
@@ -159,5 +164,27 @@ public class IliasBuddyMiscellaneousHandler {
         }
 
         return STRING_BUILDER.toString();
+    }
+
+    public static void shareRepositoryReleaseUrl(@NonNull final Activity ACTIVITY) {
+        IliasBuddyMiscellaneousHandler.shareLink(ACTIVITY, ACTIVITY.getString(R.string.app_name) + ": ",
+                ACTIVITY.getString(R.string.ilias_buddy_share_text_without_url) + "\n>> " +
+                        IliasBuddyMiscellaneousHandler.GITHUB_REPOSITORY_RELEASES_URL,
+                ACTIVITY.getString(R.string.main_activity_toolbar_options_action_share));
+    }
+
+    public static void shareEntry(@NonNull final Activity ACTIVITY,
+                                  @NonNull final IliasRssFeedItem ILIAS_RSS_ITEM) {
+        IliasBuddyMiscellaneousHandler.shareLink(ACTIVITY, ACTIVITY.getString(R.string.app_name) + " > ",
+                ILIAS_RSS_ITEM.getCourse() + " >> " +
+                        (ILIAS_RSS_ITEM.getTitleExtra() != null ? ILIAS_RSS_ITEM.getTitleExtra() + " > " : "") +
+                        ILIAS_RSS_ITEM.getTitle() + " (" + new SimpleDateFormat("dd.MM HH:mm",
+                        ACTIVITY.getResources().getConfiguration().locale).format(ILIAS_RSS_ITEM.getDate()) + ")" +
+                        (ILIAS_RSS_ITEM.getDescription().equals("") ? "" : "\n\n" +
+                                Html.fromHtml(ILIAS_RSS_ITEM.getDescription()).toString()
+                                        .replace("\n\n", "\n"))
+                        + "\n\n" +
+                        ILIAS_RSS_ITEM.getLink(),
+                ACTIVITY.getString(R.string.main_activity_toolbar_options_action_share) + " Ilias entry");
     }
 }

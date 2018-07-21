@@ -1,6 +1,6 @@
 package com.niklasm.iliasbuddy.recycler_view;
 
-import android.content.Context;
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
@@ -33,7 +33,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     private final List<IliasRssFeedItem> items;
     private final SimpleDateFormat viewDateFormat;
     private final SimpleDateFormat viewTimeFormat;
-    private final Context CONTEXT;
+    private final Activity ACTIVITY;
     private final IliasRssItemListAdapterInterface ADAPTER_INTERFACE;
 
     // Allows to remember the last item shown on screen
@@ -44,42 +44,45 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
     private boolean showFileChanges;
     private boolean showPosts;
 
-    public IliasRssItemListAdapter(final List<IliasRssFeedItem> dataSet, @NonNull final Context CONTEXT,
+    public IliasRssItemListAdapter(final List<IliasRssFeedItem> dataSet, @NonNull final Activity ACTIVITY,
                                    @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
         items = dataSet;
         itemsFiltered = dataSet;
-        viewDateFormat = new SimpleDateFormat("dd.MM", CONTEXT.getResources()
+        viewDateFormat = new SimpleDateFormat("dd.MM", ACTIVITY.getResources()
                 .getConfiguration().locale);
-        viewTimeFormat = new SimpleDateFormat("HH:mm", CONTEXT.getResources()
+        viewTimeFormat = new SimpleDateFormat("HH:mm", ACTIVITY.getResources()
                 .getConfiguration().locale);
-        this.CONTEXT = CONTEXT;
+        this.ACTIVITY = ACTIVITY;
         this.ADAPTER_INTERFACE = ADAPTER_INTERFACE;
 
-        showFileChanges = IliasBuddyPreferenceHandler.getFilterFileChanges(CONTEXT, true);
-        showPosts = IliasBuddyPreferenceHandler.getFilterPosts(CONTEXT, true);
+        showFileChanges = IliasBuddyPreferenceHandler.getFilterFileChanges(ACTIVITY, true);
+        showPosts = IliasBuddyPreferenceHandler.getFilterPosts(ACTIVITY, true);
     }
 
     public static void alertDialogRssFeedEntry(@NonNull final IliasRssFeedItem ILIAS_RSS_ITEM,
-                                               @NonNull final Context CONTEXT) {
+                                               @NonNull final Activity ACTIVITY) {
         if (ILIAS_RSS_ITEM.getDescription().equals("")) {
             // if there is no description this means it was an upload
             // therefore instantly link to the Ilias page
-            IliasBuddyMiscellaneousHandler.openUrl(CONTEXT, ILIAS_RSS_ITEM.getLink());
+            IliasBuddyMiscellaneousHandler.openUrl(ACTIVITY, ILIAS_RSS_ITEM.getLink());
         } else {
             // if not this must be a legit message for which a popup dialog will be opened
             final String message = ">> " + ILIAS_RSS_ITEM.getTitle() + "\n\n" +
                     Html.fromHtml(ILIAS_RSS_ITEM.getDescription());
-            final AlertDialog dialog = new AlertDialog.Builder(CONTEXT)
+            final AlertDialog dialog = new AlertDialog.Builder(ACTIVITY)
                     .setTitle(ILIAS_RSS_ITEM.getCourse() + " (" +
                             new SimpleDateFormat("dd.MM HH:mm",
-                                    CONTEXT.getResources().getConfiguration().locale)
+                                    ACTIVITY.getResources().getConfiguration().locale)
                                     .format(ILIAS_RSS_ITEM.getDate()) + ")")
                     .setMessage(message)
                     .setCancelable(true)
-                    .setPositiveButton(CONTEXT.getString(R.string.open_in_ilias),
+                    .setPositiveButton(ACTIVITY.getString(R.string.dialog_open),
                             (dialog1, id) -> IliasBuddyMiscellaneousHandler
-                                    .openUrl(CONTEXT, ILIAS_RSS_ITEM.getLink()))
-                    .setNegativeButton(CONTEXT.getString(R.string.dialog_back),
+                                    .openUrl(ACTIVITY, ILIAS_RSS_ITEM.getLink()))
+                    .setNegativeButton(ACTIVITY.getString(R.string.dialog_share),
+                            (dialog1, id) -> IliasBuddyMiscellaneousHandler
+                                    .shareEntry(ACTIVITY, ILIAS_RSS_ITEM))
+                    .setNeutralButton(ACTIVITY.getString(R.string.dialog_back),
                             (dialog12, id) -> dialog12.cancel())
                     .show();
             final TextView textView = Objects.requireNonNull(dialog.getWindow()).getDecorView()
@@ -168,7 +171,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         // If the bound view wasn't previously displayed on screen, it's animated
         if (position > lastPosition) {
             // R.anim.slide_up, slide_in_left
-            final Animation animation = AnimationUtils.loadAnimation(CONTEXT, R.anim.fall_down);
+            final Animation animation = AnimationUtils.loadAnimation(ACTIVITY, R.anim.fall_down);
             viewToAnimate.startAnimation(animation);
             lastPosition = position;
         }
@@ -293,7 +296,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         public void onClick(final View view) {
             IliasRssItemListAdapter.alertDialogRssFeedEntry(itemsFiltered.get(
                     ADAPTER_INTERFACE.listAdapterGetRecyclerViewChildLayoutPosition(view)),
-                    CONTEXT);
+                    ACTIVITY);
         }
     }
 }

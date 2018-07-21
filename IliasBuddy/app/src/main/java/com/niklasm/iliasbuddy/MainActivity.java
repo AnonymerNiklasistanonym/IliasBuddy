@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements
                     .getBytes(StandardCharsets.UTF_8)));
         } catch (XmlPullParserException | IOException | ParseException e) {
             IliasBuddyMiscellaneousHandler.displayErrorSnackBar(this, findViewById(R.id.fab),
-                    getString(R.string.dialog_parse_error), e.toString());
+                    getString(R.string.dialog_error_parse), e.toString());
             e.printStackTrace();
             // at last stop refresh animation of swipe to refresh layout
             rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
@@ -291,13 +291,13 @@ public class MainActivity extends AppCompatActivity implements
     public void webAuthenticationError(final AuthFailureError error) {
         Log.e("MainActivity - AuthErr", error.toString());
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
-        openSetupActivity(R.string.dialog_authentication_error, error.toString());
+        openSetupActivity(R.string.dialog_error_authentication, error.toString());
     }
 
     @Override
     public void webResponseError(final VolleyError error) {
         Log.e("MainActivity - RespErr", error.toString());
-        openSetupActivity(R.string.dialog_response_error, error.toString());
+        openSetupActivity(R.string.dialog_error_web_response, error.toString());
     }
 
     public void openSettings(final MenuItem menuItem) {
@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void noNewEntryFound() {
-        Snackbar.make(findViewById(R.id.fab), R.string.dialog_no_new_entry_found,
+        Snackbar.make(findViewById(R.id.fab), R.string.dialog_snack_bar_no_new_entry_found,
                 Snackbar.LENGTH_SHORT).show();
     }
 
@@ -399,7 +399,7 @@ public class MainActivity extends AppCompatActivity implements
         } catch (final IOException e) {
             e.printStackTrace();
             IliasBuddyMiscellaneousHandler.displayErrorSnackBar(this,
-                    findViewById(R.id.fab), getString(R.string.dialog_cache_error), e.toString());
+                    findViewById(R.id.fab), getString(R.string.dialog_error_cache), e.toString());
         }
     }
 
@@ -582,10 +582,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void menuShare(final MenuItem item) {
-        IliasBuddyMiscellaneousHandler.shareLink(this,
-                getString(R.string.app_name), getString(R.string.app_name) + "\n" +
-                        "https://github.com/AnonymerNiklasistanonym/IliasBuddy/releases",
-                getString(R.string.main_activity_toolbar_options_action_share));
+        IliasBuddyMiscellaneousHandler.shareRepositoryReleaseUrl(this);
     }
 
     public void menuDevOptionForceStartBackgroundService(final MenuItem item) {

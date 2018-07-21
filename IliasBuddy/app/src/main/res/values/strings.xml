@@ -106,46 +106,56 @@
     <string name="welcome_activity_slide_2_picture_description">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
 
     <!-- About activity -->
-    <string name="about_app_description">This open source app downloads with your private Ilias RSS feed credentials your private Ilias RSS feed. It displays it for once in a list and can also if enabled check itself if there a new RSS entries and push notifications to notify you too.</string>
-    <string name="word_version">Version</string>
-    <string name="word_check_for_new_version">Check for new version</string>
-    <string name="word_license">License</string>
-    <string name="about_app_license" translatable="false">MIT License\n\nCopyright © 2018 Niklas\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
-    <string name="word_open_source_licenses">Open source licenses</string>
-    <string name="url_ilias_buddy_repository_title">Website with source code + bug tracker</string>
-    <string name="author_github_user_name_title">AnonymerNiklasistanonym on GitHub</string>
+    <string name="about_activity_description">This open source app downloads with your private Ilias RSS feed credentials your private Ilias RSS feed. It displays it for once in a list and can also if enabled check itself if there a new RSS entries and push notifications to notify you too.</string>
+    <string name="about_activity_version">Version</string>
+    <string name="about_activity_check_for_new_version">Check for new version</string>
+    <string name="about_activity_license">License</string>
+    <string name="about_activity_license_text" translatable="false">MIT License\n\nCopyright © 2018 Niklas\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</string>
+    <string name="about_activity_open_source_licenses">Open source licenses</string>
+    <string name="about_activity_ilias_buddy_repository_website">Website with source code + bug tracker</string>
+    <string name="about_activity_author_on_github">on GitHub</string>
 
     <!-- Dialog -->
-    <string name="dialog_response_error">Web response error</string>
-    <string name="dialog_authentication_error">Authentication error</string>
-    <string name="dialog_parse_error">Parse error</string>
-    <string name="dialog_cache_error">Cache error</string>
-    <string name="dialog_volley_error">Web request error (VolleyError)</string>
     <string name="dialog_back">BACK</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_more">MORE</string>
-    <string name="dialog_no_new_entry_found">No new entry found</string>
-    <string name="dialog_json_exception">JSON parse error</string>
-    <string name="dialog_new_version_not_found">No new version found</string>
-    <string name="dialog_new_version_found">New Version found!</string>
-    <string name="dialog_current_version">Current version</string>
-    <string name="dialog_latest_version">Latest version</string>
-    <string name="dialog_new_version_already_installed">The newest version is already installed</string>
-    <string name="dialog_new_version_open_release_page">Open release page</string>
+    <string name="dialog_open">OPEN</string>
+    <string name="dialog_share">SHARE</string>
+    <!-- Dialog: Snack bar -->
+    <string name="dialog_snack_bar_no_new_entry_found">No new entry found</string>
+    <!-- Dialog: Version check -->
+    <string name="dialog_version_check_new_version_not_found">No new version found</string>
+    <string name="dialog_version_check_new_version_found">New Version found!</string>
+    <string name="dialog_version_check_current_version">Current version</string>
+    <string name="dialog_version_check_latest_version">Latest version</string>
+    <string name="dialog_version_check_new_version_already_installed">The newest version is already installed</string>
+    <string name="dialog_version_check_open_release_page">Open release page</string>
+    <!-- Dialog: Errors -->
+    <string name="dialog_error_web_response">Web response error</string>
+    <string name="dialog_error_authentication">Authentication error</string>
+    <string name="dialog_error_parse">Parse error</string>
+    <string name="dialog_error_cache">Cache error</string>
+    <string name="dialog_error_volley">Web request error (VolleyError)</string>
+    <string name="dialog_error_json">JSON parse error</string>
 
     <!-- Search -->
     <string name="search_title">Search for entries</string>
     <string name="search_hint" translatable="false">@string/search_title</string>
 
-    <!-- Notifications -->
-    <string name="notification_background_service_is_active">Background service is active</string>
-    <string name="notification_channel_sticky_description">Shows sticky notification when background service is activated</string>
+    <!-- Notification -->
+    <!-- Notification: Titles -->
+    <string name="notification_title_one_new_ilias_entry">One new Ilias entry!</string>
+    <string name="notification_title_new_ilias_entries">new Ilias entries!</string>
+    <string name="notification_title_background_service_is_active">Background service is active</string>
+    <string name="notification_description_background_service_tap_to_change">Tap to disable/configure background service</string>
+    <!-- Notification: Actions -->
+    <string name="notification_action_dismiss">Dismiss</string>
+    <string name="notification_action_open_in_ilias" translatable="false">@string/open_in_ilias</string>
+    <!-- Notification: Channels -->
     <string name="notification_channel_sticky_name">Sticky background service is active</string>
-    <string name="notification_channel_new_entries_new_ilias_entries">new Ilias entries!</string>
-    <string name="notification_channel_new_entries_one_new_ilias_entry">One new Ilias entry!</string>
+    <string name="notification_channel_sticky_description">Shows sticky notification when background service is activated</string>
     <string name="notification_channel_new_entries_name">New Ilias entries notification</string>
     <string name="notification_channel_new_entries_description">Shows notification when there are new Ilias entries in the RSS feed</string>
-    <string name="notification_dismiss_notification">Dismiss</string>
-    <string name="notification_background_service_tap_to_change">Tap to disable/configure background service</string>
+    <string name="ilias_buddy_share_text_without_url">Install IliasBuddy to always be up to date about Ilias posts and Ilias file changes</string>
 
 </resources>

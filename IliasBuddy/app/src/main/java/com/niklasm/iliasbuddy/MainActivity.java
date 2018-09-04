@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements
         // get the latest RSS entry from the main activity
         // only continue if the latest object is different
         if ((items == null || items.size() == 0) ||
-                (!items.get(0).toString().equals(PARSED_ENTRIES[0].toString()))) {
+                (PARSED_ENTRIES.length == 0 || !items.get(0).toString().equals(PARSED_ENTRIES[0].toString()))) {
             renderNewList(PARSED_ENTRIES);
         } else {
             noNewEntryFound();

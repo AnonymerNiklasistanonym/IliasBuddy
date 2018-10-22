@@ -19,7 +19,7 @@ import com.example.niklasm.iliasbuddy.R;
 import com.niklasm.iliasbuddy.SettingsActivity;
 import com.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
 import java.util.Objects;
 
@@ -95,7 +95,7 @@ public class IliasBuddyNotificationHandler {
                                                  @NonNull final String CONTENT_PREVIEW,
                                                  @NonNull final String[] CONTENT_BIG,
                                                  @NonNull final Intent ONCLICK_ACTIVITY_INTENT,
-                                                 @NonNull final IliasRssFeedItem[] NEW_ENTRIES_ARRAY,
+                                                 @NonNull final IliasRssEntry[] NEW_ENTRIES_ARRAY,
                                                  final String URL) {
 
         // determine single/multiple new entries notification style
@@ -190,7 +190,7 @@ public class IliasBuddyNotificationHandler {
 
     @NonNull
     private static NotificationCompat.Action actionDismiss(@NonNull final Context CONTEXT,
-                                                           final IliasRssFeedItem[] NEW_ENTRIES_ARRAY) {
+                                                           final IliasRssEntry[] NEW_ENTRIES_ARRAY) {
         return new NotificationCompat.Action.Builder(R.drawable.ic_delete_sweep_black,
                 CONTEXT.getString(R.string.notification_action_dismiss),
                 PendingIntent.getService(CONTEXT, 0,
@@ -217,7 +217,7 @@ public class IliasBuddyNotificationHandler {
                                                   @NonNull final String CONTENT_PREVIEW,
                                                   @NonNull final String[] CONTENT_BIG,
                                                   @NonNull final Intent ON_CLICK_ACTIVITY_INTENT,
-                                                  @NonNull final IliasRssFeedItem[] NEW_ENTRIES_ARRAY,
+                                                  @NonNull final IliasRssEntry[] NEW_ENTRIES_ARRAY,
                                                   final String URL) {
 
         Log.d("IliasBuddyNotificationH", "showNotificationNewEntries()");

@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
 public class IliasBuddyBroadcastHandler {
 
@@ -44,7 +44,7 @@ public class IliasBuddyBroadcastHandler {
 
     public static void sendBroadcastNewEntriesFound(@NonNull final Context CONTEXT,
                                                     @NonNull final String NOTIFICATION_PREVIEW,
-                                                    @NonNull final IliasRssFeedItem[] NEW_ENTRIES) {
+                                                    @NonNull final IliasRssEntry[] NEW_ENTRIES) {
         LocalBroadcastManager.getInstance(CONTEXT).sendBroadcast(
                 new Intent(IliasBuddyBroadcastHandler.NEW_ENTRIES_FOUND)
                         .putExtra(IliasBuddyBroadcastHandler.NEW_ENTRIES_FOUND_PREVIEW, NOTIFICATION_PREVIEW)

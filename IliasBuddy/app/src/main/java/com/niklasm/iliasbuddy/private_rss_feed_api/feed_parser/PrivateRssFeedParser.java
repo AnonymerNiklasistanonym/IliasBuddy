@@ -1,9 +1,9 @@
-package com.niklasm.iliasbuddy.feed_parser;
+package com.niklasm.iliasbuddy.private_rss_feed_api.feed_parser;
 
 import android.support.annotation.NonNull;
 import android.util.Xml;
 
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -21,38 +21,7 @@ import java.util.Objects;
  * Class that parses IliasRssFeedItem's from an IliasRssFeed InputStream
  * (mostly inspired by this tutorial: https://developer.android.com/training/basics/network-ops/xml.html)
  */
-public class IliasRssXmlParser {
-
-    final private static String DATE_TAG = "pubDate";
-    final private static String DESCRIPTION_TAG = "description";
-    final private static String LINK_TAG = "link";
-    final private static String TITLE_TAG = "title";
-    final private static String ENTRY_TAG = "item";
-    final private static String FEED_START_TAG = "channel";
-    final private static String TIME_PARSE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss ZZZZZ";
-
-    /**
-     * @param inputStream Contains the XML data String
-     * @return Array that contains all listed IliasRssItems from the IliasRssFeed
-     * @throws XmlPullParserException If a XML tag is in the wrong place, XML data is incomplete
-     *                                or anything other XML related
-     * @throws IOException            Input stream errors or I don't know
-     */
-    @NonNull
-    public static IliasRssFeedItem[] parse(@NonNull final InputStream inputStream)
-            throws XmlPullParserException, IOException, ParseException {
-        try {
-            // create XmlPullParser parser for parsing the XML data in the shape of a InputStream
-            final XmlPullParser parser = Xml.newPullParser();
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-            parser.setInput(inputStream, null);
-            parser.nextTag();
-            return IliasRssXmlParser.readFeed(parser);
-        } finally {
-            // close input stream if something bad happens
-            inputStream.close();
-        }
-    }
+public class PrivateRssFeedParser implements IPrivateRssFeedParser {
 
     /**
      * Extract all listed IliasRssItems from the IliasRssFeed with the given XmlPullParser
@@ -64,37 +33,37 @@ public class IliasRssXmlParser {
      * @throws IOException            Input stream errors or I don't know
      */
     @NonNull
-    private static IliasRssFeedItem[] readFeed(@NonNull final XmlPullParser PARSER)
+    private static IliasRssEntry[] readFeed(@NonNull final XmlPullParser PARSER)
             throws XmlPullParserException, IOException, ParseException {
 
         // create ArrayList for all IliasRssItems in XML file
-        final ArrayList<IliasRssFeedItem> ENTRIES = new ArrayList<>();
+        final ArrayList<IliasRssEntry> ENTRIES = new ArrayList<>();
         // require that "channel" is the current Tag
-        PARSER.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.FEED_START_TAG);
+        PARSER.require(XmlPullParser.START_TAG, null, IPrivateRssFeedTags.FEED_START);
         // iterate to the next element as long as the start tag that was just required is not found
         while (PARSER.next() != XmlPullParser.END_TAG) {
             if (PARSER.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             switch (PARSER.getName()) {
-                case IliasRssXmlParser.ENTRY_TAG:
+                case IPrivateRssFeedTags.ENTRY:
                     // if an item tag was found read this RSS entry
-                    ENTRIES.add(IliasRssXmlParser.readEntry(PARSER));
+                    ENTRIES.add(PrivateRssFeedParser.readEntry(PARSER));
                     break;
                 default:
                     // if another tag was found skip it
-                    IliasRssXmlParser.skip(PARSER);
+                    PrivateRssFeedParser.skip(PARSER);
             }
         }
         // return an array from the ArrayList
-        return ENTRIES.toArray(new IliasRssFeedItem[0]);
+        return ENTRIES.toArray(new IliasRssEntry[0]);
     }
 
     @NonNull
-    private static IliasRssFeedItem readEntry(@NonNull final XmlPullParser PARSER)
+    private static IliasRssEntry readEntry(@NonNull final XmlPullParser PARSER)
             throws XmlPullParserException, IOException, ParseException {
 
-        PARSER.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.ENTRY_TAG);
+        PARSER.require(XmlPullParser.START_TAG, null, IPrivateRssFeedTags.ENTRY);
         String[] courseExtraTitleExtraTitle = new String[]{null, null, null, null};
         String link = null;
         String description = null;
@@ -106,21 +75,21 @@ public class IliasRssXmlParser {
             }
             final String name = PARSER.getName();
             switch (name) {
-                case IliasRssXmlParser.TITLE_TAG:
+                case IPrivateRssFeedTags.TITLE:
                     courseExtraTitleExtraTitle =
-                            IliasRssXmlParser.readCourseExtraTitleTitleExtra(PARSER);
+                            PrivateRssFeedParser.readCourseExtraTitleTitleExtra(PARSER);
                     break;
-                case IliasRssXmlParser.LINK_TAG:
-                    link = IliasRssXmlParser.readLink(PARSER);
+                case IPrivateRssFeedTags.LINK:
+                    link = PrivateRssFeedParser.readLink(PARSER);
                     break;
-                case IliasRssXmlParser.DESCRIPTION_TAG:
-                    description = IliasRssXmlParser.readDescription(PARSER);
+                case IPrivateRssFeedTags.DESCRIPTION:
+                    description = PrivateRssFeedParser.readDescription(PARSER);
                     break;
-                case IliasRssXmlParser.DATE_TAG:
-                    date = IliasRssXmlParser.readDate(PARSER);
+                case IPrivateRssFeedTags.DATE:
+                    date = PrivateRssFeedParser.readDate(PARSER);
                     break;
                 default:
-                    IliasRssXmlParser.skip(PARSER);
+                    PrivateRssFeedParser.skip(PARSER);
             }
         }
 
@@ -132,7 +101,7 @@ public class IliasRssXmlParser {
             courseExtraTitleExtraTitle[3] = temp;
         }
 
-        return new IliasRssFeedItem(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
+        return new IliasRssEntry(courseExtraTitleExtraTitle[0], courseExtraTitleExtraTitle[1],
                 courseExtraTitleExtraTitle[2], Objects.requireNonNull(description),
                 Objects.requireNonNull(link), Objects.requireNonNull(date),
                 courseExtraTitleExtraTitle[3]);
@@ -141,36 +110,36 @@ public class IliasRssXmlParser {
     @NonNull
     private static Date readDate(@NonNull final XmlPullParser parser)
             throws IOException, XmlPullParserException, ParseException {
-        parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.DATE_TAG);
-        final String DATE_STRING = IliasRssXmlParser.readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.DATE_TAG);
-        return new SimpleDateFormat(IliasRssXmlParser.TIME_PARSE_FORMAT, Locale.US)
+        parser.require(XmlPullParser.START_TAG, null, IPrivateRssFeedTags.DATE);
+        final String DATE_STRING = PrivateRssFeedParser.readText(parser);
+        parser.require(XmlPullParser.END_TAG, null, IPrivateRssFeedTags.DATE);
+        return new SimpleDateFormat(IPrivateRssFeedTimeFormat.TIME_FORMAT, Locale.US)
                 .parse(DATE_STRING);
     }
 
     @NonNull
     private static String readDescription(@NonNull final XmlPullParser parser)
             throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.DESCRIPTION_TAG);
-        final String DESCRIPTION = IliasRssXmlParser.readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.DESCRIPTION_TAG);
+        parser.require(XmlPullParser.START_TAG, null, IPrivateRssFeedTags.DESCRIPTION);
+        final String DESCRIPTION = PrivateRssFeedParser.readText(parser);
+        parser.require(XmlPullParser.END_TAG, null, IPrivateRssFeedTags.DESCRIPTION);
         return DESCRIPTION;
     }
 
     @NonNull
     private static String readLink(@NonNull final XmlPullParser parser)
             throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.LINK_TAG);
-        final String LINK = IliasRssXmlParser.readText(parser);
-        parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.LINK_TAG);
+        parser.require(XmlPullParser.START_TAG, null, IPrivateRssFeedTags.LINK);
+        final String LINK = PrivateRssFeedParser.readText(parser);
+        parser.require(XmlPullParser.END_TAG, null, IPrivateRssFeedTags.LINK);
         return LINK;
     }
 
     @NonNull
     private static String[] readCourseExtraTitleTitleExtra(@NonNull final XmlPullParser parser)
             throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.TITLE_TAG);
-        final String courseExtraTitle = IliasRssXmlParser.readText(parser);
+        parser.require(XmlPullParser.START_TAG, null, IPrivateRssFeedTags.TITLE);
+        final String courseExtraTitle = PrivateRssFeedParser.readText(parser);
         final String courseExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("[") + 1,
                 courseExtraTitle.indexOf("]")).trim();
         final boolean extraExists = courseExtraTitle.contains(">");
@@ -185,7 +154,7 @@ public class IliasRssXmlParser {
                 .substring(titleTitleExtra.indexOf(":") + 1).trim() : titleTitleExtra;
         final String titleExtra = titleExtraExists ? titleTitleExtra.substring(0,
                 titleTitleExtra.indexOf(":")).trim() : null;
-        parser.require(XmlPullParser.END_TAG, null, IliasRssXmlParser.TITLE_TAG);
+        parser.require(XmlPullParser.END_TAG, null, IPrivateRssFeedTags.TITLE);
 
         return new String[]{course, titleExtra, title, extra};
 
@@ -223,6 +192,23 @@ public class IliasRssXmlParser {
                     depth++;
                     break;
             }
+        }
+    }
+
+    @NonNull
+    @Override
+    public IliasRssEntry[] parseFeed(@NonNull final InputStream inputStream)
+            throws XmlPullParserException, IOException, ParseException {
+        try {
+            // create XmlPullParser parser for parsing the XML data in the shape of a InputStream
+            final XmlPullParser parser = Xml.newPullParser();
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
+            parser.setInput(inputStream, null);
+            parser.nextTag();
+            return PrivateRssFeedParser.readFeed(parser);
+        } finally {
+            // close input stream if something bad happens
+            inputStream.close();
         }
     }
 }

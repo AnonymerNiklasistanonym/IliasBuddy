@@ -1,4 +1,4 @@
-package com.niklasm.iliasbuddy.feed_parser;
+package com.niklasm.iliasbuddy.private_rss_feed_api.feed_requester;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -14,20 +14,21 @@ import com.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IliasRssXmlWebRequester {
+public class PrivateRssFeedRequester implements IPrivateRssFeedRequester {
 
     @NonNull
-    final private IliasRssXmlWebRequesterInterface CLASS_THAT_IMPLEMENTS_INTERFACE;
+    final private IPrivateRssFeedRequesterClient CLASS_THAT_IMPLEMENTS_INTERFACE;
     @NonNull
     final private Context CONTEXT;
 
-    public IliasRssXmlWebRequester(
-            @NonNull final IliasRssXmlWebRequesterInterface CLASS_THAT_IMPLEMENTS_INTERFACE) {
+    public PrivateRssFeedRequester(@NonNull final IPrivateRssFeedRequesterClient CLASS_THAT_IMPLEMENTS_INTERFACE,
+                                   @NonNull final Context context) {
         this.CLASS_THAT_IMPLEMENTS_INTERFACE = CLASS_THAT_IMPLEMENTS_INTERFACE;
-        CONTEXT = (Context) CLASS_THAT_IMPLEMENTS_INTERFACE;
+        CONTEXT = context;
     }
 
-    public void getWebContent() {
+    @Override
+    public void requestPrivateRssFeed() {
 
         // Get credentials from preferences
         final IliasRssFeedCredentials CREDENTIALS =
@@ -35,13 +36,13 @@ public class IliasRssXmlWebRequester {
 
         // Request a string response from the provided URL.
         Volley.newRequestQueue(CONTEXT).add(new StringRequest(Request.Method.GET,
-                CREDENTIALS.getUserUrl(), CLASS_THAT_IMPLEMENTS_INTERFACE::processIliasXml,
+                CREDENTIALS.getUserUrl(), CLASS_THAT_IMPLEMENTS_INTERFACE::onFeedResponse,
                 error -> {
                     if (error instanceof AuthFailureError) {
                         CLASS_THAT_IMPLEMENTS_INTERFACE
-                                .webAuthenticationError((AuthFailureError) error);
+                                .onAuthenticationError((AuthFailureError) error);
                     } else {
-                        CLASS_THAT_IMPLEMENTS_INTERFACE.webResponseError(error);
+                        CLASS_THAT_IMPLEMENTS_INTERFACE.onResponseError(error);
                     }
                 }) {
             @Override

@@ -1,4 +1,4 @@
-package com.niklasm.iliasbuddy.objects;
+package com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry;
 
 import android.content.Context;
 import android.os.Parcel;
@@ -6,39 +6,35 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.Html;
 
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 
-public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializable, Parcelable {
-
-    public static final Creator<IliasRssFeedItem> CREATOR = new Creator<IliasRssFeedItem>() {
+public class IliasRssEntry implements IIliasRssEntry {
+    public static final Creator<IliasRssEntry> CREATOR = new Creator<IliasRssEntry>() {
         @NonNull
         @Override
-        public IliasRssFeedItem createFromParcel(final Parcel in) {
-            return new IliasRssFeedItem(in);
+        public IliasRssEntry createFromParcel(final Parcel in) {
+            return new IliasRssEntry(in);
         }
 
         @Override
-        public IliasRssFeedItem[] newArray(final int size) {
-            return new IliasRssFeedItem[size];
+        public IliasRssEntry[] newArray(final int size) {
+            return new IliasRssEntry[size];
         }
     };
-    private static final String SIMPLE_TIME_DATE_FORMAT = "dd.MM HH:mm";
     @NonNull
-    final private String COURSE;
-    final private String TITLE_EXTRA;
+    final public String COURSE;
+    final public String TITLE_EXTRA;
     @NonNull
-    final private String TITLE;
+    final public String TITLE;
     @NonNull
-    final private String DESCRIPTION;
+    final public String DESCRIPTION;
     @NonNull
-    final private String LINK;
+    final public String LINK;
     @NonNull
-    final private Date DATE;
-    final private String EXTRA;
+    final public Date DATE;
+    final public String EXTRA;
 
     /**
      * Constructor that creates a new IliasEntry
@@ -51,9 +47,9 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
      * @param DATE        Date of the RSS entry
      * @param EXTRA       Is not null if there was a file update ("FileName.pdf")
      */
-    public IliasRssFeedItem(@NonNull final String COURSE, final String TITLE_EXTRA,
-                            @NonNull final String TITLE, @NonNull final String DESCRIPTION,
-                            @NonNull final String LINK, @NonNull final Date DATE, final String EXTRA) {
+    public IliasRssEntry(@NonNull final String COURSE, final String TITLE_EXTRA,
+                         @NonNull final String TITLE, @NonNull final String DESCRIPTION,
+                         @NonNull final String LINK, @NonNull final Date DATE, final String EXTRA) {
         this.COURSE = COURSE;
         this.TITLE_EXTRA = TITLE_EXTRA;
         this.TITLE = TITLE;
@@ -63,7 +59,17 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
         this.EXTRA = EXTRA;
     }
 
-    private IliasRssFeedItem(@NonNull final Parcel IN) {
+    public IliasRssEntry(@NonNull final IliasRssEntry iliasRssEntry) {
+        COURSE = iliasRssEntry.COURSE;
+        TITLE_EXTRA = iliasRssEntry.TITLE_EXTRA;
+        TITLE = iliasRssEntry.TITLE;
+        DESCRIPTION = iliasRssEntry.DESCRIPTION;
+        LINK = iliasRssEntry.LINK;
+        DATE = iliasRssEntry.DATE;
+        EXTRA = iliasRssEntry.EXTRA;
+    }
+
+    private IliasRssEntry(@NonNull final Parcel IN) {
         COURSE = IN.readString();
         TITLE_EXTRA = IN.readString();
         TITLE = IN.readString();
@@ -73,60 +79,11 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
         EXTRA = IN.readString();
     }
 
-    public static IliasRssFeedItem[] readParcelableArray(final Parcelable[] parcelables) {
+    public static IliasRssEntry[] readParcelableArray(final Parcelable[] parcelables) {
         if (parcelables == null) {
             return null;
         }
-        return Arrays.copyOf(parcelables, parcelables.length, IliasRssFeedItem[].class);
-    }
-
-    /**
-     * @return Ilias course name of the RSS entry ("Math for Informatics")
-     */
-    @NonNull
-    public String getCourse() {
-        return COURSE;
-    }
-
-    /**
-     * @return Ilias location of entry ("Forum")
-     */
-    public String getTitleExtra() {
-        return TITLE_EXTRA;
-    }
-
-    /**
-     * @return Title of the Ilias post/file update ("Question exercise 4"/"File was updated.")
-     */
-    @NonNull
-    public String getTitle() {
-        return TITLE;
-    }
-
-    /**
-     * @return Description of the Ilias post or in case of a file an empty String
-     * ("My question is...plz help."/"")
-     */
-    @NonNull
-    public String getDescription() {
-        return DESCRIPTION;
-    }
-
-    /**
-     * @return HTTPS URL link to Ilias entry  of the RSS entry
-     */
-    @NonNull
-    public String getLink() {
-        return LINK;
-    }
-
-    @NonNull
-    public Date getDate() {
-        return DATE;
-    }
-
-    public String getExtra() {
-        return EXTRA;
+        return Arrays.copyOf(parcelables, parcelables.length, IliasRssEntry[].class);
     }
 
     /**
@@ -136,12 +93,11 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
         return DESCRIPTION.equals("");
     }
 
-
     @Override
     public String toString() {
-        return "course=" + COURSE + ",titleExtra=" + TITLE_EXTRA + ",title=" + TITLE +
-                ",description=" + DESCRIPTION + ",link=" + LINK + ",date=" + DATE.getTime() +
-                ",extra=" + EXTRA;
+        return "course=" + COURSE + ",titleExtra=" + TITLE_EXTRA + ",title=" +
+                TITLE + ",description=" + DESCRIPTION + ",link=" + LINK +
+                ",date=" + DATE.getTime() + ",extra=" + EXTRA;
     }
 
     /**
@@ -151,7 +107,7 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
     @NonNull
     public String toStringNotificationPreview(@NonNull final Context CONTEXT) {
         return ">> " + (TITLE_EXTRA != null ? TITLE_EXTRA + ": " : "") + TITLE + "\n(" +
-                new SimpleDateFormat(IliasRssFeedItem.SIMPLE_TIME_DATE_FORMAT,
+                new SimpleDateFormat(IIliasRssEntry.SIMPLE_TIME_DATE_FORMAT,
                         CONTEXT.getResources().getConfiguration().locale).format(DATE) + ")";
     }
 
@@ -175,34 +131,34 @@ public class IliasRssFeedItem implements Comparator<IliasRssFeedItem>, Serializa
     }
 
     @Override
-    public int compare(final IliasRssFeedItem OBJECT_1, final IliasRssFeedItem OBJECT_2) {
-        final int DATE_IS_THE_SAME = OBJECT_1.getDate().compareTo(OBJECT_2.getDate());
+    public int compare(final IliasRssEntry OBJECT_1, final IliasRssEntry OBJECT_2) {
+        final int DATE_IS_THE_SAME = OBJECT_1.DATE.compareTo(OBJECT_2.DATE);
         if (DATE_IS_THE_SAME != 0) {
             return DATE_IS_THE_SAME;
         }
-        final int COURSE_IS_THE_SAME = OBJECT_1.getCourse().compareTo(OBJECT_2.getCourse());
+        final int COURSE_IS_THE_SAME = OBJECT_1.COURSE.compareTo(OBJECT_2.COURSE);
         if (COURSE_IS_THE_SAME != 0) {
             return DATE_IS_THE_SAME;
         }
         final int TITLE_EXTRA_IS_THE_SAME =
-                OBJECT_1.getTitleExtra().compareTo(OBJECT_2.getTitleExtra());
+                OBJECT_1.TITLE_EXTRA.compareTo(OBJECT_2.TITLE_EXTRA);
         if (TITLE_EXTRA_IS_THE_SAME != 0) {
             return TITLE_EXTRA_IS_THE_SAME;
         }
-        final int TITLE_IS_THE_SAME = OBJECT_1.getTitle().compareTo(OBJECT_2.getTitle());
+        final int TITLE_IS_THE_SAME = OBJECT_1.TITLE.compareTo(OBJECT_2.TITLE);
         if (TITLE_IS_THE_SAME != 0) {
             return TITLE_IS_THE_SAME;
         }
         final int DESCRIPTION_IS_THE_SAME =
-                OBJECT_1.getDescription().compareTo(OBJECT_2.getDescription());
+                OBJECT_1.DESCRIPTION.compareTo(OBJECT_2.DESCRIPTION);
         if (DESCRIPTION_IS_THE_SAME != 0) {
             return DESCRIPTION_IS_THE_SAME;
         }
-        final int EXTRA_IS_THE_SAME = OBJECT_1.getExtra().compareTo(OBJECT_2.getExtra());
+        final int EXTRA_IS_THE_SAME = OBJECT_1.EXTRA.compareTo(OBJECT_2.EXTRA);
         if (EXTRA_IS_THE_SAME != 0) {
             return EXTRA_IS_THE_SAME;
         }
-        return OBJECT_1.getLink().compareTo(OBJECT_2.getLink());
+        return OBJECT_1.LINK.compareTo(OBJECT_2.LINK);
     }
 
     @Override

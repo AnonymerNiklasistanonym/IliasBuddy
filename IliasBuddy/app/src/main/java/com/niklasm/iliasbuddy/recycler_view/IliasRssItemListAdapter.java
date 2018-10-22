@@ -20,7 +20,7 @@ import android.widget.TextView;
 import com.example.niklasm.iliasbuddy.R;
 import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.Objects;
 public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemListAdapter.ViewHolder>
         implements Filterable {
 
-    private final List<IliasRssFeedItem> items;
+    private final List<IliasRssEntry> items;
     private final SimpleDateFormat viewDateFormat;
     private final SimpleDateFormat viewTimeFormat;
     private final Activity ACTIVITY;
@@ -38,13 +38,13 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
 
     // Allows to remember the last item shown on screen
     private int lastPosition = -1;
-    private List<IliasRssFeedItem> itemsFiltered;
+    private List<IliasRssEntry> itemsFiltered;
     private String currentSearch = "";
 
     private boolean showFileChanges;
     private boolean showPosts;
 
-    public IliasRssItemListAdapter(final List<IliasRssFeedItem> dataSet, @NonNull final Activity ACTIVITY,
+    public IliasRssItemListAdapter(final List<IliasRssEntry> dataSet, @NonNull final Activity ACTIVITY,
                                    @NonNull final IliasRssItemListAdapterInterface ADAPTER_INTERFACE) {
         items = dataSet;
         itemsFiltered = dataSet;
@@ -59,26 +59,26 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         showPosts = IliasBuddyPreferenceHandler.getFilterPosts(ACTIVITY, true);
     }
 
-    public static void alertDialogRssFeedEntry(@NonNull final IliasRssFeedItem ILIAS_RSS_ITEM,
+    public static void alertDialogRssFeedEntry(@NonNull final IliasRssEntry ILIAS_RSS_ITEM,
                                                @NonNull final Activity ACTIVITY) {
-        if (ILIAS_RSS_ITEM.getDescription().equals("")) {
+        if (ILIAS_RSS_ITEM.DESCRIPTION.equals("")) {
             // if there is no description this means it was an upload
             // therefore instantly link to the Ilias page
-            IliasBuddyMiscellaneousHandler.openUrl(ACTIVITY, ILIAS_RSS_ITEM.getLink());
+            IliasBuddyMiscellaneousHandler.openUrl(ACTIVITY, ILIAS_RSS_ITEM.LINK);
         } else {
             // if not this must be a legit message for which a popup dialog will be opened
-            final String message = ">> " + ILIAS_RSS_ITEM.getTitle() + "\n\n" +
-                    Html.fromHtml(ILIAS_RSS_ITEM.getDescription());
+            final String message = ">> " + ILIAS_RSS_ITEM.TITLE + "\n\n" +
+                    Html.fromHtml(ILIAS_RSS_ITEM.DESCRIPTION);
             final AlertDialog dialog = new AlertDialog.Builder(ACTIVITY)
-                    .setTitle(ILIAS_RSS_ITEM.getCourse() + " (" +
+                    .setTitle(ILIAS_RSS_ITEM.COURSE + " (" +
                             new SimpleDateFormat("dd.MM HH:mm",
                                     ACTIVITY.getResources().getConfiguration().locale)
-                                    .format(ILIAS_RSS_ITEM.getDate()) + ")")
+                                    .format(ILIAS_RSS_ITEM.DATE) + ")")
                     .setMessage(message)
                     .setCancelable(true)
                     .setPositiveButton(ACTIVITY.getString(R.string.dialog_open),
                             (dialog1, id) -> IliasBuddyMiscellaneousHandler
-                                    .openUrl(ACTIVITY, ILIAS_RSS_ITEM.getLink()))
+                                    .openUrl(ACTIVITY, ILIAS_RSS_ITEM.LINK))
                     .setNegativeButton(ACTIVITY.getString(R.string.dialog_share),
                             (dialog1, id) -> IliasBuddyMiscellaneousHandler
                                     .shareEntry(ACTIVITY, ILIAS_RSS_ITEM))
@@ -107,15 +107,15 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         // Replace the contents of a view (invoked by the layout manager)
         // - get element from the data set at this position
         // - replace the contents of the view with that element
-        final IliasRssFeedItem CURRENT_ELEMENT = itemsFiltered.get(position);
+        final IliasRssEntry CURRENT_ELEMENT = itemsFiltered.get(position);
 
         // These views have always these values and are always visible
-        holder.course.setText(CURRENT_ELEMENT.getCourse());
-        holder.date.setText(viewDateFormat.format(CURRENT_ELEMENT.getDate()));
-        holder.time.setText(viewTimeFormat.format(CURRENT_ELEMENT.getDate()));
+        holder.course.setText(CURRENT_ELEMENT.COURSE);
+        holder.date.setText(viewDateFormat.format(CURRENT_ELEMENT.DATE));
+        holder.time.setText(viewTimeFormat.format(CURRENT_ELEMENT.DATE));
 
-        if (CURRENT_ELEMENT.getTitleExtra() != null) {
-            holder.titleExtra.setText(CURRENT_ELEMENT.getTitleExtra());
+        if (CURRENT_ELEMENT.TITLE_EXTRA != null) {
+            holder.titleExtra.setText(CURRENT_ELEMENT.TITLE_EXTRA);
             holder.titleExtraCard.setVisibility(View.VISIBLE);
         } else {
             holder.titleExtraCard.setVisibility(View.GONE);
@@ -124,20 +124,20 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         // When there is an file update
         if (CURRENT_ELEMENT.isFileUpdate()) {
             // set file name as title
-            holder.title.setText(CURRENT_ELEMENT.getExtra());
+            holder.title.setText(CURRENT_ELEMENT.EXTRA);
             // and display if file was updated/added in a red label
-            holder.extra.setText(CURRENT_ELEMENT.getTitle());
+            holder.extra.setText(CURRENT_ELEMENT.TITLE);
             holder.extraCard.setVisibility(View.VISIBLE);
             // and hide description
             holder.description.setVisibility(View.GONE);
         } else {
             // else set normal title as title
-            holder.title.setText(CURRENT_ELEMENT.getTitle());
+            holder.title.setText(CURRENT_ELEMENT.TITLE);
             // and hide the red label
             holder.extraCard.setVisibility(View.GONE);
             // and display a description
             holder.description.setVisibility(View.VISIBLE);
-            holder.description.setText(Html.fromHtml(CURRENT_ELEMENT.getDescription())
+            holder.description.setText(Html.fromHtml(CURRENT_ELEMENT.DESCRIPTION)
                     .toString().replaceAll("\\s+", " ").trim());
         }
 
@@ -151,7 +151,7 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
         final long ADAPTER_INTERFACE_LATEST_ITEM_TIME =
                 ADAPTER_INTERFACE.listAdapterGetLatestEntryTime();
         final long CURRENT_ITEM_TIME =
-                CURRENT_ELEMENT.getDate().getTime();
+                CURRENT_ELEMENT.DATE.getTime();
 
         // if interface time == -1 or bigger/same than the current time highlight nothing
         if (ADAPTER_INTERFACE_LATEST_ITEM_TIME == -1 ||
@@ -195,8 +195,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     itemsFiltered = new ArrayList<>(items);
                 } else {
                     // else display only elements that contain the query in some way
-                    final List<IliasRssFeedItem> filteredList = new ArrayList<>();
-                    for (final IliasRssFeedItem ENTRY : items) {
+                    final List<IliasRssEntry> filteredList = new ArrayList<>();
+                    for (final IliasRssEntry ENTRY : items) {
                         if (ENTRY.containsIgnoreCase(charString, viewDateFormat, viewTimeFormat)) {
                             filteredList.add(ENTRY);
                         }
@@ -206,9 +206,9 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
 
                 // additionally filter if file changes or posts should be shown
                 if (!showFileChanges || !showPosts) {
-                    final List<IliasRssFeedItem> filteredList = new ArrayList<>();
+                    final List<IliasRssEntry> filteredList = new ArrayList<>();
                     // check which entries should be added to the filtered list
-                    for (final IliasRssFeedItem ENTRY : itemsFiltered) {
+                    for (final IliasRssEntry ENTRY : itemsFiltered) {
                         if ((!showFileChanges && !ENTRY.isFileUpdate()) && showPosts) {
                             filteredList.add(ENTRY);
                         } else if ((!showPosts && ENTRY.isFileUpdate()) && showFileChanges) {
@@ -231,8 +231,8 @@ public class IliasRssItemListAdapter extends RecyclerView.Adapter<IliasRssItemLi
                     final List<?> result = (List<?>) filterResults.values;
                     itemsFiltered = new ArrayList<>();
                     for (final Object object : result) {
-                        if (object instanceof IliasRssFeedItem) {
-                            itemsFiltered.add((IliasRssFeedItem) object);
+                        if (object instanceof IliasRssEntry) {
+                            itemsFiltered.add((IliasRssEntry) object);
                         }
                     }
                 }

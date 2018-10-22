@@ -158,4 +158,15 @@
     <string name="notification_channel_new_entries_description">Shows notification when there are new Ilias entries in the RSS feed</string>
     <string name="ilias_buddy_share_text_without_url">Install IliasBuddy to always be up to date about Ilias posts and Ilias file changes</string>
 
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="shortcut_short_label">Short text</string>
+    <string name="shortcut_long_label">Longer text this is</string>
+    <string name="shortcut_disabled">This shortcut is disabled</string>
+
 </resources>

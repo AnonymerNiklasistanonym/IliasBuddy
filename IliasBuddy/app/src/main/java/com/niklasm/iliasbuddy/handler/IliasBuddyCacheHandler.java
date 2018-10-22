@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ public class IliasBuddyCacheHandler {
      * @throws ClassNotFoundException Object could not be read from serialized data
      */
     @NonNull
-    public static IliasRssFeedItem[] getCache(@NonNull final Context CONTEXT)
+    public static IliasRssEntry[] getCache(@NonNull final Context CONTEXT)
             throws IOException, ClassNotFoundException {
 
         // get cache file
@@ -59,8 +59,8 @@ public class IliasBuddyCacheHandler {
         // convert content of cache file to a IliasRssFeedItem array
         final ObjectInputStream CACHE_FILE_INPUT_STREAM =
                 new ObjectInputStream(new FileInputStream(ILIAS_RSS_CACHE_FILE));
-        final IliasRssFeedItem[] CACHED_ILIAS_RSS_ITEMS =
-                (IliasRssFeedItem[]) CACHE_FILE_INPUT_STREAM.readObject();
+        final IliasRssEntry[] CACHED_ILIAS_RSS_ITEMS =
+                (IliasRssEntry[]) CACHE_FILE_INPUT_STREAM.readObject();
         CACHE_FILE_INPUT_STREAM.close();
 
         // return the cached IliasRssFeedItem array
@@ -75,7 +75,7 @@ public class IliasBuddyCacheHandler {
      * @throws IOException Cache file could not be found/created/written error
      */
     public static void setCache(@NonNull final Context CONTEXT,
-                                @NonNull final IliasRssFeedItem[] DATA_TO_CACHE)
+                                @NonNull final IliasRssEntry[] DATA_TO_CACHE)
             throws IOException {
 
         // get cache file
@@ -100,17 +100,17 @@ public class IliasBuddyCacheHandler {
 
     public static void clearCache(@NonNull final Context CONTEXT)
             throws IOException {
-        IliasBuddyCacheHandler.setCache(CONTEXT, new IliasRssFeedItem[0]);
+        IliasBuddyCacheHandler.setCache(CONTEXT, new IliasRssEntry[0]);
     }
 
     public static void addToCache(@NonNull final Context CONTEXT,
-                                  @NonNull final IliasRssFeedItem[] ENTRIES_TO_ADD)
+                                  @NonNull final IliasRssEntry[] ENTRIES_TO_ADD)
             throws IOException, ClassNotFoundException {
 
         // get current cache
-        final IliasRssFeedItem[] CURRENT_CACHE = IliasBuddyCacheHandler.getCache(CONTEXT);
+        final IliasRssEntry[] CURRENT_CACHE = IliasBuddyCacheHandler.getCache(CONTEXT);
         // merge current cache with new entries
-        final IliasRssFeedItem[] NEW_CACHE = new IliasRssFeedItem[CURRENT_CACHE.length +
+        final IliasRssEntry[] NEW_CACHE = new IliasRssEntry[CURRENT_CACHE.length +
                 ENTRIES_TO_ADD.length];
         System.arraycopy(CURRENT_CACHE, 0, NEW_CACHE, 0, CURRENT_CACHE.length);
         System.arraycopy(ENTRIES_TO_ADD, 0, NEW_CACHE, CURRENT_CACHE.length, ENTRIES_TO_ADD.length);

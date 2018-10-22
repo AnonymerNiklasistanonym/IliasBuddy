@@ -9,15 +9,20 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,33 +33,27 @@ import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.R;
 import com.niklasm.iliasbuddy.background_service.BackgroundIntentService;
 import com.niklasm.iliasbuddy.background_service.BackgroundServiceManager;
-import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlParser;
-import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequester;
-import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequesterInterface;
 import com.niklasm.iliasbuddy.handler.IliasBuddyBroadcastHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyUpdateHandler;
 import com.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.IPrivateIliasFeedApiClient;
+import com.niklasm.iliasbuddy.private_rss_feed_api.PrivateIliasFeedApi;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 import com.niklasm.iliasbuddy.recycler_view.IliasRssItemDecoration;
 import com.niklasm.iliasbuddy.recycler_view.IliasRssItemListAdapter;
 import com.niklasm.iliasbuddy.recycler_view.IliasRssItemListAdapterInterface;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface,
-        IliasRssItemListAdapterInterface {
+        SwipeRefreshLayout.OnRefreshListener, NavigationView.OnNavigationItemSelectedListener,
+        IPrivateIliasFeedApiClient, IliasRssItemListAdapterInterface {
 
     public static final String ERROR_MESSAGE_WEB_TITLE = "ERROR_MESSAGE_WEB_TITLE";
     public static final String ERROR_MESSAGE_WEB_MESSAGE = "ERROR_MESSAGE_WEB_MESSAGE";
@@ -64,10 +63,10 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView rssEntryRecyclerView;
     private IliasRssItemListAdapter mAdapter;
     private Snackbar newEntriesMessage;
-    private IliasRssXmlWebRequester iliasRssXmlWebRequester;
+    private PrivateIliasFeedApi iliasRssXmlWebRequester;
     private long latestRssEntryTime;
     private SwipeRefreshLayout rssEntryRecyclerViewSwipeToRefreshLayout;
-    private List<IliasRssFeedItem> items;
+    private List<IliasRssEntry> items;
     private Menu menu;
 
     /**
@@ -83,7 +82,18 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setSupportActionBar(findViewById(R.id.toolbar));
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         /*
           SETUP things
@@ -178,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements
         broadcastManager.registerReceiver(broadcastReceiver, intentFilter);
 
         // setup web request manager
-        iliasRssXmlWebRequester = new IliasRssXmlWebRequester(this);
+        iliasRssXmlWebRequester = new PrivateIliasFeedApi(this);
 
         /*
           Load data & Co
@@ -187,10 +197,10 @@ public class MainActivity extends AppCompatActivity implements
         try {
             // If possible load and render cached entries
             renderNewList(IliasBuddyCacheHandler.getCache(this));
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (final IOException | ClassNotFoundException e) {
             // If not possible load and render an empty list plus clear cache (create empty cache)
             e.printStackTrace();
-            renderNewList(new IliasRssFeedItem[0]);
+            renderNewList(new IliasRssEntry[0]);
             try {
                 IliasBuddyCacheHandler.clearCache(this);
             } catch (final IOException e2) {
@@ -218,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements
                 "titleStringBig (single demo)",
                 "previewString (single demo)", new String[]{"one"},
                 new Intent(this, MainActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), new IliasRssFeedItem[0],
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), new IliasRssEntry[0],
                 "https://ilias3.uni-stuttgart.de");
     }
 
@@ -228,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements
                 "previewString (multiple demo)",
                 new String[]{"one", "two", "three"},
                 new Intent(this, MainActivity.class)
-                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), new IliasRssFeedItem[0],
+                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), new IliasRssEntry[0],
                 "https://ilias3.uni-stuttgart.de");
     }
 
@@ -243,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     public void updateLatestRssEntryToNewestEntry() {
         latestRssEntryTime = (items != null && items.size() >= 1) && items.get(0) != null ?
-                items.get(0).getDate().getTime() : 0;
+                items.get(0).DATE.getTime() : 0;
         mAdapter.notifyDataSetChanged();
     }
 
@@ -254,50 +264,6 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuOpenAboutActivity(final MenuItem menuItem) {
         startActivity(new Intent(this, AboutActivity.class));
-    }
-
-    @Override
-    public void processIliasXml(final String FEED_XML_DATA) {
-        // save latest response in variable
-        MainActivity.devOptionSetLastResponse(FEED_XML_DATA);
-        // parse String Ilias RSS feed to IliasRssFeedItem[] array
-        final IliasRssFeedItem[] PARSED_ENTRIES;
-        try {
-            PARSED_ENTRIES = IliasRssXmlParser.parse(new ByteArrayInputStream(FEED_XML_DATA
-                    .replace("<rss version=\"2.0\">", "")
-                    .replace("</rss>", "")
-                    .getBytes(StandardCharsets.UTF_8)));
-        } catch (XmlPullParserException | IOException | ParseException e) {
-            IliasBuddyMiscellaneousHandler.displayErrorSnackBar(this, findViewById(R.id.fab),
-                    getString(R.string.dialog_error_parse), e.toString());
-            e.printStackTrace();
-            // at last stop refresh animation of swipe to refresh layout
-            rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
-            return;
-        }
-        // get the latest RSS entry from the main activity
-        // only continue if the latest object is different
-        if ((items == null || items.size() == 0) ||
-                (PARSED_ENTRIES.length == 0 || !items.get(0).toString().equals(PARSED_ENTRIES[0].toString()))) {
-            renderNewList(PARSED_ENTRIES);
-        } else {
-            noNewEntryFound();
-        }
-        // at last stop refresh animation of swipe to refresh layout
-        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void webAuthenticationError(final AuthFailureError error) {
-        Log.e("MainActivity - AuthErr", error.toString());
-        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
-        openSetupActivity(R.string.dialog_error_authentication, error.toString());
-    }
-
-    @Override
-    public void webResponseError(final VolleyError error) {
-        Log.e("MainActivity - RespErr", error.toString());
-        openSetupActivity(R.string.dialog_error_web_response, error.toString());
     }
 
     public void openSettings(final MenuItem menuItem) {
@@ -337,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements
         // activate refresh animation of SwipeToRefreshLayout
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(true);
         // check Ilias RSS feed
-        iliasRssXmlWebRequester.getWebContent();
+        iliasRssXmlWebRequester.getCurrentPrivateIliasFeed();
     }
 
     public void menuOpenSetupActivity(final MenuItem menuItem) {
@@ -380,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements
             // set latestRssEntryTime to null
             latestRssEntryTime = 0;
             // render empty list to override the current one
-            renderNewList(new IliasRssFeedItem[0]);
+            renderNewList(new IliasRssEntry[0]);
             // clear the last server response
             MainActivity.lastResponse = null;
         } catch (final IOException e) {
@@ -393,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @param NEW_CACHE_DATA New cache data
      */
-    private void setCache(final IliasRssFeedItem[] NEW_CACHE_DATA) {
+    private void setCache(final IliasRssEntry[] NEW_CACHE_DATA) {
         try {
             IliasBuddyCacheHandler.setCache(this, NEW_CACHE_DATA);
         } catch (final IOException e) {
@@ -403,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void renderNewList(final IliasRssFeedItem[] NEW_ENTRIES) {
+    public void renderNewList(final IliasRssEntry[] NEW_ENTRIES) {
 
         // save latest element of new data set in preferences
         IliasBuddyPreferenceHandler.setLatestItemToString(this,
@@ -443,8 +409,8 @@ public class MainActivity extends AppCompatActivity implements
                 Log.e("MainActivity", "Parcelable was null");
             }
             // convert Parcelable[] to IliasRssFeedItem[]
-            final IliasRssFeedItem[] NEW_ENTRIES_EXTRA =
-                    IliasRssFeedItem.readParcelableArray(NEW_ENTRIES_EXTRA_Parcelable);
+            final IliasRssEntry[] NEW_ENTRIES_EXTRA =
+                    IliasRssEntry.readParcelableArray(NEW_ENTRIES_EXTRA_Parcelable);
             // if the new entries have only a length of one show alert dialog to this element
             if (NEW_ENTRIES_EXTRA != null && NEW_ENTRIES_EXTRA.length == 1) {
                 IliasRssItemListAdapter.alertDialogRssFeedEntry(NEW_ENTRIES_EXTRA[0], this);
@@ -548,22 +514,22 @@ public class MainActivity extends AppCompatActivity implements
     public void menuDevOptionCleanFirstElement(final MenuItem item) {
         try {
             // load IliasRssFeedItem[] from cache
-            final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES =
+            final IliasRssEntry[] CURRENT_ILIAS_ENTRIES =
                     IliasBuddyCacheHandler.getCache(this);
             // if it's not null and IliasRssFeedItem[] has at least one element remove the first
             if (CURRENT_ILIAS_ENTRIES.length >= 1) {
-                final IliasRssFeedItem[] CURRENT_ILIAS_ENTRIES_2 = Arrays.copyOfRange(
+                final IliasRssEntry[] CURRENT_ILIAS_ENTRIES_2 = Arrays.copyOfRange(
                         CURRENT_ILIAS_ENTRIES, 1, CURRENT_ILIAS_ENTRIES.length);
                 IliasBuddyCacheHandler.setCache(this, CURRENT_ILIAS_ENTRIES_2);
                 // clean things in the future
-                latestRssEntryTime = CURRENT_ILIAS_ENTRIES_2[0].getDate().getTime();
+                latestRssEntryTime = CURRENT_ILIAS_ENTRIES_2[0].DATE.getTime();
                 // clear latest item and latest notification from preferences
                 IliasBuddyPreferenceHandler.setLatestItemToString(this,
                         CURRENT_ILIAS_ENTRIES_2[0].toString());
                 // render empty list to override the current one
                 renderNewList(CURRENT_ILIAS_ENTRIES_2);
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (final IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -587,5 +553,65 @@ public class MainActivity extends AppCompatActivity implements
 
     public void menuDevOptionForceStartBackgroundService(final MenuItem item) {
         startService(new Intent(this, BackgroundIntentService.class));
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull final MenuItem item) {
+        // Handle navigation view item clicks here.
+        final int id = item.getItemId();
+
+        /*
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }*/
+
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    public void onFeedResponse(@NonNull final IliasRssEntry[] iliasRssEntries) {
+        // get the latest RSS entry from the main activity
+        // only continue if the latest object is different
+        if ((items == null || items.size() == 0) ||
+                (iliasRssEntries.length == 0 || !items.get(0).toString().equals(iliasRssEntries[0].toString()))) {
+            renderNewList(iliasRssEntries);
+        } else {
+            noNewEntryFound();
+        }
+        // at last stop refresh animation of swipe to refresh layout
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onAuthenticationError(@NonNull final AuthFailureError authenticationError) {
+        Log.e("MainActivity - AuthErr", authenticationError.toString());
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
+        openSetupActivity(R.string.dialog_error_authentication, authenticationError.toString());
+    }
+
+    @Override
+    public void onResponseError(@NonNull final VolleyError responseError) {
+        Log.e("MainActivity - RespErr", responseError.toString());
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
+        openSetupActivity(R.string.dialog_error_web_response, responseError.toString());
+    }
+
+    @Override
+    public void onFeedParseError(@NonNull final Exception feedParseError) {
+        Log.e("MainActivity - ParseErr", feedParseError.toString());
+        rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
+        openSetupActivity(R.string.dialog_error_parse, feedParseError.toString());
     }
 }

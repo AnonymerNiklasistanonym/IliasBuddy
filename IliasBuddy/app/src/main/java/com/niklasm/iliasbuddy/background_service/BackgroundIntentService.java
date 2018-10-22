@@ -11,25 +11,19 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.VolleyError;
 import com.example.niklasm.iliasbuddy.R;
 import com.niklasm.iliasbuddy.MainActivity;
-import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlParser;
-import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequester;
-import com.niklasm.iliasbuddy.feed_parser.IliasRssXmlWebRequesterInterface;
 import com.niklasm.iliasbuddy.handler.IliasBuddyBroadcastHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.IPrivateIliasFeedApiClient;
+import com.niklasm.iliasbuddy.private_rss_feed_api.PrivateIliasFeedApi;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.text.ParseException;
 import java.util.ArrayList;
 
-public class BackgroundIntentService extends Service implements IliasRssXmlWebRequesterInterface {
+public class BackgroundIntentService extends Service implements IPrivateIliasFeedApiClient {
 
     @Override
     public int onStartCommand(final Intent INTENT, final int flags, final int startId) {
@@ -45,8 +39,8 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             // if the entries are not null add them to the cache
             if (NEW_ENTRIES_EXTRA_Parcelable != null) {
                 // convert Parcelable[] to IliasRssFeedItem[]
-                final IliasRssFeedItem[] NEW_ENTRIES_EXTRA =
-                        IliasRssFeedItem.readParcelableArray(NEW_ENTRIES_EXTRA_Parcelable);
+                final IliasRssEntry[] NEW_ENTRIES_EXTRA =
+                        IliasRssEntry.readParcelableArray(NEW_ENTRIES_EXTRA_Parcelable);
                 try {
                     // add them to the cache
                     IliasBuddyCacheHandler.addToCache(this, NEW_ENTRIES_EXTRA);
@@ -66,7 +60,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         }
 
         // make a web request
-        new IliasRssXmlWebRequester(this).getWebContent();
+        new PrivateIliasFeedApi(this).getCurrentPrivateIliasFeed();
 
         // return this so that the service can be restarted
         return Service.START_NOT_STICKY;
@@ -77,7 +71,7 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         return null;
     }
 
-    public void createNotification(@NonNull final IliasRssFeedItem[] NEW_ENTRIES) {
+    public void createNotification(@NonNull final IliasRssEntry[] NEW_ENTRIES) {
 
         /*
         Get the latest element from the last notification as String
@@ -131,14 +125,14 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
         // Show notification with all the values
         IliasBuddyNotificationHandler.showNotificationNewEntries(this, NOTIFICATION_TITLE,
                 NOTIFICATION_TITLE_BIG, NOTIFICATION_PREVIEW_CONTENT, NOTIFICATION_TEXT_ARRAY,
-                ON_CLICK, NEW_ENTRIES, NEW_ENTRIES[0].getLink());
+                ON_CLICK, NEW_ENTRIES, NEW_ENTRIES[0].LINK);
 
         // Additionally send a broadcast to the main activity if it currently is running
         IliasBuddyBroadcastHandler.sendBroadcastNewEntriesFound(this,
                 NOTIFICATION_PREVIEW_CONTENT, NEW_ENTRIES);
     }
 
-    private IliasRssFeedItem[] getNewElements(final IliasRssFeedItem[] NEW_DATA_SET) {
+    private IliasRssEntry[] getNewElements(final IliasRssEntry[] NEW_DATA_SET) {
 
         // if new data is null return null
         if (NEW_DATA_SET == null || NEW_DATA_SET.length == 0) {
@@ -153,13 +147,13 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
             return NEW_DATA_SET;
         }
 
-        final ArrayList<IliasRssFeedItem> newIliasRssItems = new ArrayList<>();
+        final ArrayList<IliasRssEntry> newIliasRssItems = new ArrayList<>();
 
         // else check which elements of the new data set are new
-        for (final IliasRssFeedItem NEW_ENTRY : NEW_DATA_SET) {
+        for (final IliasRssEntry NEW_ENTRY : NEW_DATA_SET) {
             if (NEW_ENTRY.toString().equals(CURRENT_LATEST_ENTRY)) {
                 // if newest entry was found return all found entries
-                return newIliasRssItems.toArray(new IliasRssFeedItem[0]);
+                return newIliasRssItems.toArray(new IliasRssEntry[0]);
             } else {
                 newIliasRssItems.add(NEW_ENTRY);
             }
@@ -170,28 +164,13 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
     }
 
     @Override
-    public void processIliasXml(final String FEED_XML_DATA) {
-        Log.d("BackgroundIntentService", "processIliasXml");
-        MainActivity.devOptionSetLastResponse(FEED_XML_DATA);
-
-        // Parse the current Ilias feed to an IliasRssFeedItem[]
-        final IliasRssFeedItem[] PARSED_WEB_RSS_FEED;
-        try {
-            Log.d("BackgroundIntentService", "processIliasXml >> Parse entries");
-            PARSED_WEB_RSS_FEED = IliasRssXmlParser.parse(new ByteArrayInputStream(FEED_XML_DATA
-                    .replace("<rss version=\"2.0\">", "")
-                    .replace("</rss>", "").getBytes(StandardCharsets.UTF_8)));
-        } catch (ParseException | XmlPullParserException | IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
+    public void onFeedResponse(@NonNull final IliasRssEntry[] iliasRssEntries) {
         // Find out which entries of them are new
-        final IliasRssFeedItem[] NEW_ENTRIES = getNewElements(PARSED_WEB_RSS_FEED);
+        final IliasRssEntry[] NEW_ENTRIES = getNewElements(iliasRssEntries);
 
         // Do nothing if there are no entries or zero new ones
         if (NEW_ENTRIES == null || NEW_ENTRIES.length == 0) {
-            Log.d("BackgroundIntentService", "processIliasXml >> No new entries");
+            Log.d("BackgroundIntentService", "onFeedResponse >> No new entries");
             return;
         }
 
@@ -199,12 +178,17 @@ public class BackgroundIntentService extends Service implements IliasRssXmlWebRe
     }
 
     @Override
-    public void webAuthenticationError(final AuthFailureError error) {
-        Log.e("BackgroundInt - AuthErr", error.toString());
+    public void onAuthenticationError(@NonNull final AuthFailureError authenticationError) {
+        Log.e("BackgroundInt - AuthErr", authenticationError.toString());
     }
 
     @Override
-    public void webResponseError(final VolleyError error) {
-        Log.e("BackgroundInt - RespErr", error.toString());
+    public void onResponseError(@NonNull final VolleyError responseError) {
+        Log.e("BackgroundInt - RespErr", responseError.toString());
+    }
+
+    @Override
+    public void onFeedParseError(@NonNull final Exception feedParseError) {
+        Log.e("BackgroundInt - FeedErr", feedParseError.toString());
     }
 }

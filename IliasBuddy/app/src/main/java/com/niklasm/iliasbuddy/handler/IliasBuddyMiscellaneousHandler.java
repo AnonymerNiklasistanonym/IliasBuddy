@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.niklasm.iliasbuddy.R;
-import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;
+import com.niklasm.iliasbuddy.private_rss_feed_api.feed_entry.IliasRssEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -88,67 +88,67 @@ public class IliasBuddyMiscellaneousHandler {
         textView.setTextIsSelectable(true);
     }
 
-    public static String notificationBigTitleSingle(@NonNull final IliasRssFeedItem ENTRY) {
+    public static String notificationBigTitleSingle(@NonNull final IliasRssEntry ENTRY) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return ENTRY.getCourse() + " >> " +
-                    (ENTRY.getTitleExtra() != null ? ENTRY.getTitleExtra() : "");
+            return ENTRY.COURSE + " >> " +
+                    (ENTRY.TITLE_EXTRA != null ? ENTRY.TITLE_EXTRA : "");
         } else {
-            return ENTRY.getCourse();
+            return ENTRY.COURSE;
         }
 
     }
 
-    public static String notificationTitleSingle(@NonNull final IliasRssFeedItem ENTRY,
+    public static String notificationTitleSingle(@NonNull final IliasRssEntry ENTRY,
                                                  @NonNull final Context CONTEXT) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return CONTEXT.getString(R.string.notification_title_one_new_ilias_entry) +
-                    " [" + ENTRY.getCourse() + "]";
+                    " [" + ENTRY.COURSE + "]";
         } else {
             return CONTEXT.getString(R.string.notification_title_one_new_ilias_entry);
         }
     }
 
-    public static String notificationBigContentSingle(@NonNull final IliasRssFeedItem ENTRY,
+    public static String notificationBigContentSingle(@NonNull final IliasRssEntry ENTRY,
                                                       @NonNull final Context CONTEXT) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return ENTRY.getTitle() + " (" + new SimpleDateFormat("dd.MM HH:mm",
-                    CONTEXT.getResources().getConfiguration().locale).format(ENTRY.getDate()) + ")" +
-                    (ENTRY.getDescription().equals("") ? "" : "\n\n" + Html.fromHtml(ENTRY.getDescription()).toString().replace("\n\n", "\n"));
+            return ENTRY.TITLE + " (" + new SimpleDateFormat("dd.MM HH:mm",
+                    CONTEXT.getResources().getConfiguration().locale).format(ENTRY.DATE) + ")" +
+                    (ENTRY.DESCRIPTION.equals("") ? "" : "\n\n" + Html.fromHtml(ENTRY.DESCRIPTION).toString().replace("\n\n", "\n"));
         } else {
             return ">> " +
-                    (ENTRY.getTitleExtra() != null ? ENTRY.getTitleExtra() + " > " : "") +
-                    ENTRY.getTitle() + "\n(" + new SimpleDateFormat("dd.MM HH:mm",
-                    CONTEXT.getResources().getConfiguration().locale).format(ENTRY.getDate()) + ")" +
-                    (ENTRY.getDescription().equals("") ? "" : "\n\n" + Html.fromHtml(ENTRY.getDescription()).toString().replace("\n\n", "\n"));
+                    (ENTRY.TITLE_EXTRA != null ? ENTRY.TITLE_EXTRA + " > " : "") +
+                    ENTRY.TITLE + "\n(" + new SimpleDateFormat("dd.MM HH:mm",
+                    CONTEXT.getResources().getConfiguration().locale).format(ENTRY.DATE) + ")" +
+                    (ENTRY.DESCRIPTION.equals("") ? "" : "\n\n" + Html.fromHtml(ENTRY.DESCRIPTION).toString().replace("\n\n", "\n"));
         }
     }
 
-    public static String notificationPreviewSingle(@NonNull final IliasRssFeedItem ENTRY,
+    public static String notificationPreviewSingle(@NonNull final IliasRssEntry ENTRY,
                                                    @NonNull final Context CONTEXT) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return (ENTRY.getTitleExtra() != null ? ENTRY.getTitleExtra() + ": " : "") +
-                    ENTRY.getTitle() + " (" + new SimpleDateFormat("dd.MM HH:mm",
-                    CONTEXT.getResources().getConfiguration().locale).format(ENTRY.getDate()) + ")";
+            return (ENTRY.TITLE_EXTRA != null ? ENTRY.TITLE_EXTRA + ": " : "") +
+                    ENTRY.TITLE + " (" + new SimpleDateFormat("dd.MM HH:mm",
+                    CONTEXT.getResources().getConfiguration().locale).format(ENTRY.DATE) + ")";
         } else {
-            return ENTRY.getCourse();
+            return ENTRY.COURSE;
         }
     }
 
-    public static String notificationPreviewMultiple(@NonNull final IliasRssFeedItem[] ENTRIES) {
+    public static String notificationPreviewMultiple(@NonNull final IliasRssEntry[] ENTRIES) {
 
         final StringBuilder STRING_BUILDER = new StringBuilder("");
         final ArrayList<String> COURSE_LIST = new ArrayList<>();
         final ArrayList<Integer> COUNTER_LIST = new ArrayList<>();
 
-        for (final IliasRssFeedItem ENTRY : ENTRIES) {
+        for (final IliasRssEntry ENTRY : ENTRIES) {
             // check if course was already added
-            if (COURSE_LIST.contains(ENTRY.getCourse())) {
+            if (COURSE_LIST.contains(ENTRY.COURSE)) {
                 // if yes increment the number of occurrences counter
-                final int INDEX_OF_COURSE = COURSE_LIST.indexOf(ENTRY.getCourse());
+                final int INDEX_OF_COURSE = COURSE_LIST.indexOf(ENTRY.COURSE);
                 COUNTER_LIST.set(INDEX_OF_COURSE, COUNTER_LIST.get(INDEX_OF_COURSE) + 1);
             } else {
                 // if no add the course to the list
-                COURSE_LIST.add(ENTRY.getCourse());
+                COURSE_LIST.add(ENTRY.COURSE);
                 COUNTER_LIST.add(1);
             }
         }
@@ -174,17 +174,17 @@ public class IliasBuddyMiscellaneousHandler {
     }
 
     public static void shareEntry(@NonNull final Activity ACTIVITY,
-                                  @NonNull final IliasRssFeedItem ILIAS_RSS_ITEM) {
+                                  @NonNull final IliasRssEntry ILIAS_RSS_ITEM) {
         IliasBuddyMiscellaneousHandler.shareLink(ACTIVITY, ACTIVITY.getString(R.string.app_name) + " > ",
-                ILIAS_RSS_ITEM.getCourse() + " >> " +
-                        (ILIAS_RSS_ITEM.getTitleExtra() != null ? ILIAS_RSS_ITEM.getTitleExtra() + " > " : "") +
-                        ILIAS_RSS_ITEM.getTitle() + " (" + new SimpleDateFormat("dd.MM HH:mm",
-                        ACTIVITY.getResources().getConfiguration().locale).format(ILIAS_RSS_ITEM.getDate()) + ")" +
-                        (ILIAS_RSS_ITEM.getDescription().equals("") ? "" : "\n\n" +
-                                Html.fromHtml(ILIAS_RSS_ITEM.getDescription()).toString()
+                ILIAS_RSS_ITEM.COURSE + " >> " +
+                        (ILIAS_RSS_ITEM.TITLE_EXTRA != null ? ILIAS_RSS_ITEM.TITLE_EXTRA + " > " : "") +
+                        ILIAS_RSS_ITEM.TITLE + " (" + new SimpleDateFormat("dd.MM HH:mm",
+                        ACTIVITY.getResources().getConfiguration().locale).format(ILIAS_RSS_ITEM.DATE) + ")" +
+                        (ILIAS_RSS_ITEM.DESCRIPTION.equals("") ? "" : "\n\n" +
+                                Html.fromHtml(ILIAS_RSS_ITEM.DESCRIPTION).toString()
                                         .replace("\n\n", "\n"))
                         + "\n\n" +
-                        ILIAS_RSS_ITEM.getLink(),
+                        ILIAS_RSS_ITEM.LINK,
                 ACTIVITY.getString(R.string.main_activity_toolbar_options_action_share) + " Ilias entry");
     }
 }

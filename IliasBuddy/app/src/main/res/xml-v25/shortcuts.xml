@@ -2,7 +2,7 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_link"
+        android:icon="@drawable/ic_current_entries"
         android:shortcutDisabledMessage="@string/shortcut_disabled"
         android:shortcutId="compose"
         android:shortcutLongLabel="@string/shortcut_long_label"
@@ -16,4 +16,16 @@
              they launch this shortcut. -->
     </shortcut>
     <!-- Specify more shortcuts here. -->
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_settings_black"
+        android:shortcutDisabledMessage="@string/shortcut_disabled2"
+        android:shortcutId="compose2"
+        android:shortcutLongLabel="@string/shortcut_long_label2"
+        android:shortcutShortLabel="@string/shortcut_short_label2">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.niklasm.iliasbuddy.SettingsActivity"
+            android:targetPackage="com.niklasm.iliasbuddy" />
+    </shortcut>
 </shortcuts>

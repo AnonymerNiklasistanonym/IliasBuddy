@@ -10,6 +10,7 @@
     <application
         android:allowBackup="true"
         android:configChanges="keyboardHidden|orientation|screenSize"
+        android:exported="true"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -61,6 +62,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.niklasm.iliasbuddy.SettingsActivity"
+            android:exported="true"
             android:label="@string/settings_activity_toolbar_title"
             android:parentActivityName="com.niklasm.iliasbuddy.MainActivity" />
 

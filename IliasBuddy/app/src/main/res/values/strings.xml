@@ -165,8 +165,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
-    <string name="shortcut_short_label">Short text</string>
-    <string name="shortcut_long_label">Longer text this is</string>
+    <string name="shortcut_short_label">Current entries</string>
+    <string name="shortcut_long_label">View current entries</string>
     <string name="shortcut_disabled">This shortcut is disabled</string>
+    <string name="shortcut_short_label2">Settings</string>
+    <string name="shortcut_long_label2">View settings</string>
+    <string name="shortcut_disabled2">This shortcut is disabled</string>
 
 </resources>

@@ -2,7 +2,7 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
         android:enabled="true"
-        android:icon="@drawable/ic_link">
+        android:icon="@drawable/ic_current_entries">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="com.niklasm.iliasbuddy.MainActivity"
@@ -10,7 +10,17 @@
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. -->
-        <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <!-- Specify more shortcuts here. -->
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_settings_black">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.niklasm.iliasbuddy.SettingsActivity"
+            android:targetPackage="com.niklasm.iliasbuddy" />
+        <!-- If your shortcut is associated with multiple intents, include them
+             here. The last intent in the list determines what the user sees when
+             they launch this shortcut. -->
+    </shortcut>
 </shortcuts>

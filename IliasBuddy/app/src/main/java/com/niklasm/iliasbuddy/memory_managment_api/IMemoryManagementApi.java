@@ -7,12 +7,12 @@ import java.io.Serializable;
 
 interface IMemoryManagementApi {
 
-    void saveToCache(@NonNull final String directory, @NonNull final String fileName,
-                     @NonNull final Serializable data) throws IOException;
-
     @NonNull
-    Serializable getCache(@NonNull final String directory, @NonNull final String fileName)
+    <T extends Serializable> T getCache(@NonNull final String directory, @NonNull final String fileName)
             throws IOException, ClassNotFoundException;
+
+    <T extends Serializable> void saveToCache(@NonNull final String directory, @NonNull final String fileName,
+                                              @NonNull final T data) throws IOException;
 
     void saveToPersistent(@NonNull final String directory, @NonNull final String fileName,
                           @NonNull final Serializable data);

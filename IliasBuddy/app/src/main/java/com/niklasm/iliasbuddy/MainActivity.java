@@ -38,6 +38,7 @@ import com.niklasm.iliasbuddy.handler.IliasBuddyCacheHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyUpdateHandler;
+import com.niklasm.iliasbuddy.miscellancellous.SnackBarDialog;
 import com.niklasm.iliasbuddy.notification_handler.IliasBuddyNotificationHandler;
 import com.niklasm.iliasbuddy.private_rss_feed_api.IPrivateIliasFeedApiClient;
 import com.niklasm.iliasbuddy.private_rss_feed_api.PrivateIliasFeedApi;
@@ -144,13 +145,11 @@ public class MainActivity extends AppCompatActivity implements
                         Background service just found new entries and pushed a notification -
                         thus create snack bar message that refreshes feed on action click
                         */
-                        newEntriesMessage = Snackbar
-                                .make(findViewById(R.id.fab), INTENT.getStringExtra(
-                                        IliasBuddyBroadcastHandler.NEW_ENTRIES_FOUND_PREVIEW),
-                                        Snackbar.LENGTH_INDEFINITE)
-                                .setAction(R.string.main_activity_floating_button_tooltip_refresh,
-                                        view -> checkForRssUpdates(true));
-                        newEntriesMessage.show();
+                        newEntriesMessage = SnackBarDialog.displayActionSnackBar(
+                                findViewById(R.id.fab),
+                                INTENT.getStringExtra(IliasBuddyBroadcastHandler.NEW_ENTRIES_FOUND_PREVIEW),
+                                getString(R.string.main_activity_floating_button_tooltip_refresh),
+                                view -> checkForRssUpdates(true));
                         break;
                     case IliasBuddyBroadcastHandler.UPDATE_SILENT:
                         // notification clicked that said update feed silently
@@ -271,8 +270,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void noNewEntryFound() {
-        Snackbar.make(findViewById(R.id.fab), R.string.dialog_snack_bar_no_new_entry_found,
-                Snackbar.LENGTH_SHORT).show();
+        SnackBarDialog.displayNormalSnackBar(findViewById(R.id.fab),
+                getString(R.string.dialog_snack_bar_no_new_entry_found), false);
     }
 
     @Override
@@ -364,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements
             IliasBuddyCacheHandler.setCache(this, NEW_CACHE_DATA);
         } catch (final IOException e) {
             e.printStackTrace();
-            IliasBuddyMiscellaneousHandler.displayErrorSnackBar(this,
+            SnackBarDialog.displayErrorSnackBar(this,
                     findViewById(R.id.fab), getString(R.string.dialog_error_cache), e.toString());
         }
     }

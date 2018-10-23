@@ -26,8 +26,19 @@ public class MemoryManagementApi implements IMemoryManagementApi {
                 File.separator + directory + File.separator + fileName);
     }
 
+    @NonNull
     @Override
-    public void saveToCache(@NonNull final String directory, @NonNull final String fileName, @NonNull final Serializable data) throws IOException {
+    public <T extends Serializable> T getCache(@NonNull final String directory, @NonNull final String fileName) throws IOException, ClassNotFoundException {
+        final File file = getCacheFile(directory, fileName);
+        final ObjectInputStream cacheInputStream = new ObjectInputStream(new FileInputStream(file));
+        @SuppressWarnings("unchecked")
+        final T serializable = (T) cacheInputStream.readObject();
+        cacheInputStream.close();
+        return serializable;
+    }
+
+    @Override
+    public <T extends Serializable> void saveToCache(@NonNull final String directory, @NonNull final String fileName, @NonNull final T data) throws IOException {
         final File file = getCacheFile(directory, fileName);
         // check if the parent directory of the cache file exists and if not create it
         if (file.getParentFile().mkdirs()) {
@@ -40,16 +51,6 @@ public class MemoryManagementApi implements IMemoryManagementApi {
         final ObjectOutput CACHE_FILE_OUTPUT_STREAM = new ObjectOutputStream(new FileOutputStream(file));
         CACHE_FILE_OUTPUT_STREAM.writeObject(data);
         CACHE_FILE_OUTPUT_STREAM.close();
-    }
-
-    @NonNull
-    @Override
-    public Serializable getCache(@NonNull final String directory, @NonNull final String fileName) throws IOException, ClassNotFoundException {
-        final File file = getCacheFile(directory, fileName);
-        final ObjectInputStream cacheInputStream = new ObjectInputStream(new FileInputStream(file));
-        final Serializable serializable = (Serializable) cacheInputStream.readObject();
-        cacheInputStream.close();
-        return serializable;
     }
 
     @Override

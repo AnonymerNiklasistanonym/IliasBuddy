@@ -1,27 +1,22 @@
 package com.niklasm.iliasbuddy;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.niklasm.iliasbuddy.R;
-import com.niklasm.iliasbuddy.handler.IliasBuddyMiscellaneousHandler;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
+import com.niklasm.iliasbuddy.miscellancellous.PopupDialog;
+import com.niklasm.iliasbuddy.miscellancellous.SnackBarDialog;
 import com.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
 
 import java.util.Objects;
@@ -43,7 +38,6 @@ public class SetupActivity extends AppCompatActivity {
         Objects.requireNonNull(actionBar).setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
-        final Context CONTEXT = this;
         final AutoCompleteTextView rssUrl = findViewById(R.id.url);
         final EditText rssUserName = findViewById(R.id.userName);
         final EditText rssPassword = findViewById(R.id.password);
@@ -64,10 +58,10 @@ public class SetupActivity extends AppCompatActivity {
 
             @Override
             public CharSequence fixText(final CharSequence invalidText) {
-                // show toast id url is not valid
-                Toast.makeText(CONTEXT,
-                        R.string.setup_activity_input_ilias_private_rss_feed_url_is_invalid_message,
-                        Toast.LENGTH_LONG).show();
+                // show url is not valid
+                SnackBarDialog.displayNormalSnackBar(fabButton,
+                        getString(R.string.setup_activity_input_ilias_private_rss_feed_url_is_invalid_message),
+                        true);
                 return invalidText;
             }
         });
@@ -86,9 +80,9 @@ public class SetupActivity extends AppCompatActivity {
                         rssUrl.getText().toString());
                 startActivity(new Intent(SetupActivity.this, MainActivity.class));
             } else {
-                Snackbar.make(fabButton,
-                        R.string.setup_activity_input_ilias_private_rss_feed_url_is_invalid_message,
-                        Snackbar.LENGTH_INDEFINITE).show();
+                SnackBarDialog.displayNormalSnackBar(fabButton,
+                        getString(R.string.setup_activity_input_ilias_private_rss_feed_url_is_invalid_message),
+                        true);
             }
         });
 
@@ -97,7 +91,7 @@ public class SetupActivity extends AppCompatActivity {
             final String errorTitle = intent.getStringExtra(MainActivity.ERROR_MESSAGE_WEB_TITLE);
             final String errorMsg = intent.getStringExtra(MainActivity.ERROR_MESSAGE_WEB_MESSAGE);
             if (errorTitle != null && errorMsg != null) {
-                IliasBuddyMiscellaneousHandler.displayErrorSnackBar(this, fabButton, errorTitle, errorMsg);
+                SnackBarDialog.displayErrorSnackBar(this, fabButton, errorTitle, errorMsg);
             }
         }
     }
@@ -111,14 +105,9 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     public void openHelp(final MenuItem menu) {
-        final AlertDialog alertDialog = new AlertDialog.Builder(SetupActivity.this)
-                .setTitle(R.string.setup_activity_toolbar_action_help_instructions)
-                .setMessage(Html.fromHtml(getString(R.string.setup_activity_toolbar_action_help_instructions_popup_html_content)))
-                .setNeutralButton(R.string.dialog_ok, (dialog, which) -> dialog.dismiss())
-                .show();
-        ((TextView) Objects.requireNonNull(alertDialog
-                .findViewById(android.R.id.message)))
-                .setMovementMethod(LinkMovementMethod.getInstance());
+        PopupDialog.showOkDialogSelectable(this,
+                getString(R.string.setup_activity_toolbar_action_help_instructions),
+                Html.fromHtml(getString(R.string.setup_activity_toolbar_action_help_instructions_popup_html_content)));
     }
 
     @Override

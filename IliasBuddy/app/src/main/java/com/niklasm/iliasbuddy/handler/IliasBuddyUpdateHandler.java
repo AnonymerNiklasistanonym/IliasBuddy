@@ -1,13 +1,13 @@
 package com.niklasm.iliasbuddy.handler;
 
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.niklasm.iliasbuddy.BuildConfig;
 import com.example.niklasm.iliasbuddy.R;
+import com.niklasm.iliasbuddy.miscellancellous.PopupDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,44 +24,33 @@ public class IliasBuddyUpdateHandler {
                         final String NEWEST_VERSION_URL = NEWEST_RELEASE.getString("html_url");
                         if (NEWEST_VERSION.equals(BuildConfig.VERSION_NAME)) {
                             if (!ONLY_CHECK) {
-                                new AlertDialog.Builder(CONTEXT)
-                                        .setTitle(R.string.dialog_version_check_new_version_not_found)
-                                        .setMessage(R.string.dialog_version_check_new_version_already_installed)
-                                        .setNeutralButton(R.string.dialog_ok,
-                                                (dialog, which) -> dialog.dismiss())
-                                        .create().show();
+                                PopupDialog.showOkDialog(CONTEXT,
+                                        CONTEXT.getResources().getString(R.string.dialog_version_check_new_version_not_found),
+                                        CONTEXT.getResources().getString(R.string.dialog_version_check_new_version_already_installed));
                             }
                         } else {
-                            new AlertDialog.Builder(CONTEXT)
-                                    .setTitle(R.string.dialog_version_check_new_version_found)
-                                    .setMessage(CONTEXT.getString(R.string.dialog_version_check_current_version) + ": " + BuildConfig.VERSION_NAME
-                                            + "\n" + CONTEXT.getString(R.string.dialog_version_check_latest_version) + ": " + NEWEST_VERSION)
-                                    .setPositiveButton(R.string.dialog_version_check_open_release_page,
-                                            (dialog, which) -> {
-                                                IliasBuddyMiscellaneousHandler.openUrl(CONTEXT, NEWEST_VERSION_URL);
-                                                dialog.dismiss();
-                                            })
-                                    .setNeutralButton(R.string.dialog_ok,
-                                            (dialog, which) -> dialog.dismiss())
-                                    .create().show();
+                            PopupDialog.showOkCustomDialog(CONTEXT,
+                                    CONTEXT.getResources().getString(R.string.dialog_version_check_new_version_found),
+                                    CONTEXT.getResources().getString(R.string.dialog_version_check_current_version) +
+                                            ": " + BuildConfig.VERSION_NAME + "\n" +
+                                            CONTEXT.getString(R.string.dialog_version_check_latest_version) +
+                                            ": " + NEWEST_VERSION,
+                                    CONTEXT.getString(R.string.dialog_version_check_open_release_page),
+                                    (dialog, which) -> {
+                                        IliasBuddyMiscellaneousHandler.openUrl(CONTEXT, NEWEST_VERSION_URL);
+                                        dialog.dismiss();
+                                    });
                         }
                     } catch (final JSONException e) {
                         e.printStackTrace();
-                        new AlertDialog.Builder(CONTEXT)
-                                .setTitle(R.string.dialog_error_json)
-                                .setMessage(e.getMessage() + "\n\n" + response.toString())
-                                .setNeutralButton(R.string.dialog_back,
-                                        (dialog, which) -> dialog.dismiss())
-                                .create().show();
+                        PopupDialog.showBackDialog(CONTEXT,
+                                CONTEXT.getResources().getString(R.string.dialog_error_json),
+                                e.getMessage() + "\n\n" + response.toString());
                     }
                 },
-                error -> new AlertDialog.Builder(CONTEXT)
-                        .setTitle(R.string.dialog_error_volley)
-                        .setMessage(error + "\n\n"
-                                + new String(error.networkResponse.data))
-                        .setNeutralButton(R.string.dialog_back,
-                                (dialog, which) -> dialog.dismiss())
-                        .create().show()
+                error -> PopupDialog.showBackDialog(CONTEXT,
+                        CONTEXT.getResources().getString(R.string.dialog_error_volley),
+                        error + "\n\n" + new String(error.networkResponse.data))
         ));
     }
 }

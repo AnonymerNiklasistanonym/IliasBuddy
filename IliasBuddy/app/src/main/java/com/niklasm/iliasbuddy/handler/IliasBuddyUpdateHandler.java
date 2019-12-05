@@ -1,7 +1,7 @@
 package com.niklasm.iliasbuddy.handler;
 
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;

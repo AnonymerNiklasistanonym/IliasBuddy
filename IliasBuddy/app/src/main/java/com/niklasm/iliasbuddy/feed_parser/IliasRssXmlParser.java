@@ -1,6 +1,6 @@
 package com.niklasm.iliasbuddy.feed_parser;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Xml;
 
 import com.niklasm.iliasbuddy.objects.IliasRssFeedItem;

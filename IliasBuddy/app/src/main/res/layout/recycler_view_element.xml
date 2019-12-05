@@ -120,7 +120,7 @@
                 android:orientation="horizontal">
 
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:id="@+id/extraCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -142,9 +142,9 @@
                         android:textColor="@android:color/white"
                         tools:text="New file" />
 
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:id="@+id/titleExtraCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -165,7 +165,7 @@
                         android:textColor="@android:color/white"
                         tools:text="Forum / Slides" />
 
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 

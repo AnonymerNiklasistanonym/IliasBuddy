@@ -1,6 +1,6 @@
 package com.niklasm.iliasbuddy.objects;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class IliasRssFeedCredentials {
 

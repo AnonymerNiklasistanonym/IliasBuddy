@@ -8,16 +8,16 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+import androidx.annotation.NonNull;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,6 +51,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener, IliasRssXmlWebRequesterInterface,
@@ -135,8 +136,8 @@ public class MainActivity extends AppCompatActivity implements
                         thus create snack bar message that refreshes feed on action click
                         */
                         newEntriesMessage = Snackbar
-                                .make(findViewById(R.id.fab), INTENT.getStringExtra(
-                                        IliasBuddyBroadcastHandler.NEW_ENTRIES_FOUND_PREVIEW),
+                                .make(findViewById(R.id.fab), Objects.requireNonNull(INTENT.getStringExtra(
+                                        IliasBuddyBroadcastHandler.NEW_ENTRIES_FOUND_PREVIEW)),
                                         Snackbar.LENGTH_INDEFINITE)
                                 .setAction(R.string.main_activity_floating_button_tooltip_refresh,
                                         view -> checkForRssUpdates(true));

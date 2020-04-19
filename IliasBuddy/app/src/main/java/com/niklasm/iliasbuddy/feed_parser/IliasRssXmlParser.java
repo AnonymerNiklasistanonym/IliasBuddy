@@ -169,17 +169,18 @@ public class IliasRssXmlParser {
     @NonNull
     private static String[] readCourseExtraTitleTitleExtra(@NonNull final XmlPullParser parser)
             throws IOException, XmlPullParserException {
+        // TODO Do regex matching!!!!!!!!!!!!!!!!!!!!!!!!
         parser.require(XmlPullParser.START_TAG, null, IliasRssXmlParser.TITLE_TAG);
         final String courseExtraTitle = IliasRssXmlParser.readText(parser);
         final String courseExtra = courseExtraTitle.substring(courseExtraTitle.indexOf("[") + 1,
-                courseExtraTitle.indexOf("]")).trim();
+                courseExtraTitle.lastIndexOf("]")).trim();
         final boolean extraExists = courseExtraTitle.contains(">");
         final String course = extraExists ? courseExtra.substring(0,
                 courseExtra.indexOf(">")).trim() : courseExtra;
         final String extra =
                 extraExists ? courseExtra.substring(courseExtra.indexOf(">") + 1).trim() : null;
         final String titleTitleExtra =
-                courseExtraTitle.substring(courseExtraTitle.indexOf("]") + 1).trim();
+                courseExtraTitle.substring(courseExtraTitle.lastIndexOf("]") + 1).trim();
         final boolean titleExtraExists = titleTitleExtra.contains(":");
         final String title = titleExtraExists ? titleTitleExtra
                 .substring(titleTitleExtra.indexOf(":") + 1).trim() : titleTitleExtra;
@@ -197,12 +198,12 @@ public class IliasRssXmlParser {
     @NonNull
     private static String readText(@NonNull final XmlPullParser parser)
             throws IOException, XmlPullParserException {
-        String result = "";
         if (parser.next() == XmlPullParser.TEXT) {
-            result = parser.getText();
+            String result = parser.getText();
             parser.nextTag();
+            return result;
         }
-        return result;
+        return "";
     }
 
     private static void skip(@NonNull final XmlPullParser PARSER)

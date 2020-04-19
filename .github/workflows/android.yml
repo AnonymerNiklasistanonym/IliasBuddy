@@ -21,7 +21,7 @@ jobs:
         java-version: 1.8
     - name: Test (Gradle)
       run: make test
-      working-directory: ${{env.working-directory}}
+      #working-directory: ${{env.working-directory}}
 
   build:
 
@@ -37,7 +37,7 @@ jobs:
         java-version: 1.8
     - name: Build debug APK (Gradle)
       run: make build_debug
-      working-directory: ${{env.working-directory}}
+      #working-directory: ${{env.working-directory}}
     - name: Upload Debug APK
       uses: actions/upload-artifact@v1
       with:

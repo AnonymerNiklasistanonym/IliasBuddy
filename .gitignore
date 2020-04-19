@@ -56,4 +56,6 @@ freeline_project_description.json
 
 # do never commit the zip file
 IliasBuddy.zip
-IliasBuddy/.idea/vcs.xml
+
+# File where all the environment variables for signing the release apk are located
+keyinfo.sh

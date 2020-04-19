@@ -11,6 +11,14 @@ android {
         versionName "0.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        release {
+            storeFile file("$System.env.KEY_STORE_PATH")
+            storePassword = "$System.env.KEY_STORE_PASSWORD"
+            keyAlias = "$System.env.KEY_ALIAS"
+            keyPassword = "$System.env.KEY_ALIAS_PASSWORD"
+        }
+    }
     buildTypes {
         debug {
             minifyEnabled false
@@ -19,6 +27,7 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     buildToolsVersion '29.0.2'

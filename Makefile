@@ -5,8 +5,11 @@ BUILD_DIR=$(SRC_DIR)/app/build
 LOCATION_RELEASE_APK=$(BUILD_DIR)/outputs/apk/release/app-release.apk
 LOCATION_DEBUG_APK=$(BUILD_DIR)/outputs/apk/debug/app-debug.apk
 
-OUT_RELEASE_APK=IliasBuddy.apk
-OUT_DEBUG_APK=IliasBuddyDebug.apk
+VERSION_NAME=$(shell sed -n 's/versionName "\(.*\)"/\1/p' IliasBuddy/app/build.gradle | sed -e 's/\s\+//g')
+VERSION_NAME_CODE=$(shell echo $(VERSION_NAME) | sed -e 's/\.\+//g')
+
+OUT_RELEASE_APK=IliasBuddy_v$(VERSION_NAME_CODE).apk
+OUT_DEBUG_APK=IliasBuddyDebug_v$(VERSION_NAME_CODE).apk
 
 .PHONY: clean test build_debug build_release
 

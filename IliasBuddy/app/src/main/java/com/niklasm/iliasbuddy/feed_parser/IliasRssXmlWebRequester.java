@@ -1,11 +1,16 @@
 package com.niklasm.iliasbuddy.feed_parser;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
+
 import android.util.Base64;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
@@ -34,7 +39,7 @@ public class IliasRssXmlWebRequester {
                 IliasBuddyPreferenceHandler.getCredentials(CONTEXT);
 
         // Request a string response from the provided URL.
-        Volley.newRequestQueue(CONTEXT).add(new StringRequest(Request.Method.GET,
+        final StringRequest rssFeedRequest = new StringRequest(Request.Method.GET,
                 CREDENTIALS.getUserUrl(), CLASS_THAT_IMPLEMENTS_INTERFACE::processIliasXml,
                 error -> {
                     if (error instanceof AuthFailureError) {
@@ -55,7 +60,14 @@ public class IliasRssXmlWebRequester {
                 headers.put("Authorization", HEADER_AUTHENTICATION_BASE64);
                 return headers;
             }
-        });
+        };
+        // Use a double of the default retry timeout (2,5s) in case traffic is heavily congested
+        rssFeedRequest.setRetryPolicy(new DefaultRetryPolicy(
+                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        ));
+        Volley.newRequestQueue(CONTEXT).add(rssFeedRequest);
     }
 
 }

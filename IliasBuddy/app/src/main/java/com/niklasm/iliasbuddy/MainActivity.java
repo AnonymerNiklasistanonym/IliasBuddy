@@ -291,19 +291,22 @@ public class MainActivity extends AppCompatActivity implements
 
     public String parseVolleyErrorToInfoString(final VolleyError error) {
         String errorMessage = "(no network response)";
+        errorMessage = error.getMessage();
+        if (errorMessage == null) {
+            errorMessage = "";
+        } else {
+            errorMessage = "Error Message: " + errorMessage + "\n";
+        }
+        long networkTimeMs = error.getNetworkTimeMs();
+        errorMessage += "Time: " + networkTimeMs + " ms\n";
         if (error.networkResponse != null) {
-            errorMessage = error.getMessage();
-            if (errorMessage == null) {
-                errorMessage = "";
-            } else {
-                errorMessage = "Error Message: " + errorMessage + "\n";
-            }
             errorMessage += "Status Code:  " + error.networkResponse.statusCode + "\n";
-            errorMessage += "Time: " + error.networkResponse.networkTimeMs + " ms\n";
             final String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
             if (!responseBody.isEmpty()) {
                 errorMessage += "Response:\n" + responseBody + "\n";
             }
+        } else {
+            errorMessage += "(no network response)\n";
         }
         return errorMessage;
     }
@@ -318,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void webResponseError(final VolleyError error) {
         Log.e("MainActivity - RespErr", error.toString());
-        openSetupActivity(R.string.dialog_error_web_response, error.toString() + "\n" + parseVolleyErrorToInfoString(error));
+        openSetupActivity(R.string.dialog_error_web_response, error.getClass().getCanonicalName() + "\n" + parseVolleyErrorToInfoString(error));
     }
 
     public void openSettings(final MenuItem menuItem) {

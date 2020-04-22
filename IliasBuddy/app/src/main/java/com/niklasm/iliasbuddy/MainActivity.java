@@ -47,6 +47,9 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -295,19 +298,25 @@ public class MainActivity extends AppCompatActivity implements
         if (errorMessage == null) {
             errorMessage = "";
         } else {
-            errorMessage = "Error Message: " + errorMessage + "\n";
+            errorMessage = "Error message:\n" + errorMessage + "\n\n";
         }
         long networkTimeMs = error.getNetworkTimeMs();
         errorMessage += "Time: " + networkTimeMs + " ms\n";
         if (error.networkResponse != null) {
-            errorMessage += "Status Code:  " + error.networkResponse.statusCode + "\n";
+            errorMessage += "Status Code: " + error.networkResponse.statusCode + "\n";
             final String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
             if (!responseBody.isEmpty()) {
-                errorMessage += "Response:\n" + responseBody + "\n";
+                errorMessage += "\nResponse:\n" + responseBody + "\n\n";
+            } else {
+                errorMessage += "(no network response body)\n";
             }
         } else {
             errorMessage += "(no network response)\n";
         }
+        Writer writer = new StringWriter();
+        error.printStackTrace(new PrintWriter(writer));
+        final String stackTrace = writer.toString();
+        errorMessage += "\nStack trace:\n" + stackTrace;
         return errorMessage;
     }
 
@@ -321,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void webResponseError(final VolleyError error) {
         Log.e("MainActivity - RespErr", error.toString());
-        openSetupActivity(R.string.dialog_error_web_response, error.getClass().getCanonicalName() + "\n" + parseVolleyErrorToInfoString(error));
+        openSetupActivity(R.string.dialog_error_web_response, "Error class:\n" + error.getClass().getCanonicalName() + "\n\n" + parseVolleyErrorToInfoString(error));
     }
 
     public void openSettings(final MenuItem menuItem) {

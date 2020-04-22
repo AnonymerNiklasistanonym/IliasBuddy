@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
+
 import com.google.android.material.snackbar.Snackbar;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -288,17 +289,36 @@ public class MainActivity extends AppCompatActivity implements
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
     }
 
+    public String parseVolleyErrorToInfoString(final VolleyError error) {
+        String errorMessage = "(no network response)";
+        if (error.networkResponse != null) {
+            errorMessage = error.getMessage();
+            if (errorMessage == null) {
+                errorMessage = "";
+            } else {
+                errorMessage = "Error Message: " + errorMessage + "\n";
+            }
+            errorMessage += "Status Code:  " + error.networkResponse.statusCode + "\n";
+            errorMessage += "Time: " + error.networkResponse.networkTimeMs + " ms\n";
+            final String responseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
+            if (!responseBody.isEmpty()) {
+                errorMessage += "Response:\n" + responseBody + "\n";
+            }
+        }
+        return errorMessage;
+    }
+
     @Override
     public void webAuthenticationError(final AuthFailureError error) {
         Log.e("MainActivity - AuthErr", error.toString());
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
-        openSetupActivity(R.string.dialog_error_authentication, error.toString());
+        openSetupActivity(R.string.dialog_error_authentication, parseVolleyErrorToInfoString(error));
     }
 
     @Override
     public void webResponseError(final VolleyError error) {
         Log.e("MainActivity - RespErr", error.toString());
-        openSetupActivity(R.string.dialog_error_web_response, error.toString());
+        openSetupActivity(R.string.dialog_error_web_response, error.toString() + "\n" + parseVolleyErrorToInfoString(error));
     }
 
     public void openSettings(final MenuItem menuItem) {

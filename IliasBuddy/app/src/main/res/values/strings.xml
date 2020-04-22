@@ -120,7 +120,7 @@
     <string name="welcome_activity_slide_2_picture_description">Phone which has on it\'s display in the upper half a RSS symbol and on it\'s bottom half a download arrow pointing down</string>
 
     <!-- About activity -->
-    <string name="about_activity_description">This open source app downloads with your private Ilias RSS feed credentials your private Ilias RSS feed. It displays it for once in a list and can also if enabled check itself if there a new RSS entries and push notifications to notify you too.</string>
+    <string name="about_activity_description">This open source app downloads with your private Ilias RSS feed credentials your private Ilias RSS feed. It displays the feed entries in a searchable list, but can also - if enabled - check in the background for new entries and show notifications for them.</string>
     <string name="about_activity_version">Version</string>
     <string name="about_activity_check_for_new_version">Check for new version</string>
     <string name="about_activity_license">License</string>

@@ -46,7 +46,7 @@
     <string name="welcome_activity_slide_1_picture_description">Das Ilias® Logo (weißes Rechteck mit transparentem Ilias® Schriftzug unten links) welches auf dem IliasBuddy App Logo benutzt wird</string>
     <string name="welcome_activity_slide_3_picture_description">Smartphone das vibriert und eine Sprechblase aus der Mitte des Displays kommen hat welche ein \"Ton an\" Symbol enthält</string>
     <string name="welcome_activity_slide_2_picture_description">Smartphone welches auf seinem Display in der oberen Hälfte ein RSS Symbol hat und auf der unteren Hälfte einen Download Pfeil der nach unten zeigt hat</string>
-    <string name="about_activity_description">Diese Open Source (Quelloffene) App lädt mit deinen privaten Ilias RSS Feed Anmeldeinformationen deinen privaten Ilias RSS Feed herunter. Sie zeigt einmal die Beiträge des Feeds in einer Liste an und kann zudem wenn es aktiviert ist selber im Hintergrund nach Aktualisierungen des Feeds schauen und wenn sie welche findet dich durch Benachrichtigungen auch darauf hinweisen.</string>
+    <string name="about_activity_description">Diese Open Source (Quelloffene) App lädt mit deinen privaten Ilias RSS Feed Anmeldeinformationen deinen privaten Ilias RSS Feed herunter. Sie zeigt die Beiträge des Feeds in einer durchsuchbaren Liste an und kann zudem - wenn es aktiviert ist - selber im Hintergrund nach Aktualisierungen des Feeds schauen und dann durch Benachrichtigungen darauf hinweisen.</string>
     <string name="about_activity_version">Version</string>
     <string name="about_activity_license">Lizenz</string>
     <string name="about_activity_open_source_licenses">Open Source Lizenzen</string>

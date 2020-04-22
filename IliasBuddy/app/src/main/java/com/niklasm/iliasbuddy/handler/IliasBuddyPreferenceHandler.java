@@ -27,6 +27,7 @@ public class IliasBuddyPreferenceHandler {
     private static final String START_BACKGROUND_SERVICE_ON_BOOT = "start_background_notifications_on_boot";
     private static final String FILTER_SHOW_FILE_CHANGES = "FILTER_SHOW_FILE_CHANGES";
     private static final String FILTER_SHOW_POSTS = "FILTER_SHOW_POSTS";
+    private static final String RETRY_TIMEOUT_RSS_FEED_REQUESTS_MS = "retry_timeout_rss_feed";
 
     private static boolean getPreferenceBoolean(@NonNull final Context CONTEXT,
                                                 @NonNull final String PREFERENCE,
@@ -192,5 +193,11 @@ public class IliasBuddyPreferenceHandler {
                                       final boolean VALUE) {
         IliasBuddyPreferenceHandler.setPreferenceBoolean(CONTEXT,
                 IliasBuddyPreferenceHandler.FILTER_SHOW_POSTS, VALUE);
+    }
+
+    public static String getRetryTimeoutRssFeedMs(@NonNull final Context CONTEXT,
+                                         final String DEFAULT) {
+        return IliasBuddyPreferenceHandler.getPreferenceString(CONTEXT,
+                IliasBuddyPreferenceHandler.RETRY_TIMEOUT_RSS_FEED_REQUESTS_MS, DEFAULT);
     }
 }

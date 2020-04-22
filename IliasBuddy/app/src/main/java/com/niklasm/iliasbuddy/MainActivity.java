@@ -5,12 +5,24 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
+import com.android.volley.ClientError;
+import com.android.volley.NetworkError;
+import com.android.volley.NoConnectionError;
+import com.android.volley.ParseError;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.google.android.material.snackbar.Snackbar;
+
+import androidx.core.net.ConnectivityManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
@@ -19,6 +31,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,6 +63,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -292,6 +307,25 @@ public class MainActivity extends AppCompatActivity implements
         rssEntryRecyclerViewSwipeToRefreshLayout.setRefreshing(false);
     }
 
+    public int parseVolleyErrorToInfoTypeString(final VolleyError error) {
+        if(error instanceof ClientError){
+            return R.string.dialog_error_web_response_client;
+        } else if(error instanceof NoConnectionError){
+            return R.string.dialog_error_web_response_no_connection;
+        } else if (error instanceof NetworkError) {
+            return R.string.dialog_error_web_response_network;
+        } else if (error instanceof ParseError ){
+            return R.string.dialog_error_web_response_parsing;
+        } else if (error instanceof AuthFailureError){
+            return R.string.dialog_error_web_response_authentication;
+        } else if (error instanceof ServerError) {
+            return R.string.dialog_error_web_response_server;
+        } else if (error instanceof TimeoutError) {
+            return R.string.dialog_error_web_response_timeout;
+        }
+        return R.string.dialog_error_web_response_unknown;
+    }
+
     public String parseVolleyErrorToInfoString(final VolleyError error) {
         String errorMessage = "(no network response)";
         errorMessage = error.getMessage();
@@ -313,10 +347,14 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             errorMessage += "(no network response)\n";
         }
-        Writer writer = new StringWriter();
-        error.printStackTrace(new PrintWriter(writer));
-        final String stackTrace = writer.toString();
-        errorMessage += "\nStack trace:\n" + stackTrace;
+        // When in debug mode also show stack trace
+        boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+        if (isDebuggable) {
+            Writer writer = new StringWriter();
+            error.printStackTrace(new PrintWriter(writer));
+            final String stackTrace = writer.toString();
+            errorMessage += "\nStack trace:\n" + stackTrace;
+        }
         return errorMessage;
     }
 
@@ -330,7 +368,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void webResponseError(final VolleyError error) {
         Log.e("MainActivity - RespErr", error.toString());
-        openSetupActivity(R.string.dialog_error_web_response, "Error class:\n" + error.getClass().getCanonicalName() + "\n\n" + parseVolleyErrorToInfoString(error));
+        // TODO If timeout error add dialog to go into settings and change the timeout
+        openSetupActivity(parseVolleyErrorToInfoTypeString(error), parseVolleyErrorToInfoString(error));
     }
 
     public void openSettings(final MenuItem menuItem) {

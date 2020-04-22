@@ -72,6 +72,20 @@
         <item>720</item>
         <item>1440</item>
     </string-array>
+    <string name="settings_activity_pref_general_retry_timeout_rss_feed">Retry timeout for Ilias RSS feed</string>
+    <string name="settings_activity_pref_general_retry_timeout_rss_feed_description">Extend the retry timeout for fetching the Ilias RSS feed in case of a slow connection or a congested server (when you get multiple timeout errors increase this value)</string>
+    <string-array name="settings_activity_pref_general_retry_timeout_rss_feed_titles">
+        <item>Default (2.5s)</item>
+        <item>x2 (5s)</item>
+        <item>x4 (10s)</item>
+        <item>x8 (20s)</item>
+    </string-array>
+    <string-array name="settings_activity_pref_general_retry_timeout_rss_feed_values" translatable="false">
+        <item>2500</item>
+        <item>5000</item>
+        <item>10000</item>
+        <item>20000</item>
+    </string-array>
     <string name="settings_activity_pref_notifications_background_notifications_on_boot">Start background checks on boot</string>
     <string name="settings_activity_pref_notifications_background_notifications_on_boot_summary">Background service will be started on boot/reboot of the device</string>
     <string name="settings_activity_pref_notifications_notification_sound">Sound on new notification</string>
@@ -132,6 +146,14 @@
     <string name="dialog_version_check_open_release_page">Open release page</string>
     <!-- Dialog: Errors -->
     <string name="dialog_error_web_response">Web response error</string>
+    <string name="dialog_error_web_response_unknown">Web response error (unknown)</string>
+    <string name="dialog_error_web_response_timeout">Web response error (timeout)</string>
+    <string name="dialog_error_web_response_client">Web response error (client)</string>
+    <string name="dialog_error_web_response_network">Web response error (network)</string>
+    <string name="dialog_error_web_response_server">Web response error (server)</string>
+    <string name="dialog_error_web_response_no_connection">Web response error (no connection)</string>
+    <string name="dialog_error_web_response_parsing">Web response error (parsing)</string>
+    <string name="dialog_error_web_response_authentication">Web response error (authentication)</string>
     <string name="dialog_error_authentication">Authentication error</string>
     <string name="dialog_error_parse">Parse error</string>
     <string name="dialog_error_cache">Cache error</string>

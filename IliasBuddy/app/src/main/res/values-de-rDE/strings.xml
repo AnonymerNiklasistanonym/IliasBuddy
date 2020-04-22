@@ -53,6 +53,14 @@
     <string name="about_activity_ilias_buddy_repository_website">Webseite mit Quellcode und Fehlerverfolgungssystem</string>
     <string name="about_activity_author_on_github">AnonymerNiklasistanonym auf GitHub</string>
     <string name="dialog_error_web_response">Internetantwortfehler</string>
+    <string name="dialog_error_web_response_unknown">Internetantwortfehler (Unbekannt)</string>
+    <string name="dialog_error_web_response_timeout">Internetantwortfehler (Zeitüberschreitung)</string>
+    <string name="dialog_error_web_response_client">Internetantwortfehler (Client)</string>
+    <string name="dialog_error_web_response_network">Internetantwortfehler (Netzwerk)</string>
+    <string name="dialog_error_web_response_server">Internetantwortfehler (Server)</string>
+    <string name="dialog_error_web_response_no_connection">Internetantwortfehler (keine Verbindung)</string>
+    <string name="dialog_error_web_response_parsing">Internetantwortfehler (Parsen)</string>
+    <string name="dialog_error_web_response_authentication">Internetantwortfehler (Authentifizierung)</string>
     <string name="dialog_error_authentication">Authentifizierungsfehler</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_more">MEHR</string>
@@ -71,6 +79,14 @@
         <item>Alle 6 Stunden</item>
         <item>Alle 12 Stunde</item>
         <item>Jeden Tag</item>
+    </string-array>
+    <string name="settings_activity_pref_general_retry_timeout_rss_feed">Zeitlimit für Abrufen des Ilias RSS Feeds</string>
+    <string name="settings_activity_pref_general_retry_timeout_rss_feed_description">Erweitere das Zeitlimit für das wiederholte Abrufen des Ilias RSS Feeds im Falle einer langsamen Verbindung oder einem überlasteten Server (Wenn es mehrere Zeitlimit Fehler gibt erhöhe diesen Wert)</string>
+    <string-array name="settings_activity_pref_general_retry_timeout_rss_feed_titles">
+        <item>Standard (2.5s)</item>
+        <item>x2 (5s)</item>
+        <item>x4 (10s)</item>
+        <item>x8 (20s)</item>
     </string-array>
     <string name="main_activity_show_last_response_title">Letzte Antwort des Servers</string>
     <string name="main_activity_show_last_response_no_response">Keine aufgezeichnete Antwort gefunden</string>

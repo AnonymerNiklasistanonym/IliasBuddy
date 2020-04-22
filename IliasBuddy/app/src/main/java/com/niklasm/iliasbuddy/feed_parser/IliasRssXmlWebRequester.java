@@ -13,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.niklasm.iliasbuddy.R;
 import com.niklasm.iliasbuddy.handler.IliasBuddyPreferenceHandler;
 import com.niklasm.iliasbuddy.objects.IliasRssFeedCredentials;
 
@@ -61,9 +62,20 @@ public class IliasRssXmlWebRequester {
                 return headers;
             }
         };
-        // Use a double of the default retry timeout (2,5s) in case traffic is heavily congested
+        // Allow to customize the retry timeout over a setting
+        int retry_timeout_ms;
+        try {
+            final String preference_timeout = IliasBuddyPreferenceHandler.getRetryTimeoutRssFeedMs(CONTEXT, CONTEXT.getResources().getStringArray(R.array.settings_activity_pref_general_retry_timeout_rss_feed_values)[0]);
+            retry_timeout_ms = Integer.parseInt(preference_timeout);
+        }
+        catch (NumberFormatException e)
+        {
+            // Because a string is parsed it could come to an error - use default timeout but print stack trace
+            e.printStackTrace();
+            retry_timeout_ms = DefaultRetryPolicy.DEFAULT_TIMEOUT_MS;
+        }
         rssFeedRequest.setRetryPolicy(new DefaultRetryPolicy(
-                DefaultRetryPolicy.DEFAULT_TIMEOUT_MS * 2,
+                retry_timeout_ms,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));

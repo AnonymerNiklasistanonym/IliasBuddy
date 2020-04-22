@@ -51,7 +51,7 @@
     <string name="about_activity_license">Lizenz</string>
     <string name="about_activity_open_source_licenses">Open Source Lizenzen</string>
     <string name="about_activity_ilias_buddy_repository_website">Webseite mit Quellcode und Fehlerverfolgungssystem</string>
-    <string name="about_activity_author_on_github">AnonymerNiklasistanonym auf GitHub</string>
+    <string name="about_activity_author_on_github">auf GitHub</string>
     <string name="dialog_error_web_response">Internetantwortfehler</string>
     <string name="dialog_error_web_response_unknown">Internetantwortfehler (Unbekannt)</string>
     <string name="dialog_error_web_response_timeout">Internetantwortfehler (Zeitüberschreitung)</string>
